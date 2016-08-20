@@ -107,7 +107,7 @@ var reset_current_level = () => {
     0, 
     1, 
     1, 
-    0, 
+    0, // 15: Balance
     1, 
     1, 
     1, 
@@ -117,7 +117,7 @@ var reset_current_level = () => {
     0, 
     0, 
     0, 
-    0 // yellow toggle pressed
+    0 // 25: yellow toggle pressed
   ];
   
   // Cubes
@@ -128,6 +128,9 @@ var reset_current_level = () => {
   
   // Pipes state
   pipes_state = [];
+  
+  // Balances state
+  balances_state = [];
 }
 
 

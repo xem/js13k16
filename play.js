@@ -31,8 +31,16 @@ var play = () => {
     }
   }
   
+  // Init balances states (on first frame)
+  if(frame == 0){
+    for(i in level_data.balances){
+      balances_state[i] = {y1: level_data.balances[i][1] * 32 , y2: level_data.balances[i][3] * 32, weight1: 0, weight2: 0};
+    }
+  }
+  
   // Pipes
   for(i in level_data.pipes){
+    
     // Go to position 2 when switch is pressed
     if(pipes_state[i].pressed){
       
@@ -146,14 +154,27 @@ var play = () => {
     pipes_state[i].pressed = false;
   }
   
+  // Reset weights of Mario, cubes and balances
+  current_mario.weight = 1;
+  for(i in level_data.cubes){
+    level_data.cubes[i].weight = 1;
+  }
+  for(i in level_data.balances){
+    balances_state[i].weight1 = 0;
+    balances_state[i].weight2 = 0;
+  }
+  
+  
+  
   // Init Mario (on first frame)
   if(frame == 0){
     current_mario.x = level_data.start[0] * 32;
     current_mario.y = level_data.start[1] * 32;
   }
   
+  
   // Move mario
-  // ----------
+  // ==========
   
   // If not dead and didn't win
   if(current_mario.state != 3 && !win){
@@ -272,6 +293,11 @@ var play = () => {
       
     }
     
+    // compute mario's weight
+    if(current_mario.cube_held !== null){
+      current_mario.weight = 1 + level_data.cubes[current_mario.cube_held].weight;
+    }
+    
     // If Mario actually falls
     if(current_mario.vy > 0){
       
@@ -293,7 +319,7 @@ var play = () => {
           &&
           current_mario.x < level_data.cubes[i].x + 31
           &&
-          current_mario.y + 31 > level_data.cubes[i].y
+          current_mario.y + 31 > level_data.cubes[i].y - 8
           &&
           current_mario.y + 31 < level_data.cubes[i].y + 20
         )
@@ -303,12 +329,12 @@ var play = () => {
           current_mario.grounded = true;
           current_mario.cube_below = i;
           current_mario.position_on_cube = current_mario.x - level_data.cubes[i].x;
+          level_data.cubes[i].weight += current_mario.weight;
         }
       }
       
       // Stop falling if there's a pipe there
       for(j in level_data.pipes){
-        console.log(current_mario.y, pipes_state[j].y);
         if(
           current_mario.x + mario_width >= level_data.pipes[j][0] * 32
           &&
@@ -321,6 +347,42 @@ var play = () => {
           current_mario.y = pipes_state[j].y - 32;
           current_mario.vy = 0;
           current_mario.grounded = true;
+        }
+      }
+      
+      // Stop falling if there's a balance "1" there
+      for(j in level_data.balances){
+        if(
+          current_mario.x + mario_width >= level_data.balances[j][0] * 32 - 32
+          &&
+          current_mario.x < level_data.balances[j][0] * 32 + 64
+          &&
+          current_mario.y + 31 >= balances_state[j].y1 - 8
+          &&
+          current_mario.y + 31 <= balances_state[j].y1 + 32
+        ){
+          current_mario.y = balances_state[j].y1 - 32;
+          current_mario.vy = 0;
+          current_mario.grounded = true;
+          balances_state[j].weight1 += current_mario.weight;
+        }
+      }
+      
+      // Stop falling if there's a balance "2" there
+      for(j in level_data.balances){
+        if(
+          current_mario.x + mario_width >= level_data.balances[j][2] * 32 - 32
+          &&
+          current_mario.x < level_data.balances[j][2] * 32 + 64
+          &&
+          current_mario.y + 31 >= balances_state[j].y2 - 8
+          &&
+          current_mario.y + 31 <= balances_state[j].y2 + 32
+        ){
+          current_mario.y = balances_state[j].y2 - 32;
+          current_mario.vy = 0;
+          current_mario.grounded = true;
+          balances_state[j].weight2 += current_mario.weight;
         }
       }
     }
@@ -416,6 +478,7 @@ var play = () => {
         //}        
         level_data.cubes[current_mario.cube_held].mario = null;
         current_mario.cube_held = null;
+        current_mario.weight = 1;
       }
     }
     
@@ -452,14 +515,10 @@ var play = () => {
     }
   }
   
-  // Death animation
-  if(current_mario.state == 3){
-    current_mario.vy += gravity;
-    if(current_mario.vy > max_fall_speed){
-      current_mario.vy = max_fall_speed;
-    }
-    current_mario.y += current_mario.vy;
-  }
+  
+  
+  // Move cubes
+  // =====
   
   // Make cubes fall if they're not held
   for(i in level_data.cubes){
@@ -498,9 +557,9 @@ var play = () => {
     
       // Stop falling if a solid tile or spike is under
       if(
-        is_solid(tile_at(level_data.cubes[i].x, level_data.cubes[i].y + 32), 1)
+        is_solid(tile_at(level_data.cubes[i].x + 1, level_data.cubes[i].y + 32), 1)
         ||
-        is_solid(tile_at(level_data.cubes[i].x + 32, level_data.cubes[i].y + 32), 1)
+        is_solid(tile_at(level_data.cubes[i].x + 31, level_data.cubes[i].y + 32), 1)
       ){
         level_data.cubes[i].y = ~~(level_data.cubes[i].y / 32) * 32;
         level_data.cubes[i].vy = 0;
@@ -514,7 +573,7 @@ var play = () => {
             &&
             level_data.cubes[i].x <= level_data.cubes[j].x + 31
             &&
-            level_data.cubes[i].y + 31 >= level_data.cubes[j].y
+            level_data.cubes[i].y + 31 >= level_data.cubes[j].y - 8
             &&
             level_data.cubes[i].y + 31 <= level_data.cubes[j].y + 20
           )
@@ -524,6 +583,7 @@ var play = () => {
             level_data.cubes[i].grounded = true;
             level_data.cubes[i].cube_below = j;
             level_data.cubes[i].position_on_cube = level_data.cubes[i].x - level_data.cubes[j].x;
+            level_data.cubes[j].weight += level_data.cubes[i].weight;
           }
         }
       }
@@ -544,7 +604,52 @@ var play = () => {
           level_data.cubes[i].grounded = true;
         }
       }
+      
+      // Stop falling if there's a balance "1" there
+      for(j in level_data.balances){
+        if(
+          level_data.cubes[i].x + 32 >= level_data.balances[j][0] * 32 - 32
+          &&
+          level_data.cubes[i].x < level_data.balances[j][0] * 32 + 64
+          &&
+          level_data.cubes[i].y + 31 >= balances_state[j].y1 - 8
+          &&
+          level_data.cubes[i].y + 31 <= balances_state[j].y1 + 32
+        ){
+          level_data.cubes[i].y = balances_state[j].y1 - 32;
+          level_data.cubes[i].vy = 0;
+          level_data.cubes[i].grounded = true;
+          balances_state[j].weight1 += level_data.cubes[i].weight;
+        }
+      }
+      
+      // Stop falling if there's a balance "2" there
+      for(j in level_data.balances){
+        if(
+          level_data.cubes[i].x + 32 >= level_data.balances[j][2] * 32 - 32
+          &&
+          level_data.cubes[i].x < level_data.balances[j][2] * 32 + 64
+          &&
+          level_data.cubes[i].y + 31 >= balances_state[j].y2 - 8
+          &&
+          level_data.cubes[i].y + 31 <= balances_state[j].y2 + 32
+        ){
+          level_data.cubes[i].y = balances_state[j].y2 - 32;
+          level_data.cubes[i].vy = 0;
+          level_data.cubes[i].grounded = true;
+          balances_state[j].weight2 += level_data.cubes[i].weight;
+        }
+      }
     }
+  }
+
+  // Death animation
+  if(current_mario.state == 3){
+    current_mario.vy += gravity;
+    if(current_mario.vy > max_fall_speed){
+      current_mario.vy = max_fall_speed;
+    }
+    current_mario.y += current_mario.vy;
   }
   
   // Draw cubes
@@ -592,13 +697,45 @@ var play = () => {
     c.fillText("Pick and drop cubes with [space]. Restart with R.", 640, 120);
     c.fillText("Collect all coins and reach the flag.", 640, 160);
   }
+  if(level == 2 && last_screen == 1){
+    c.font = "bold 30px arial";
+    c.fillStyle = "black";
+    c.textAlign = "center";
+    c.fillText("Some mechanisms...", 640, 80);
+  }
+  
+  // Balances
+  for(i in level_data.balances){
+    
+    // More weight on side 1
+    if(balances_state[i].weight1 > balances_state[i].weight2){
+      balances_state[i].y1 += 4;
+      balances_state[i].y2 -= 4;
+    }
+    
+    // More weight on side 2
+    else if(balances_state[i].weight2 > balances_state[i].weight1){
+      balances_state[i].y1 -= 4;
+      balances_state[i].y2 += 4;
+    }
+    
+    // Draw balance 1
+    draw_sprite(15, level_data.balances[i][0] * 32 - 32, balances_state[i].y1 + 40);
+    draw_sprite(15, level_data.balances[i][0] * 32, balances_state[i].y1 + 40);
+    draw_sprite(15, level_data.balances[i][0] * 32 + 32, balances_state[i].y1 + 40);
+    
+    // Draw balance 2
+    draw_sprite(15, level_data.balances[i][2] * 32 - 32, balances_state[i].y2 + 40);
+    draw_sprite(15, level_data.balances[i][2] * 32, balances_state[i].y2 + 40);
+    draw_sprite(15, level_data.balances[i][2] * 32 + 32, balances_state[i].y2 + 40);
+  }
   
   // Next frame
   frame++;
   
   //requestAnimationFrame(play);
   
-  //document.title = frame + " " + tile_at(current_mario.x + mario_width, current_mario.y + 30);
+  document.title = frame + " " + current_mario.weight + " " + balances_state[0].weight1 + " " + balances_state[0].weight2 + " " + level_data.cubes[1].weight;
   
   // Win animation
   if(win){
