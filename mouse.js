@@ -122,14 +122,18 @@ onclick = (e) => {
           level_data.hash += String.fromCharCode(tile + 0x30);
         }
       }
+      
+      location.hash = "";
         
       if(level_data.tested == false){
         alert("You need to test and win your level first.");
-        prompt("Here's your level:",level_data.hash);
+        
+        // TMP
+        prompt("Here's your level URL:", location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances}));
       }
       
       else {
-        prompt("Here's your level:",level_data.hash);
+        prompt("Here's your level URL:", location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances}));
       }
     }
     c.closePath();

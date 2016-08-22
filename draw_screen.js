@@ -174,6 +174,31 @@ var draw_screen = onload = onhashchange = () => {
       }
     }
     
+    // Balances
+    for(i in level_data.balances){
+      
+      if(level_data.balances[i][3]){
+        // Draw balance 1
+        draw_tile(15, level_data.balances[i][0] - 1, level_data.balances[i][1]);
+        draw_tile(15, level_data.balances[i][0], level_data.balances[i][1]);
+        draw_tile(15, level_data.balances[i][0] + 1, level_data.balances[i][1]);
+        
+        level_data.tiles[level_data.balances[i][1]][level_data.balances[i][0] - 1] = 15;
+        level_data.tiles[level_data.balances[i][1]][level_data.balances[i][0]] = 15;
+        level_data.tiles[level_data.balances[i][1]][level_data.balances[i][0] + 1] = 15;
+        
+        // Draw balance 2
+        draw_tile(15, level_data.balances[i][2] - 1, level_data.balances[i][3]);
+        draw_tile(15, level_data.balances[i][2], level_data.balances[i][3]);
+        draw_tile(15, level_data.balances[i][2] + 1, level_data.balances[i][3]);
+        
+        level_data.tiles[level_data.balances[i][3]][level_data.balances[i][2] - 1] = 15;
+        level_data.tiles[level_data.balances[i][3]][level_data.balances[i][2]] = 15;
+        level_data.tiles[level_data.balances[i][3]][level_data.balances[i][2] + 1] = 15;
+      }
+    }
+    
+    
     // Show the tile being placed:
     
     if(tile_y >= 0 && !rightclick){

@@ -104,10 +104,3 @@ var levels = [
 0000000000000000000000000000000000000000"},
 
 ];
-
-// If a hash is set, play the level directly
-if(location.hash){
-  level_data = JSON.parse(location.hash.slice(1));
-  screen = 2;
-  draw_screen();
-}
