@@ -29,6 +29,7 @@ onhashchange = function(){
     level_data = JSON.parse(decodeURIComponent(location.hash.slice(1)));
     screen = 2;
     draw_screen();
+    location.hash = "";
   }
 }
 

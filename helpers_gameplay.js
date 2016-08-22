@@ -11,7 +11,7 @@ var first_frame = function(){
       
       level_data.tiles[j][i] = level_data.hash.charCodeAt(j * 40 + i) - 0x30;
 
-      // Ignore "?" (balanced platforms placeholders)
+      // Ignore tile #15 / "?" / balanced platforms placeholders.
       if(level_data.tiles[j][i] == 15){
         level_data.tiles[j][i] = 0
       }
@@ -101,10 +101,11 @@ var parse_draw_map = function(){
       drawn_tile = level_data.tiles[j][i];
       
       // Tile #12: cube (register it in level_data.cubes and remove it from the tiles)
-      if(drawn_tile == 12 && frame == 0){
-        level_data.cubes.push({x: i * 32, y: j * 32, vy: 0, mario: null});
+      if(drawn_tile == 12){
         drawn_tile = 0;
-        level_data.tiles[j][i] = 0;
+        if(frame == 0){
+          level_data.cubes.push({x: i * 32, y: j * 32, vy: 0, mario: null});
+        }
       }
       
       draw_tile(drawn_tile, i, j);

@@ -86,7 +86,7 @@ var reset_current_level = () => {
     1, 
     0,
     0, // 11: yellow toggle
-    0, 
+    0, // 12: cube
     1, 
     1, 
     0, // 15: Balance
