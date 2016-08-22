@@ -94,7 +94,7 @@ var play = () => {
     }
     
     // Apply gravity and collsions
-    gravity_and_collisions(current_mario, mario_width);
+    gravity_and_collisions(current_mario, mario_width, 0);
     
     // Collect coins (tile 6 => tile 0)
     if(tile_at(current_mario.x + mario_width / 2, current_mario.y + 16) == 6){
@@ -207,9 +207,10 @@ var play = () => {
   
   for(i in level_data.cubes){
     
-    // Apply gravity and collsions
-    //apply_gravity_and_collisions(level_data.cubes[i], 32);
-    
+    // Apply gravity and collsions if the cube is not held
+    if(level_data.cubes[i].mario === null){
+      gravity_and_collisions(level_data.cubes[i], 32, 1);
+    }
   }
   
   // Draw cubes

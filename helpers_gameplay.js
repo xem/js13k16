@@ -2,12 +2,19 @@
 
 // First frame inits
 var first_frame = function(){
+  
   // Build map
   level_data.tiles = [];
   for(var j = 0; j < 20; j++){
     level_data.tiles[j] = [];
     for(var i = 0; i < 40; i++){
+      
       level_data.tiles[j][i] = level_data.hash.charCodeAt(j * 40 + i) - 0x30;
+
+      // Ignore "?" (balanced platforms placeholders)
+      if(level_data.tiles[j][i] == 15){
+        level_data.tiles[j][i] = 0
+      }
     }
   }
   
@@ -159,9 +166,8 @@ var reset_mechanisms = function(){
 }
 
 
-// Apply gravity and collisions to a given object (mario or cube)
-var gravity_and_collisions = function(obj, obj_width){
-  
+// Apply gravity and collisions to a given object (type 0: mario, type 1: cube)
+var gravity_and_collisions = function(obj, obj_width, type){
   
   // Stop going right if there's a solid tile or the end of the screen on the right
   if(
@@ -228,7 +234,7 @@ var gravity_and_collisions = function(obj, obj_width){
   }
   obj.y += obj.vy;
   
-  // Press yellow switch
+  // Press yellow switch (at the bottom left or right)
   if(tile_at(obj.x, obj.y + 20) == 11){
     set_tile(obj.x, obj.y + 20, 25);
     yellow_toggle = true;
@@ -256,18 +262,22 @@ var gravity_and_collisions = function(obj, obj_width){
   }
   
   // compute object's weight
-  if(obj.cube_held !== null){
+  if(typeof obj.cube_held != "undefined" && obj.cube_held !== null){
     obj.weight = 1 + level_data.cubes[obj.cube_held].weight;
   }
   
   // If object actually falls
   if(obj.vy > 0){
     
-    // Stop falling if a solid tile is under object
+    // Stop falling if a solid tile is under object (or a spike, if the object is a cube)
     if(
       is_solid(tile_at(obj.x, obj.y + 32))
       ||
       is_solid(tile_at(obj.x + obj_width, obj.y + 32))
+      ||
+      (type == 1 && tile_at(obj.x, obj.y + 32) == 7)
+      ||
+      (type == 1 && tile_at(obj.x + obj_width, obj.y + 32) == 7)
     ){
       obj.y = ~~(obj.y / 32) * 32;
       obj.vy = 0;
@@ -277,9 +287,9 @@ var gravity_and_collisions = function(obj, obj_width){
     // Stop falling if a cube is under object
     for(i in level_data.cubes){
       if(
-        obj.x + obj_width > level_data.cubes[i].x
+        obj.x + obj_width > level_data.cubes[i].x + 8
         &&
-        obj.x < level_data.cubes[i].x + 31
+        obj.x < level_data.cubes[i].x + 24
         &&
         obj.y + 31 > level_data.cubes[i].y - 8
         &&
@@ -348,22 +358,25 @@ var gravity_and_collisions = function(obj, obj_width){
     }
   }
   
-  // Stop going up if there's a solid tile on top
-  if(
-    is_solid(tile_at(current_mario.x, current_mario.y))
-    ||
-    is_solid(tile_at(current_mario.x + mario_width, current_mario.y))
-  ){
-    
-    // Break bricks (tile #5)
-    if(tile_at(current_mario.x, current_mario.y) == 5){
-      set_tile(current_mario.x, current_mario.y, 0);
+  
+  // Stop going up if there's a solid tile on top (only for Mario)
+  if(type == 0){
+    if(
+      is_solid(tile_at(current_mario.x, current_mario.y))
+      ||
+      is_solid(tile_at(current_mario.x + mario_width, current_mario.y))
+    ){
+      
+      // Break bricks (tile #5)
+      if(tile_at(current_mario.x, current_mario.y) == 5){
+        set_tile(current_mario.x, current_mario.y, 0);
+      }
+      if(tile_at(current_mario.x + mario_width, current_mario.y) == 5){
+        set_tile(current_mario.x + mario_width, current_mario.y, 0);
+      }
+      
+      current_mario.y = ~~((current_mario.y) / 32) * 32 + 32;
+      current_mario.vy = 0;
     }
-    if(tile_at(current_mario.x + mario_width, current_mario.y) == 5){
-      set_tile(current_mario.x + mario_width, current_mario.y, 0);
-    }
-    
-    current_mario.y = ~~((current_mario.y) / 32) * 32 + 32;
-    current_mario.vy = 0;
   }
 }
