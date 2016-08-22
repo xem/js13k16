@@ -1,40 +1,61 @@
 // Globals
 // =======
   
-// Canvas ctx
+// Canvas context 2D
 var c = a.getContext("2d");
+
+// Init local storage to 1 if it's not already set
+localStorage["scpm_level"] |= 2;
 
 // Current screen (0: main menu / 1: level selection / 2: playing / 3: editor)
 var screen = 1;
+
+// Previous screen (when we quit a level, 0: when playing a shared level / 1: when playing a built-in level / 3: whe testing a level in the level eitor)
 var last_screen = 0;
 
-// Mouse down (clicking)
+// Mouse down (player is clicking)
 var mousedown = false;
 
-// Right click
+// Player is right clicking
 var rightclick = false;
 
-// Mouse coords
-var mouse_tile_x = mouse_tile_y = 0;
+// Mario's width (not 32px in order to pass easily between two blocks)
+var mario_width = 24;
+
+// Gravity (downwards acceleration):
+var gravity = 2;
+
+// Max fall speed (for mario and cubes)
+var max_fall_speed = 20;
+
+// Jump speed (upwards vy force):
+var jump_speed = 20;
+
+// Walk speed (horizontal vx)
+var walk_speed = 6;
+
+// Mouse coords (in tiles)
+var tile_x = tile_y = 0;
+
+// Mouse coords (in px)
+var x = y = 0;
 
 // Current level
 var level = 0;
 
+// All the data of the current level
 var level_data = {};
 
 // Other globals (editor)
 var pipe_click, current_pipe, balance_click, current_balance, current_editor_tile, mouse_tile_x, mouse_tile_y, pipe_high, pipe_low, end_pipe, end_pole, number, drawn_tile;
 
 // Other globals (gameplay)
-var win, win_frame, coins_left, loop, frame, current_mario, mario_width, gravity, max_fall_speed, jump_speed, walk_speed, solid, yellow_toggle, yellow_toggle_last_frame, pipes_state, balances_state;
-
-// Data
-// ====
+var win, win_frame, coins_left, loop, frame, current_mario, solid, yellow_toggle, yellow_toggle_last_frame, pipes_state, balances_state;
 
 // Built-in levels:
 var levels = [
   
-  // 0
+  // 0: nope
   {},
   
   // 1
@@ -77,9 +98,16 @@ var levels = [
 0000099990000000000000300000000000000003\
 00000000900000000000<0300000000000000003\
 0000000090000000000000300000000000000003\
-000;000090000000000000300000000000000003\
+000;000000000000000000300000000000000003\
 3333333333333333333333300000000000000003\
 3333333333333333333333300000000000000003\
 0000000000000000000000000000000000000000"},
 
 ];
+
+// If a hash is set, play the level directly
+if(location.hash){
+  level_data = JSON.parse(location.hash.slice(1));
+  screen = 2;
+  draw_screen();
+}

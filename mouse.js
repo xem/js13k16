@@ -63,7 +63,6 @@ onclick = (e) => {
             last_screen = 1;
             screen = 2;
             level = number;
-            reset_current_level();
             level_data = levels[number];
             draw_screen();
           }
@@ -104,7 +103,6 @@ onclick = (e) => {
           level_data.hash += String.fromCharCode(tile + 0x30);
         }
       }
-      reset_current_level();
       last_screen = 3;
       screen = 2;
       draw_screen();
@@ -347,8 +345,8 @@ onmousemove = (e) => {
     // Save mouse tile coordinates
     x = e.pageX - a.getBoundingClientRect().left - document.documentElement.scrollLeft - document.body.scrollLeft;
     y = e.pageY - a.getBoundingClientRect().top - document.documentElement.scrollTop - document.body.scrollTop;
-    mouse_tile_x = Math.floor(x / 32);
-    mouse_tile_y = Math.floor((y - 40) / 32);
+    tile_x = Math.floor(x / 32);
+    tile_y = Math.floor((y - 40) / 32);
     draw_screen();
   }
 }

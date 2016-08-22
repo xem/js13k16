@@ -47,9 +47,6 @@ var reset_current_level = () => {
   win = false;
   coins_left = 0;
   win_frame = 0;
-  
-  // Game loop
-  //loop = 0;
 
   // Current frame
   frame = 0;
@@ -74,21 +71,6 @@ var reset_current_level = () => {
     position_on_cube: null,
     pick_cube_animation_frame: 0
   }
-
-  // Mario's width (not 32px in order to pass easily between two blocks)
-  mario_width = 24;
-
-  // Gravity (downwards acceleration):
-  gravity = 2;
-
-  // Max fall speed
-  max_fall_speed = 20;
-
-  // Jump speed (upwards vy force):
-  jump_speed = 20;
-
-  // Walk speed (horizontal vx)
-  walk_speed = 6;
 
   // Solidity of the tiles (some of them vary during gameplay, sor reset it before each level and after reset)
   solid = [
@@ -120,10 +102,10 @@ var reset_current_level = () => {
     0 // 25: yellow toggle pressed
   ];
   
-  // Cubes
+  // Cubes (parsed at frame 0)
   level_data.cubes = [];
   
-  // Yellow toggle
+  // Yellow toggles state at last frame
   yellow_toggle_last_frame = false;
   
   // Pipes state
@@ -160,4 +142,4 @@ var reset_maker_level = () => {
   
   // Current tile in the level editor (0: sky / 1: start / etc.)
   current_editor_tile = 0;
-}
+};

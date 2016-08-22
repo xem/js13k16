@@ -8,24 +8,14 @@ var draw_screen = onload = onhashchange = () => {
   c.font = "bold 30px arial";
   c.textAlign = "center";
   
-  // Init local storage to 1 if it's not already set
-  localStorage["scpm_level"] |= 2;
-
-  // If a hash is set, play the level directly
-  if(location.hash){
-    leveldata = location.hash.slice(1);
-    screen = 2;
-    draw_screen();
-  }
+  // Pixelize graphics
+  c["mozImageSmoothingEnabled"] = false;
+  c["imageSmoothingEnabled"] = false;
   
   // Main menu
   // =========
 
   if(screen == 0){
-  
-    // Pixelize graphics
-    c.mozImageSmoothingEnabled = false;
-    c.imageSmoothingEnabled = false;
  
     // Show title
     c.drawImage(tileset, 512, 0, 70, 16, 120, 150, 280, 64);
@@ -77,19 +67,14 @@ var draw_screen = onload = onhashchange = () => {
     if(loop){
       clearInterval(loop);
     }
+    reset_current_level();
     loop = setInterval(play, 33);
-    
-    //play();
   }
   
   // Level editor
   // ============
   
   if(screen == 3){
-    
-    // Pixelize graphics
-    c.mozImageSmoothingEnabled = false;
-    c.imageSmoothingEnabled = false;
     
     c.strokeStyle = "#777";
     c.lineWidth = 1;
@@ -191,42 +176,42 @@ var draw_screen = onload = onhashchange = () => {
     
     // Show the tile being placed:
     
-    if(mouse_tile_y >= 0 && !rightclick){
+    if(tile_y >= 0 && !rightclick){
       
       // Special cases:
       // Tile #1: time machine
       if(current_editor_tile == 1){
-        if(mouse_tile_y > 0){
-          draw_tile(22, mouse_tile_x, mouse_tile_y - 1);
-          draw_tile(23, mouse_tile_x, mouse_tile_y);
+        if(tile_y > 0){
+          draw_tile(22, tile_x, tile_y - 1);
+          draw_tile(23, tile_x, tile_y);
         }
       }
       
       // Tile #14: pipe
       else if(current_editor_tile == 14){
         if(pipe_click == 0){
-          draw_tile(16, mouse_tile_x, mouse_tile_y);
-          draw_tile(17, mouse_tile_x + 1, mouse_tile_y);
+          draw_tile(16, tile_x, tile_y);
+          draw_tile(17, tile_x + 1, tile_y);
         }
         if(pipe_click == 1){
-          draw_tile(16, level_data.pipes[current_pipe][0], mouse_tile_y);
-          draw_tile(17, level_data.pipes[current_pipe][0] + 1, mouse_tile_y);
+          draw_tile(16, level_data.pipes[current_pipe][0], tile_y);
+          draw_tile(17, level_data.pipes[current_pipe][0] + 1, tile_y);
         }
         if(pipe_click == 2){
-          draw_tile(20, mouse_tile_x, mouse_tile_y);
+          draw_tile(20, tile_x, tile_y);
         }
       }
       
       // Tile #15: balance
       else if(current_editor_tile == 15){
-        draw_tile(15, mouse_tile_x - 1, mouse_tile_y);
-        draw_tile(15, mouse_tile_x, mouse_tile_y);
-        draw_tile(15, mouse_tile_x + 1, mouse_tile_y);
+        draw_tile(15, tile_x - 1, tile_y);
+        draw_tile(15, tile_x, tile_y);
+        draw_tile(15, tile_x + 1, tile_y);
       }
       
       // Normal case:
       else {
-        draw_tile(current_editor_tile, mouse_tile_x, mouse_tile_y);
+        draw_tile(current_editor_tile, tile_x, tile_y);
       }
     }
     
@@ -253,7 +238,6 @@ var draw_screen = onload = onhashchange = () => {
     c.fillText("CLEAR", 1050, 28);
     c.fillText("EXIT", 1175, 28);
     c.stroke();
-    
     c.closePath();
     
     // Current tile on the tileset
