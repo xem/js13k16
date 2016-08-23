@@ -23,7 +23,15 @@ var play = () => {
       c.font = "bold 30px arial";
       c.fillStyle = "black";
       c.textAlign = "center";
-      c.fillText("Mechanisms...", 640, 80);
+      c.fillText("You shall use these mechanisms...", 640, 80);
+    }
+    
+    if(level == 3){
+      c.font = "bold 30px arial";
+      c.fillStyle = "black";
+      c.textAlign = "center";
+      c.fillText("And now, you're thinking with portals!", 640, 80);
+      c.fillText("Use mouse to aim and [left click] / [right click] to shoot.", 640, 120);
     }
   }
   
@@ -59,6 +67,7 @@ var play = () => {
     
     // Idle
     current_mario.state = 0;
+    current_mario.vx = 0;
     
     // Go right if possible
     if(current_mario.right){
@@ -216,6 +225,7 @@ var play = () => {
     
     // Apply gravity and collsions if the cube is not held
     if(level_data.cubes[i].mario === null){
+      level_data.cubes[i].vx = 0;
       gravity_and_collisions(level_data.cubes[i], 32, 1);
     }
   }

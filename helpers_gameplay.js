@@ -181,7 +181,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
       ||
       is_solid(tile_at(obj.x + obj_width + obj.vx, obj.y + 31))
     ){
-      obj.x = ~~(obj.x / 32) * 32 + 32 - obj_width - 1;
+      obj.x = ~~((obj.x + obj.vx) / 32) * 32 + 32 - obj_width - 1;
       obj.vx = 0;
     }
     
@@ -215,7 +215,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
       ||
       is_solid(tile_at(obj.x + obj.vx, obj.y + 31))
     ){
-      obj.x = ~~(obj.x / 32) * 32 + 32;
+      obj.x = ~~((obj.x + obj.vx) / 32) * 32 + 32;
       obj.vx = 0;
     }
     if(obj.x < 0){
@@ -248,6 +248,11 @@ var gravity_and_collisions = function(obj, obj_width, type){
   obj.vy += gravity;
   if(obj.vy > max_fall_speed){
     obj.vy = max_fall_speed;
+  }
+  
+  // If object's bottom (lower quarter) is on a solid tile (ex: toggled block), fall under it
+  if(is_solid(tile_at(obj.x + obj_width / 2, obj.y + 24))){
+    obj.y = ~~(obj.y / 32) * 32 + 32;
   }
   
   // If vertical speed is downwards
@@ -362,7 +367,6 @@ var gravity_and_collisions = function(obj, obj_width, type){
       obj.vy = 0;
     }
   }
-  
   
   // Update position according to vertical speed
   obj.y += obj.vy;

@@ -107,6 +107,8 @@ var reset_current_level = () => {
   
   // Yellow toggles state at last frame
   yellow_toggle_last_frame = false;
+  yellow_toggle_on = true;
+  yellow_toggle_delay = 0;
   
   // Pipes state
   pipes_state = [];
