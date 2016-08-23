@@ -166,73 +166,205 @@ var reset_mechanisms = function(){
   }
 }
 
-
 // Apply gravity and collisions to a given object (type 0: mario, type 1: cube)
 var gravity_and_collisions = function(obj, obj_width, type){
   
+  // compute object's weight
+  if(typeof obj.cube_held != "undefined" && obj.cube_held !== null){
+    obj.weight = 1 + level_data.cubes[obj.cube_held].weight;
+  }
+  
   // Stop going right if there's a solid tile or the end of the screen on the right
-  if(
-    is_solid(tile_at(obj.x + obj_width, obj.y))
-    ||
-    is_solid(tile_at(obj.x + obj_width, obj.y + 31))
-  ){
-    obj.x = ~~(obj.x / 32) * 32 + 32 - obj_width - 1;
-  }
-  if(obj.x > 1280 - obj_width){
-    obj.x = 1280 - obj_width;
-    obj.state = 0;
-  }
-  
-  // Stop going right if there's a pipe there
-  for(var j in level_data.pipes){
+  if(obj.vx > 0){
     if(
-      obj.x + obj_width >= level_data.pipes[j][0] * 32
-      &&
-      obj.x + obj_width <= level_data.pipes[j][0] * 32 + 16
-      &&
-      obj.y + 31 >= pipes_state[j].y
-      &&
-      obj.y <= pipes_state[j].y_base
+      is_solid(tile_at(obj.x + obj_width + obj.vx, obj.y))
+      ||
+      is_solid(tile_at(obj.x + obj_width + obj.vx, obj.y + 31))
     ){
-      obj.x = level_data.pipes[j][0] * 32 - obj_width - 1;
+      obj.x = ~~(obj.x / 32) * 32 + 32 - obj_width - 1;
+      obj.vx = 0;
+    }
+    
+    if(obj.x > 1280 - obj_width){
+      obj.x = 1280 - obj_width;
+      obj.vx = 0;
+    }
+    
+    // Stop going right if there's a pipe there
+    for(var j in level_data.pipes){
+      if(
+        obj.x + obj_width + obj.vx >= level_data.pipes[j][0] * 32
+        &&
+        obj.x + obj_width + obj.vx  <= level_data.pipes[j][0] * 32 + 16
+        &&
+        obj.y + 31 >= pipes_state[j].y
+        &&
+        obj.y <= pipes_state[j].y_base
+      ){
+        obj.x = level_data.pipes[j][0] * 32 - obj_width - 1;
+        obj.vx = 0;
+      }
     }
   }
   
+  if(obj.vx < 0){
   
-  // Stop going left if there's a solid tile or end of the level on the left
-  if(
-    is_solid(tile_at(obj.x, obj.y))
-    ||
-    is_solid(tile_at(obj.x, obj.y + 31))
-  ){
-    obj.x = ~~(obj.x / 32) * 32 + 32;
-  }
-  if(obj.x < 0){
-    obj.x = 0;
-    obj.state = 0;
-  }
-  
-  // Stop going left if there's a pipe there
-  for(j in level_data.pipes){
+    // Stop going left if there's a solid tile or end of the level on the left
     if(
-      obj.x >= level_data.pipes[j][0] * 32 + 64 - 16
-      &&
-      obj.x <= level_data.pipes[j][0] * 32 + 64
-      &&
-      obj.y + 31 >= pipes_state[j].y
-      &&
-      obj.y <= pipes_state[j].y_base
+      is_solid(tile_at(obj.x + obj.vx, obj.y))
+      ||
+      is_solid(tile_at(obj.x + obj.vx, obj.y + 31))
     ){
-      obj.x = level_data.pipes[j][0] * 32 + 64;
+      obj.x = ~~(obj.x / 32) * 32 + 32;
+      obj.vx = 0;
+    }
+    if(obj.x < 0){
+      obj.x = 0;
+      obj.vx = 0;
+    }
+    
+    // Stop going left if there's a pipe there
+    for(j in level_data.pipes){
+      if(
+        obj.x + obj.vx >= level_data.pipes[j][0] * 32 + 64 - 16
+        &&
+        obj.x + obj.vx <= level_data.pipes[j][0] * 32 + 64
+        &&
+        obj.y + 31 >= pipes_state[j].y
+        &&
+        obj.y <= pipes_state[j].y_base
+      ){
+        obj.x = level_data.pipes[j][0] * 32 + 64;
+        obj.vx = 0;
+      }
     }
   }
   
-  // Apply gravity
+  // Apply horizontal speed
+  obj.x += obj.vx;
+  
+  // Apply gravity and compute vertical speed (but don't update position yet)
   obj.grounded = false;
   obj.vy += gravity;
   if(obj.vy > max_fall_speed){
     obj.vy = max_fall_speed;
   }
+  
+  // If vertical speed is downwards
+  if(obj.vy > 0){
+    
+    // Stop falling if a solid tile is under object (or a spike, if the object is a cube)
+    if(
+      is_solid(tile_at(obj.x, obj.y + 32 + obj.vy))
+      ||
+      is_solid(tile_at(obj.x + obj_width, obj.y + 32 + obj.vy))
+      ||
+      (type == 1 && tile_at(obj.x, obj.y + 32 + obj.vy) == 7)
+      ||
+      (type == 1 && tile_at(obj.x + obj_width, obj.y + 32 + obj.vy) == 7)
+    ){
+      obj.y = ~~((obj.y + obj.vy) / 32) * 32;
+      obj.vy = 0;
+      obj.grounded = true;
+    }
+    
+    // Stop falling if a cube is under object
+    for(i in level_data.cubes){
+      if(
+        obj.x + obj_width > level_data.cubes[i].x
+        &&
+        obj.x < level_data.cubes[i].x + 32
+        &&
+        obj.y + 31 + obj.vy > level_data.cubes[i].y - 8
+        &&
+        obj.y + 31 + obj.vy < level_data.cubes[i].y + 20
+      ){
+        obj.y = level_data.cubes[i].y - 32;
+        obj.vy = 0;
+        obj.grounded = true;
+        obj.cube_below = i;
+        obj.position_on_cube = obj.x - level_data.cubes[i].x;
+        level_data.cubes[i].weight += obj.weight;
+      }
+    }
+    
+    // Stop falling if there's a pipe there
+    for(j in level_data.pipes){
+      if(
+        obj.x + obj_width >= level_data.pipes[j][0] * 32
+        &&
+        obj.x < level_data.pipes[j][0] * 32 + 64
+        &&
+        obj.y + 31 + obj.vy >= pipes_state[j].y
+        &&
+        obj.y + 31 + obj.vy <= pipes_state[j].y + 32
+      ){
+        obj.y = pipes_state[j].y - 32;
+        obj.vy = 0;
+        obj.grounded = true;
+      }
+    }
+    
+    // Stop falling if there's a balance "1" there
+    for(j in level_data.balances){
+      if(
+        obj.x + obj_width >= level_data.balances[j][0] * 32 - 32
+        &&
+        obj.x < level_data.balances[j][0] * 32 + 64
+        &&
+        obj.y + 31 + obj.vy >= balances_state[j].y1 - 8
+        &&
+        obj.y + 31 + obj.vy <= balances_state[j].y1 + 32
+      ){
+        obj.y = balances_state[j].y1 - 32;
+        obj.vy = 0;
+        obj.grounded = true;
+        balances_state[j].weight1 += obj.weight;
+      }
+    }
+    
+    // Stop falling if there's a balance "2" there
+    for(j in level_data.balances){
+      if(
+        obj.x + obj_width >= level_data.balances[j][2] * 32 - 32
+        &&
+        obj.x < level_data.balances[j][2] * 32 + 64
+        &&
+        obj.y + 31 + obj.vy >= balances_state[j].y2 - 8
+        &&
+        obj.y + 31 + obj.vy <= balances_state[j].y2 + 32
+      ){
+        obj.y = balances_state[j].y2 - 32;
+        obj.vy = 0;
+        obj.grounded = true;
+        balances_state[j].weight2 += obj.weight;
+      }
+    }
+  }
+  
+  // Stop going up if there's a solid tile on top (only for Mario)
+  if(type == 0 && obj.vy < 0){
+    if(
+      is_solid(tile_at(obj.x, obj.y))
+      ||
+      is_solid(tile_at(obj.x + obj_width, obj.y))
+    ){
+      
+      // Break bricks (tile #5)
+      if(tile_at(obj.x, obj.y) == 5){
+        set_tile(obj.x, obj.y, 0);
+      }
+      if(tile_at(obj.x + mario_width, obj.y) == 5){
+        set_tile(obj.x + mario_width, obj.y, 0);
+      }
+      
+      obj.y = ~~((obj.y) / 32) * 32 + 32;
+      obj.vy = 0;
+    }
+  }
+  
+  
+  // Update position according to vertical speed
   obj.y += obj.vy;
   
   // Press yellow switch (at the bottom left or right)
@@ -258,126 +390,6 @@ var gravity_and_collisions = function(obj, obj_width, type){
       obj.y + 20 <= level_data.pipes[i][4] * 32 + 32
     ){
       pipes_state[i].pressed = true;
-    }
-    
-  }
-  
-  // compute object's weight
-  if(typeof obj.cube_held != "undefined" && obj.cube_held !== null){
-    obj.weight = 1 + level_data.cubes[obj.cube_held].weight;
-  }
-  
-  // If object actually falls
-  if(obj.vy > 0){
-    
-    // Stop falling if a solid tile is under object (or a spike, if the object is a cube)
-    if(
-      is_solid(tile_at(obj.x, obj.y + 32))
-      ||
-      is_solid(tile_at(obj.x + obj_width, obj.y + 32))
-      ||
-      (type == 1 && tile_at(obj.x, obj.y + 32) == 7)
-      ||
-      (type == 1 && tile_at(obj.x + obj_width, obj.y + 32) == 7)
-    ){
-      obj.y = ~~(obj.y / 32) * 32;
-      obj.vy = 0;
-      obj.grounded = true;
-    }
-    
-    // Stop falling if a cube is under object
-    for(i in level_data.cubes){
-      if(
-        obj.x + obj_width > level_data.cubes[i].x + 8
-        &&
-        obj.x < level_data.cubes[i].x + 24
-        &&
-        obj.y + 31 > level_data.cubes[i].y - 8
-        &&
-        obj.y + 31 < level_data.cubes[i].y + 20
-      ){
-        obj.y = level_data.cubes[i].y - 32;
-        obj.vy = 0;
-        obj.grounded = true;
-        obj.cube_below = i;
-        obj.position_on_cube = obj.x - level_data.cubes[i].x;
-        level_data.cubes[i].weight += obj.weight;
-      }
-    }
-    
-    // Stop falling if there's a pipe there
-    for(j in level_data.pipes){
-      if(
-        obj.x + obj_width >= level_data.pipes[j][0] * 32
-        &&
-        obj.x < level_data.pipes[j][0] * 32 + 64
-        &&
-        obj.y + 31 >= pipes_state[j].y
-        &&
-        obj.y + 31 <= pipes_state[j].y + 32
-      ){
-        obj.y = pipes_state[j].y - 32;
-        obj.vy = 0;
-        obj.grounded = true;
-      }
-    }
-    
-    // Stop falling if there's a balance "1" there
-    for(j in level_data.balances){
-      if(
-        obj.x + obj_width >= level_data.balances[j][0] * 32 - 32
-        &&
-        obj.x < level_data.balances[j][0] * 32 + 64
-        &&
-        obj.y + 31 >= balances_state[j].y1 - 8
-        &&
-        obj.y + 31 <= balances_state[j].y1 + 32
-      ){
-        obj.y = balances_state[j].y1 - 32;
-        obj.vy = 0;
-        obj.grounded = true;
-        balances_state[j].weight1 += obj.weight;
-      }
-    }
-    
-    // Stop falling if there's a balance "2" there
-    for(j in level_data.balances){
-      if(
-        obj.x + obj_width >= level_data.balances[j][2] * 32 - 32
-        &&
-        obj.x < level_data.balances[j][2] * 32 + 64
-        &&
-        obj.y + 31 >= balances_state[j].y2 - 8
-        &&
-        obj.y + 31 <= balances_state[j].y2 + 32
-      ){
-        obj.y = balances_state[j].y2 - 32;
-        obj.vy = 0;
-        obj.grounded = true;
-        balances_state[j].weight2 += obj.weight;
-      }
-    }
-  }
-  
-  
-  // Stop going up if there's a solid tile on top (only for Mario)
-  if(type == 0){
-    if(
-      is_solid(tile_at(current_mario.x, current_mario.y))
-      ||
-      is_solid(tile_at(current_mario.x + mario_width, current_mario.y))
-    ){
-      
-      // Break bricks (tile #5)
-      if(tile_at(current_mario.x, current_mario.y) == 5){
-        set_tile(current_mario.x, current_mario.y, 0);
-      }
-      if(tile_at(current_mario.x + mario_width, current_mario.y) == 5){
-        set_tile(current_mario.x + mario_width, current_mario.y, 0);
-      }
-      
-      current_mario.y = ~~((current_mario.y) / 32) * 32 + 32;
-      current_mario.vy = 0;
     }
   }
 }

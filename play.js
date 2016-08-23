@@ -60,11 +60,13 @@ var play = () => {
     // Idle
     current_mario.state = 0;
     
-    // Go right
+    // Go right if possible
     if(current_mario.right){
       current_mario.keyright[frame] = true;
-      current_mario.x += walk_speed;
+      current_mario.vx = walk_speed;
       current_mario.direction = 1;
+      
+      // Walk animation
       if(current_mario.grounded){
         current_mario.state = 1;
       }
@@ -73,8 +75,10 @@ var play = () => {
     // Go left
     if(current_mario.left){
       current_mario.keyleft[frame] = true;
-      current_mario.x -= walk_speed;
+      current_mario.vx = -walk_speed;
       current_mario.direction = 0;
+      
+      // Walk animation
       if(current_mario.grounded){
         current_mario.state = 1;
       } 
@@ -94,7 +98,9 @@ var play = () => {
     }
     
     // Apply gravity and collsions
+    //console.log(current_mario.x, current_mario.y);
     gravity_and_collisions(current_mario, mario_width, 0);
+    //console.log(current_mario.x, current_mario.y);
     
     // Collect coins (tile 6 => tile 0)
     if(tile_at(current_mario.x + mario_width / 2, current_mario.y + 16) == 6){
@@ -189,6 +195,7 @@ var play = () => {
       }
       if(coins_left == 0){
         win = true;
+        current_mario.state = 0;
       }
     }
   }
