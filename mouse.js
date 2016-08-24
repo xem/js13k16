@@ -1,5 +1,5 @@
 // Handle clicks on the canvas on each screen
-onclick = (e) => {
+a.onclick = a.oncontextmenu = (e) => {
 
   // Offsets
   x = e.pageX - a.getBoundingClientRect().left - document.documentElement.scrollLeft - document.body.scrollLeft;
@@ -74,9 +74,26 @@ onclick = (e) => {
   
   // In-game
   // =======
-  if(screen == 2){
+  if(screen == 2 && frame > 0){
+    
+    // Left click: current mario sends a blue portal
+    if(e.which == 1){
+      c.beginPath();
+      
+      // Compute the angle made by the line "Mario - click coordinates" and the horizontal axis
+      var angle = Math.atan2(x - (current_mario.x + mario_width / 2), y - (current_mario.y + 16));
+      current_mario.shoot_blue = 1;
+      current_mario.portal_shoot_x = current_mario.x + mario_width / 2;
+      current_mario.portal_shoot_y = current_mario.y + 16;
+      current_mario.portal_shoot_vx = Math.sin(angle);
+      current_mario.portal_shoot_vy = Math.cos(angle);
+      
+      c.stroke();
+      c.closePath();
+    }
     
     // Quit
+    c.beginPath();
     c.rect(1240, 0, 32, 32);
     if(c.isPointInPath(x, y)){
       clearInterval(loop);
@@ -84,6 +101,8 @@ onclick = (e) => {
       draw_screen();
     }
     c.closePath();
+    
+    
   }
   
   // Level editor
@@ -319,6 +338,8 @@ onclick = (e) => {
     }
     c.closePath();
   }
+  
+  return false;
 }
 
 // On mouse down, set a mousedown flag and a rightclick flag (if right click is down)

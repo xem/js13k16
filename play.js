@@ -23,15 +23,15 @@ var play = () => {
       c.font = "bold 30px arial";
       c.fillStyle = "black";
       c.textAlign = "center";
-      c.fillText("You shall use these mechanisms...", 640, 80);
+      c.fillText("Let's add some mechanisms...", 640, 80);
     }
     
     if(level == 3){
       c.font = "bold 30px arial";
       c.fillStyle = "black";
       c.textAlign = "center";
-      c.fillText("And now, you're thinking with portals!", 640, 80);
-      c.fillText("Use mouse to aim and [left click] / [right click] to shoot.", 640, 120);
+      //c.fillText("And now, you're thinking with portals!", 640, 80);
+      //c.fillText("Use mouse to aim and [left click] / [right click] to shoot.", 640, 120);
     }
   }
   
@@ -207,6 +207,19 @@ var play = () => {
         current_mario.state = 0;
       }
     }
+    
+    // Shoot blue portal
+    if(current_mario.shoot_blue){
+      current_mario.shoot_blue += 1.5;
+      current_mario.portal_shoot_x += current_mario.shoot_blue * current_mario.portal_shoot_vx;
+      current_mario.portal_shoot_y += current_mario.shoot_blue * current_mario.portal_shoot_vy;
+      if(is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y))){
+        current_mario.shoot_blue = 0;
+      }
+      else{
+        c.fillRect(current_mario.portal_shoot_x, current_mario.portal_shoot_y + 40, 4, 4);        
+      }
+    }
   }
   
   // Death animation
@@ -296,6 +309,7 @@ var play = () => {
   frame++;
   
   //document.title = frame + " " + current_mario.weight + " " + balances_state[0].weight1 + " " + balances_state[0].weight2 + " " + level_data.cubes[1].weight;
+  document.title = current_mario.x + " " + current_mario.y;
   
   // Win animation
   if(win){

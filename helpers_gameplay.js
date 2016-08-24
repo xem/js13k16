@@ -64,7 +64,7 @@ var move_draw_pipes = function(){
     // Draw pipe body    
     end_pipe = false;
     for(var k = ~~(pipes_state[i].y / 32) + 1; k < 21; k++){
-      if(k < 20 && !level_data.tiles[k][level_data.pipes[i][0]] && !level_data.tiles[k][level_data.pipes[i][0] + 1] && !end_pipe){
+      if(k < 20 && !is_solid(tile_at(level_data.pipes[i][0],k)) && !is_solid(tile_at(level_data.pipes[i][0] + 1, k)) && !end_pipe){
         draw_tile(18, level_data.pipes[i][0], k);
         draw_tile(19, level_data.pipes[i][0] + 1, k);
       }

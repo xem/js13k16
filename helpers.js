@@ -16,7 +16,7 @@ var tile_at = (x, y) => {
     return 0;
   }
   
-  return level_data.tiles[~~(y / 32)][~~(x / 32)];
+  return level_data.tiles[~~(y / 32)][~~(x / 32)] || 0;
 }
 
 // Set a tile at these coordinates (in px)
