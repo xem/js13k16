@@ -50,7 +50,7 @@ var level_data = {};
 var pipe_click, current_pipe, balance_click, current_balance, current_editor_tile, mouse_tile_x, mouse_tile_y, pipe_high, pipe_low, end_pipe, end_pole, number, drawn_tile;
 
 // Other globals (gameplay)
-var win, win_frame, coins_left, loop, frame, current_mario, solid, yellow_toggle, yellow_toggle_last_frame, pipes_state, balances_state, yellow_toggle_delay, yellow_toggle_on;
+var win, win_frame, coins_left, loop, frame, current_mario, solid, yellow_toggle, yellow_toggle_last_frame, pipes_state, balances_state, yellow_toggle_delay, yellow_toggle_on, blue_portal, orange_portal, temp_side;
 
 // Built-in levels:
 var levels = [
@@ -119,11 +119,11 @@ var levels = [
 0300000000000000000000000008000;00000400\
 0300000000000000000000000008003333993300\
 0300000000000000000000000008003000000300\
-0300000444444444444440000008003020000300\
-0300000400000000000000000008003000000300\
-030F000400000000000000000000003000000300\
-030G000400000000000000000000003000000300\
-0344444400000000000000000000003333333300\
+0300000000444444444440000008003020000300\
+0300000000400000000000000008003000000300\
+030F000400400000000000000000003000000300\
+030G000000400000000000000000003000000300\
+0344444444400000000000000000003333333300\
 0000000000000000000000000000000000000000\
 0000000000000000000000000000000000000000"}
 

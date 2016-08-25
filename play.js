@@ -210,16 +210,122 @@ var play = () => {
     
     // Shoot blue portal
     if(current_mario.shoot_blue){
-      current_mario.shoot_blue += 1.5;
-      current_mario.portal_shoot_x += current_mario.shoot_blue * current_mario.portal_shoot_vx;
-      current_mario.portal_shoot_y += current_mario.shoot_blue * current_mario.portal_shoot_vy;
-      if(is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y))){
-        current_mario.shoot_blue = 0;
-      }
-      else{
-        c.fillRect(current_mario.portal_shoot_x, current_mario.portal_shoot_y + 40, 4, 4);        
+      for(i = 0; i < 40; i++){
+        current_mario.shoot_blue += .001;
+        current_mario.portal_shoot_x += current_mario.shoot_blue * current_mario.portal_shoot_vx;
+        current_mario.portal_shoot_y += current_mario.shoot_blue * current_mario.portal_shoot_vy;
+        if(is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y))){
+          current_mario.shoot_blue = 0;
+          
+          // Define on which side the portal goes (0: top, 1: right, 2: bottom, 3: left)
+          // Avoid opening a portal between two solid tiles, and on sides not reachable given the current angle
+          if(current_mario.portal_shoot_x % 32 < 4 && !is_solid(tile_at(current_mario.portal_shoot_x - 32, current_mario.portal_shoot_y)) && current_mario.portal_shoot_vx > 0){
+            temp_side = 3;
+          }
+          if(current_mario.portal_shoot_x % 32 > 28 && !is_solid(tile_at(current_mario.portal_shoot_x + 32, current_mario.portal_shoot_y)) && current_mario.portal_shoot_vx < 0){
+            temp_side = 1;
+          }
+          if(current_mario.portal_shoot_y % 32 < 4 && !is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y - 32)) && current_mario.portal_shoot_vy > 0){
+            temp_side = 0;
+          }
+          if(current_mario.portal_shoot_y % 32 > 28 && !is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y + 32)) && current_mario.portal_shoot_vy < 0){
+            temp_side = 2;
+          }
+
+          // Place portal if tile is #4 and no orange portal is here yet
+          if(
+            tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y) == 4
+            &&
+            (~~(current_mario.portal_shoot_x / 32) != orange_portal.tile_x || ~~(current_mario.portal_shoot_y / 32) != orange_portal.tile_y || orange_portal != temp_side)
+          ){
+            blue_portal.tile_x = ~~(current_mario.portal_shoot_x / 32);
+            blue_portal.tile_y = ~~(current_mario.portal_shoot_y / 32);
+            blue_portal.side = temp_side;
+          }
+        }
+        else{
+          c.fillStyle = "blue";
+          c.fillRect(current_mario.portal_shoot_x, current_mario.portal_shoot_y + 40, 6, 6);        
+        }
       }
     }
+    
+    // Shoot orange portal
+    if(current_mario.shoot_orange){
+      for(i = 0; i < 40; i++){
+        current_mario.shoot_orange += .001;
+        current_mario.portal_shoot_x += current_mario.shoot_orange * current_mario.portal_shoot_vx;
+        current_mario.portal_shoot_y += current_mario.shoot_orange * current_mario.portal_shoot_vy;
+        if(is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y))){
+          current_mario.shoot_orange = 0;
+          
+          // Define on which side the portal goes (0: top, 1: right, 2: bottom, 3: left)
+          // Avoid opening a portal between two solid tiles, and on sides not reachable given the current angle
+          if(current_mario.portal_shoot_x % 32 < 4 && !is_solid(tile_at(current_mario.portal_shoot_x - 32, current_mario.portal_shoot_y)) && current_mario.portal_shoot_vx > 0){
+            temp_side = 3;
+          }
+          if(current_mario.portal_shoot_x % 32 > 28 && !is_solid(tile_at(current_mario.portal_shoot_x + 32, current_mario.portal_shoot_y)) && current_mario.portal_shoot_vx < 0){
+            temp_side = 1;
+          }
+          if(current_mario.portal_shoot_y % 32 < 4 && !is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y - 32)) && current_mario.portal_shoot_vy > 0){
+            temp_side = 0;
+          }
+          if(current_mario.portal_shoot_y % 32 > 28 && !is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y + 32)) && current_mario.portal_shoot_vy < 0){
+            temp_side = 2;
+          }
+
+          // Place portal if tile is #4 and no orange portal is here yet
+          if(
+            tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y) == 4
+            &&
+            (~~(current_mario.portal_shoot_x / 32) != orange_portal.tile_x || ~~(current_mario.portal_shoot_y / 32) != orange_portal.tile_y || orange_portal != temp_side)
+          ){
+            orange_portal.tile_x = ~~(current_mario.portal_shoot_x / 32);
+            orange_portal.tile_y = ~~(current_mario.portal_shoot_y / 32);
+            orange_portal.side = temp_side;
+          }
+        }
+        else{
+          c.fillStyle = "orange";
+          c.fillRect(current_mario.portal_shoot_x, current_mario.portal_shoot_y + 40, 6, 6);        
+        }
+      }
+    }
+    
+    // Display open portals
+    if(blue_portal.tile_x){
+      c.fillStyle = "blue";
+      if(blue_portal.side == 0){
+        c.fillRect(blue_portal.tile_x * 32, blue_portal.tile_y * 32 + 40 - 8, 32, 8);
+      }
+      if(blue_portal.side == 1){
+        c.fillRect(blue_portal.tile_x * 32 + 28, blue_portal.tile_y * 32 + 40, 8, 32);
+      }
+      if(blue_portal.side == 2){
+        c.fillRect(blue_portal.tile_x * 32, blue_portal.tile_y * 32 + 40 + 28, 32, 8);
+      }
+      if(blue_portal.side == 3){
+        c.fillRect(blue_portal.tile_x * 32 - 4, blue_portal.tile_y * 32 + 40, 8, 32);
+      }
+    }
+    
+    if(orange_portal.tile_x){
+      c.fillStyle = "orange";
+      if(orange_portal.side == 0){
+        c.fillRect(orange_portal.tile_x * 32, orange_portal.tile_y * 32 + 40 - 8, 32, 8);
+      }
+      if(orange_portal.side == 1){
+        c.fillRect(orange_portal.tile_x * 32 + 28, orange_portal.tile_y * 32 + 40, 8, 32);
+      }
+      if(orange_portal.side == 2){
+        c.fillRect(orange_portal.tile_x * 32, orange_portal.tile_y * 32 + 40 + 28, 32, 8);
+      }
+      if(orange_portal.side == 3){
+        c.fillRect(orange_portal.tile_x * 32 - 4, orange_portal.tile_y * 32 + 40, 8, 32);
+      }
+    }
+    
+    
   }
   
   // Death animation

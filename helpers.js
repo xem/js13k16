@@ -115,6 +115,11 @@ var reset_current_level = () => {
   
   // Balances state
   balances_state = [];
+  
+  // Portals
+  blue_portal = { tile_x: -1, tile_y: -1 };
+  orange_portal = { tile_x: -2, tile_y: -2 };
+
 }
 
 
