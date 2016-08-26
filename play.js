@@ -67,10 +67,21 @@ var play = () => {
     
     // Idle
     current_mario.state = 0;
-    current_mario.vx = 0;
     
-    // Go right if possible
-    if(current_mario.right){
+    // Cancel vx (unless a teleportation occurred or mario not grounded)
+    if(
+      (
+        !current_mario.teleport_idle
+        &&
+        current_mario.vx < 10
+      )
+      || current_mario.grounded
+    ){
+      current_mario.vx = 0;
+    }
+    
+    // Go right
+    if(current_mario.right && !current_mario.teleport_idle){
       current_mario.keyright[frame] = true;
       current_mario.vx = walk_speed;
       current_mario.direction = 1;
@@ -82,7 +93,7 @@ var play = () => {
     }
     
     // Go left
-    if(current_mario.left){
+    if(current_mario.left && !current_mario.teleport_idle){
       current_mario.keyleft[frame] = true;
       current_mario.vx = -walk_speed;
       current_mario.direction = 0;
@@ -93,8 +104,8 @@ var play = () => {
       } 
     }
     
-    // Jump
-    if(current_mario.up && current_mario.grounded && current_mario.can_jump){
+    // Jump (if not in a portal)
+    if(!current_mario.in_portal && current_mario.up && current_mario.grounded && current_mario.can_jump){
       current_mario.keyup[frame] = true;
       current_mario.vy -= jump_speed;
       current_mario.grounded = false;
@@ -292,40 +303,23 @@ var play = () => {
       }
     }
     
-    // Display open portals
-    if(blue_portal.tile_x){
-      c.fillStyle = "blue";
-      if(blue_portal.side == 0){
-        c.fillRect(blue_portal.tile_x * 32, blue_portal.tile_y * 32 + 40 - 8, 32, 8);
-      }
-      if(blue_portal.side == 1){
-        c.fillRect(blue_portal.tile_x * 32 + 28, blue_portal.tile_y * 32 + 40, 8, 32);
-      }
-      if(blue_portal.side == 2){
-        c.fillRect(blue_portal.tile_x * 32, blue_portal.tile_y * 32 + 40 + 28, 32, 8);
-      }
-      if(blue_portal.side == 3){
-        c.fillRect(blue_portal.tile_x * 32 - 4, blue_portal.tile_y * 32 + 40, 8, 32);
-      }
+    // If hero is not in a #4 solid tile, assume he's not in a portal
+    if(
+      tile_at(current_mario.x + 1, current_mario.y + 1) != 4
+      &&
+      tile_at(current_mario.x + mario_width - 1, current_mario.y + 1) != 4
+      &&
+      tile_at(current_mario.x + 1, current_mario.y + 31) != 4
+      &&
+      tile_at(current_mario.x + + mario_width - 1, current_mario.y + 31) != 4
+    ){
+      current_mario.in_portal = false;
     }
     
-    if(orange_portal.tile_x){
-      c.fillStyle = "orange";
-      if(orange_portal.side == 0){
-        c.fillRect(orange_portal.tile_x * 32, orange_portal.tile_y * 32 + 40 - 8, 32, 8);
-      }
-      if(orange_portal.side == 1){
-        c.fillRect(orange_portal.tile_x * 32 + 28, orange_portal.tile_y * 32 + 40, 8, 32);
-      }
-      if(orange_portal.side == 2){
-        c.fillRect(orange_portal.tile_x * 32, orange_portal.tile_y * 32 + 40 + 28, 32, 8);
-      }
-      if(orange_portal.side == 3){
-        c.fillRect(orange_portal.tile_x * 32 - 4, orange_portal.tile_y * 32 + 40, 8, 32);
-      }
+    // Decrement teleportation idle delay
+    if(current_mario.teleport_idle){
+      current_mario.teleport_idle--;
     }
-    
-    
   }
   
   // Death animation
@@ -366,6 +360,38 @@ var play = () => {
     c.scale(-1,1);
     c.drawImage(tileset, [26, [27,28,29][~~(frame / 2) % 3], 30, 31][current_mario.state] * 16, 0, 16, 16, 0, 40, 32, 32);
     c.restore();
+  }
+  
+  // Draw portal tiles and portals in front of hero
+  draw_tile(4, blue_portal.tile_x, blue_portal.tile_y);
+  draw_tile(4, orange_portal.tile_x, orange_portal.tile_y);
+  c.fillStyle = "blue";
+  
+  if(blue_portal.side == 0){
+    c.fillRect(blue_portal.tile_x * 32, blue_portal.tile_y * 32 + 40 - 8, 32, 8);
+  }
+  if(blue_portal.side == 1){
+    c.fillRect(blue_portal.tile_x * 32 + 28, blue_portal.tile_y * 32 + 40, 8, 32);
+  }
+  if(blue_portal.side == 2){
+    c.fillRect(blue_portal.tile_x * 32, blue_portal.tile_y * 32 + 40 + 28, 32, 8);
+  }
+  if(blue_portal.side == 3){
+    c.fillRect(blue_portal.tile_x * 32 - 4, blue_portal.tile_y * 32 + 40, 8, 32);
+  }
+  c.fillStyle = "orange";
+  
+  if(orange_portal.side == 0){
+    c.fillRect(orange_portal.tile_x * 32, orange_portal.tile_y * 32 + 40 - 8, 32, 8);
+  }
+  if(orange_portal.side == 1){
+    c.fillRect(orange_portal.tile_x * 32 + 28, orange_portal.tile_y * 32 + 40, 8, 32);
+  }
+  if(orange_portal.side == 2){
+    c.fillRect(orange_portal.tile_x * 32, orange_portal.tile_y * 32 + 40 + 28, 32, 8);
+  }
+  if(orange_portal.side == 3){
+    c.fillRect(orange_portal.tile_x * 32 - 4, orange_portal.tile_y * 32 + 40, 8, 32);
   }
   
   // Apply yellow toggle (invert plain and transparent tiles if yellow toggle has changed during this frame)

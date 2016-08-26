@@ -167,16 +167,107 @@ var reset_mechanisms = function(){
 }
 
 // Apply gravity and collisions to a given object (type 0: mario, type 1: cube)
+// And enter in portals
 var gravity_and_collisions = function(obj, obj_width, type){
   
   // compute object's weight
   if(typeof obj.cube_held != "undefined" && obj.cube_held !== null){
     obj.weight = 1 + level_data.cubes[obj.cube_held].weight;
   }
-  
-  // Stop going right if there's a solid tile or the end of the screen on the right
+
+  // Go right
   if(obj.vx > 0){
+    
+    // Enter a blue portal on the right (tile 4 + portal on position 3 = left + orange portal exists)
     if(
+      tile_at(obj.x + obj_width + obj.vx, obj.y + 16) == 4
+      &&
+      orange_portal.tile_x >= 0
+      &&
+      blue_portal.tile_x == ~~((obj.x + obj_width + obj.vx) / 32)
+      &&
+      blue_portal.tile_y == ~~((obj.y + 16) / 32)
+      &&
+      blue_portal.side == 3
+    ){
+      obj.y = ~~((obj.y + 16) / 32) * 32;
+      obj.vy = 0;
+      obj.in_portal = true;
+      
+      // Teleport
+      if(tile_at(obj.x + obj_width - obj_width / 2, obj.y + 16) == 4){
+        obj.x = orange_portal.tile_x * 32;
+        if(orange_portal.side == 1){
+          obj.x += 16; 
+        }
+        obj.y = orange_portal.tile_y * 32;
+        obj.teleport_idle = 5;
+        
+        // right => top
+        if(orange_portal.side == 0){
+          obj.vy = -obj.vx;
+          obj.vx = 0;
+        }
+        
+        // right => bottom
+        if(orange_portal.side == 2){
+          obj.vy = obj.vx;
+          obj.vx = 0;
+        }
+        
+        // right => left
+        if(orange_portal.side == 3){
+          obj.vx = -obj.vx;
+        }
+      }
+    }
+    
+    // Enter a orange portal on the right (tile 4 + portal on position 3 = left + blue portal exists)
+    else if(
+      tile_at(obj.x + obj_width + obj.vx, obj.y + 16) == 4
+      &&
+      blue_portal.tile_x >= 0
+      &&
+      orange_portal.tile_x == ~~((obj.x + obj_width + obj.vx) / 32)
+      &&
+      orange_portal.tile_y == ~~((obj.y + 16) / 32)
+      &&
+      orange_portal.side == 3
+    ){
+      obj.y = ~~((obj.y + 16) / 32) * 32;
+      obj.vy = 0;
+      obj.in_portal = true;
+      
+      // Teleport
+      if(tile_at(obj.x + obj_width - obj_width / 2, obj.y + 16) == 4){
+        obj.x = blue_portal.tile_x * 32;
+        if(blue_portal.side == 1){
+          obj.x += 16; 
+        }
+        obj.y = blue_portal.tile_y * 32;
+        obj.teleport_idle = 5;
+        
+        // right => top
+        if(blue_portal.side == 0){
+          obj.vy = -obj.vx;
+          obj.vx = 0;
+        }
+        
+        // right => bottom
+        if(blue_portal.side == 2){
+          obj.vy = obj.vx;
+          obj.vx = 0;
+        }
+        
+        // right => left
+        if(blue_portal.side == 3){
+          obj.vx = -obj.vx;
+        }
+      }
+    }
+    
+    // Stop going right if there's a solid tile or the end of the screen on the right
+    else if(
       is_solid(tile_at(obj.x + obj_width + obj.vx, obj.y))
       ||
       is_solid(tile_at(obj.x + obj_width + obj.vx, obj.y + 31))
@@ -193,6 +284,8 @@ var gravity_and_collisions = function(obj, obj_width, type){
     // Stop going right if there's a pipe there
     for(var j in level_data.pipes){
       if(
+        !obj.in_portal
+        &&
         obj.x + obj_width + obj.vx >= level_data.pipes[j][0] * 32
         &&
         obj.x + obj_width + obj.vx  <= level_data.pipes[j][0] * 32 + 16
@@ -207,10 +300,99 @@ var gravity_and_collisions = function(obj, obj_width, type){
     }
   }
   
+  // Go left
   if(obj.vx < 0){
   
-    // Stop going left if there's a solid tile or end of the level on the left
+    // Enter a blue portal on the left (tile 4 + portal on position 1 = right + orange portal exists)
     if(
+      tile_at(obj.x + obj.vx, obj.y + 16) == 4
+      &&
+      orange_portal.tile_x >= 0
+      &&
+      blue_portal.tile_x == ~~((obj.x + obj.vx) / 32)
+      &&
+      blue_portal.tile_y == ~~((obj.y + 16) / 32)
+      &&
+      blue_portal.side == 1
+    ){
+      obj.y = ~~((obj.y + 16) / 32) * 32;
+      obj.vy = 0;
+      obj.in_portal = true;
+      
+      // Teleport
+      if(tile_at(obj.x - obj_width / 2, obj.y + 16) == 4){
+        obj.x = orange_portal.tile_x * 32;
+        if(orange_portal.side == 1){
+          obj.x += 16; 
+        }
+        obj.y = orange_portal.tile_y * 32;
+        obj.teleport_idle = 5;
+        
+        // right => top
+        if(orange_portal.side == 0){
+          obj.vy = obj.vx;
+          obj.vx = 0;
+        }
+        
+        // right => bottom
+        if(orange_portal.side == 2){
+          obj.vy = -obj.vx;
+          obj.vx = 0;
+        }
+        
+        // right => left
+        if(orange_portal.side == 3){
+          obj.vx = obj.vx;
+        }
+      }
+    }
+    
+    // Enter a orange portal on the right (tile 4 + portal on position 1 = left + blue portal exists)
+    else if(
+      tile_at(obj.x + obj.vx, obj.y + 16) == 4
+      &&
+      blue_portal.tile_x >= 0
+      &&
+      orange_portal.tile_x == ~~((obj.x + obj.vx) / 32)
+      &&
+      orange_portal.tile_y == ~~((obj.y + 16) / 32)
+      &&
+      orange_portal.side == 1
+    ){
+      obj.y = ~~((obj.y + 16) / 32) * 32;
+      obj.vy = 0;
+      obj.in_portal = true;
+      
+      // Teleport
+      if(tile_at(obj.x - obj_width / 2, obj.y + 16) == 4){
+        obj.x = blue_portal.tile_x * 32;
+        if(blue_portal.side == 1){
+          obj.x += 16; 
+        }
+        obj.y = blue_portal.tile_y * 32;
+        obj.teleport_idle = 5;
+        
+        // right => top
+        if(blue_portal.side == 0){
+          obj.vy = -obj.vx;
+          obj.vx = 0;
+        }
+        
+        // right => bottom
+        if(blue_portal.side == 2){
+          obj.vy = obj.vx;
+          obj.vx = 0;
+        }
+        
+        // right => left
+        if(blue_portal.side == 3){
+          obj.vx = -obj.vx;
+        }
+      }
+    }
+    
+    // Stop going left if there's a solid tile or end of the level on the left
+    else if(
       is_solid(tile_at(obj.x + obj.vx, obj.y))
       ||
       is_solid(tile_at(obj.x + obj.vx, obj.y + 31))
@@ -244,22 +426,113 @@ var gravity_and_collisions = function(obj, obj_width, type){
   obj.x += obj.vx;
   
   // Apply gravity and compute vertical speed (but don't update position yet)
-  obj.grounded = false;
-  obj.vy += gravity;
-  if(obj.vy > max_fall_speed){
-    obj.vy = max_fall_speed;
+  if(!obj.in_portal){
+    obj.grounded = false;
+    obj.vy += gravity;
+    if(obj.vy > max_fall_speed){
+      obj.vy = max_fall_speed;
+    }
   }
   
   // If object's bottom (lower quarter) is on a solid tile (ex: toggled block), fall under it
-  if(is_solid(tile_at(obj.x + obj_width / 2, obj.y + 24))){
+  if(!obj.in_portal && is_solid(tile_at(obj.x + obj_width / 2, obj.y + 24))){
     obj.y = ~~(obj.y / 32) * 32 + 32;
   }
   
-  // If vertical speed is downwards
+  // Go down
   if(obj.vy > 0){
     
-    // Stop falling if a solid tile is under object (or a spike, if the object is a cube)
+    // Enter a blue portal on the bottom (tile 4 + portal on position 0 = top + orange portal exists)
     if(
+      tile_at(obj.x + obj_width / 2, obj.y + 32 + obj.vy + 8) == 4
+      &&
+      orange_portal.tile_x >= 0
+      &&
+      blue_portal.tile_x == ~~((obj.x + obj_width / 2) / 32)
+      &&
+      blue_portal.tile_y == ~~((obj.y + 32 + obj.vy) / 32)
+      &&
+      blue_portal.side == 0
+    ){
+      obj.x = ~~((obj.x + obj_width / 2) / 32) * 32;
+      //l(obj.x);
+      obj.vx = 0;
+      obj.in_portal = true;
+      
+      // Teleport
+      if(obj.vy > 10 || (obj.vy <= 10 && tile_at(obj.x + obj_width / 2, obj.y + 32 + obj.vy - 16) == 4)){
+        obj.x = orange_portal.tile_x * 32;
+        if(orange_portal.side == 1){
+          obj.x += 16; 
+        }
+        obj.y = orange_portal.tile_y * 32;
+        obj.teleport_idle = 5;
+        
+        // bottom => top
+        if(orange_portal.side == 0){
+          obj.vy = -obj.vy;
+        }
+        
+        // bottom => right
+        if(orange_portal.side == 1){
+          obj.vx = Math.max(obj.vy, 5);
+          obj.vy = 0;
+        }
+        
+        // bottom => left
+        if(orange_portal.side == 3){
+          obj.vx = Math.min(-obj.vy, -5);
+          obj.vy = 0;
+        }
+      }
+    }
+    
+    // Enter a orange portal on the bottom (tile 4 + portal on position 0 = top + blue portal exists)
+    else if(
+      tile_at(obj.x + obj_width / 2, obj.y + 32 + obj.vy + 8) == 4
+      &&
+      blue_portal.tile_x >= 0
+      &&
+      orange_portal.tile_x == ~~((obj.x + obj_width / 2) / 32)
+      &&
+      orange_portal.tile_y == ~~((obj.y + 32 + obj.vy) / 32)
+      &&
+      orange_portal.side == 0
+    ){
+      obj.x = ~~((obj.x + obj_width / 2) / 32) * 32;
+      //l(obj.x);
+      obj.vx = 0;
+      obj.in_portal = true;
+      
+      // Teleport
+      if(obj.vy > 10 || (obj.vy <= 10 && tile_at(obj.x + obj_width / 2, obj.y + 32 + obj.vy - 16) == 4)){
+        obj.x = blue_portal.tile_x * 32;
+        if(blue_portal.side == 1){
+          obj.x += 16; 
+        }obj.y = blue_portal.tile_y * 32;
+        obj.teleport_idle = 5;
+        
+        // bottom => top
+        if(blue_portal.side == 0){
+          obj.vy = -obj.vy;
+        }
+        
+        // bottom => right
+        if(blue_portal.side == 1){
+          obj.vx = Math.max(obj.vy, 5);
+          obj.vy = 0;
+        }
+        
+        // bottom => left
+        if(blue_portal.side == 3){
+          obj.vx = Math.min(-obj.vy, -5);
+          obj.vy = 0;
+        }
+      }
+    }
+    
+    // Stop falling if a solid tile is under object (or a spike, if the object is a cube)
+    else if(
       is_solid(tile_at(obj.x, obj.y + 32 + obj.vy))
       ||
       is_solid(tile_at(obj.x + obj_width, obj.y + 32 + obj.vy))
@@ -347,23 +620,115 @@ var gravity_and_collisions = function(obj, obj_width, type){
     }
   }
   
-  // Stop going up if there's a solid tile on top (only for Mario)
+  // Go up (only for Mario)
   if(type == 0 && obj.vy < 0){
+
+    // Enter a blue portal on top (tile 4 + portal on position 2 = bottom + orange portal exists)
     if(
-      is_solid(tile_at(obj.x, obj.y))
+      tile_at(obj.x + obj_width / 2, obj.y - 8) == 4
+      &&
+      orange_portal.tile_x >= 0
+      &&
+      blue_portal.tile_x == ~~((obj.x + obj_width / 2) / 32)
+      &&
+      blue_portal.tile_y == ~~((obj.y - 8) / 32)
+      &&
+      blue_portal.side == 2
+    ){
+      obj.x = ~~((obj.x + obj_width / 2) / 32) * 32;
+      //l(obj.x);
+      obj.vx = 0;
+      obj.in_portal = true;
+      
+      // Teleport
+      if(tile_at(obj.x + obj_width / 2, obj.y - 8) == 4){
+        obj.x = orange_portal.tile_x * 32;
+        if(orange_portal.side == 1){
+          obj.x += 16; 
+        }
+        obj.y = orange_portal.tile_y * 32;
+        obj.teleport_idle = 5;
+        
+        // top => right
+        if(orange_portal.side == 1){
+          obj.vx = -obj.vy;
+          obj.vy = 0;
+        }
+        
+        // top => bottom
+        if(orange_portal.side == 2){
+          obj.vy = -obj.vy;
+        }
+        
+        // top => left
+        if(orange_portal.side == 3){
+          obj.vx = obj.vy;
+          obj.vy = 0;
+        }
+      }
+    }
+    
+    // Enter a orange portal on top (tile 4 + portal on position 2 = bottom + blue portal exists)
+    else if(
+      tile_at(obj.x + obj_width / 2, obj.y - 8) == 4
+      &&
+      blue_portal.tile_x >= 0
+      &&
+      orange_portal.tile_x == ~~((obj.x + obj_width / 2) / 32)
+      &&
+      orange_portal.tile_y == ~~((obj.y - 8) / 32)
+      &&
+      orange_portal.side == 2
+    ){
+      obj.x = ~~((obj.x + obj_width / 2) / 32) * 32;
+      //l(obj.x);
+      obj.vx = 0;
+      obj.in_portal = true;
+      
+      // Teleport
+      if(tile_at(obj.x + obj_width / 2, obj.y - 8) == 4){
+        obj.x = blue_portal.tile_x * 32;
+        if(blue_portal.side == 1){
+          obj.x += 16; 
+        }
+        obj.y = blue_portal.tile_y * 32;
+        obj.teleport_idle = 5;
+        
+        // top => right
+        if(blue_portal.side == 1){
+          obj.vx = -obj.vy;
+          obj.vy = 0;
+        }
+        
+        // top => bottom
+        if(blue_portal.side == 2){
+          obj.vy = -obj.vy;
+        }
+        
+        // top => left
+        if(blue_portal.side == 3){
+          obj.vx = obj.vy;
+          obj.vy = 0;
+        }
+      }
+    }
+    
+    // Stop going up if there's a solid tile on top (only for Mario)
+    else if(
+      is_solid(tile_at(obj.x, obj.y + obj.vy))
       ||
-      is_solid(tile_at(obj.x + obj_width, obj.y))
+      is_solid(tile_at(obj.x + obj_width, obj.y + obj.vy))
     ){
       
       // Break bricks (tile #5)
-      if(tile_at(obj.x, obj.y) == 5){
-        set_tile(obj.x, obj.y, 0);
+      if(tile_at(obj.x, obj.y + obj.vy) == 5){
+        set_tile(obj.x, obj.y + obj.vy, 0);
       }
-      if(tile_at(obj.x + mario_width, obj.y) == 5){
-        set_tile(obj.x + mario_width, obj.y, 0);
+      if(tile_at(obj.x + mario_width, obj.y + obj.vy) == 5){
+        set_tile(obj.x + mario_width, obj.y + obj.vy, 0);
       }
       
-      obj.y = ~~((obj.y) / 32) * 32 + 32;
+      obj.y = ~~((obj.y + obj.vy) / 32) * 32 + 32;
       obj.vy = 0;
     }
   }

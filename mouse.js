@@ -76,25 +76,26 @@ a.onclick = a.oncontextmenu = (e) => {
   // =======
   if(screen == 2 && frame > 0){
     
-    // Left click: current mario sends a blue portal
-    if(e.which == 1){
-      current_mario.shoot_blue = 1;
-    } 
-    if(e.which == 3){
-      current_mario.shoot_orange = 1;
+    // Send portals (only if we're not in a portal already)
+    if(!current_mario.in_portal){
+      
+      // Left click: current mario sends a blue portal
+      if(e.which == 1){
+        current_mario.shoot_blue = 1;
+      }
+      
+      // Right click: current mario sends a orange portal
+      if(e.which == 3){
+        current_mario.shoot_orange = 1;
+      }
+      
+      // Compute the angle made by the line "Mario - click coordinates" and the horizontal axis
+      var angle = Math.atan2(x - (current_mario.x + mario_width / 2), y - (current_mario.y + 40 + 16));
+      current_mario.portal_shoot_x = current_mario.x + mario_width / 2;
+      current_mario.portal_shoot_y = current_mario.y + 16;
+      current_mario.portal_shoot_vx = Math.sin(angle);
+      current_mario.portal_shoot_vy = Math.cos(angle);
     }
-    
-    c.beginPath();
-    
-    // Compute the angle made by the line "Mario - click coordinates" and the horizontal axis
-    var angle = Math.atan2(x - (current_mario.x + mario_width / 2), y - (current_mario.y + 40 + 16));
-    current_mario.portal_shoot_x = current_mario.x + mario_width / 2;
-    current_mario.portal_shoot_y = current_mario.y + 16;
-    current_mario.portal_shoot_vx = Math.sin(angle);
-    current_mario.portal_shoot_vy = Math.cos(angle);
-    
-    c.stroke();
-    c.closePath();
     
     // Quit
     c.beginPath();
