@@ -239,7 +239,7 @@ var handle_clicks = (e) => {
       }
       
       else{
-      
+        l(1);
         // Tile #1: only one time machine, below line 1
         if(current_editor_tile == 1){
           
@@ -348,7 +348,7 @@ var handle_clicks = (e) => {
         }      
       }
       
-      draw_screen();
+      draw_screen(1);
     }
     c.closePath();
   }
@@ -386,6 +386,6 @@ onmousemove = (e) => {
     y = e.pageY - a.getBoundingClientRect().top - document.documentElement.scrollTop - document.body.scrollTop;
     tile_x = Math.floor(x / 32);
     tile_y = Math.floor((y - 40) / 32);
-    draw_screen();
+    draw_screen(1);
   }
 }

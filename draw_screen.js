@@ -1,5 +1,6 @@
 // Draw current screen (on load, when draw_screen is called, and when the hash changes)
-var draw_screen = onload = onhashchange = () => {
+// If no_reset is set, update the level editor without loading the map from the hash
+var draw_screen = onload = onhashchange = (no_reset) => {
   
   // Reset canvas
   a.width ^= 0;
@@ -97,12 +98,14 @@ var draw_screen = onload = onhashchange = () => {
     }
     
     // Tiles on grid
-    if(level_data.hash){
-      level_data.tiles = [];
-      for(var j = 0; j < 20; j++){
-        level_data.tiles[j] = [];
-        for(var i = 0; i < 40; i++){
-          level_data.tiles[j][i] = level_data.hash.charCodeAt(j * 40 + i) - 0x30;
+    if(!no_reset){
+      if(level_data.hash){
+        level_data.tiles = [];
+        for(var j = 0; j < 20; j++){
+          level_data.tiles[j] = [];
+          for(var i = 0; i < 40; i++){
+            level_data.tiles[j][i] = level_data.hash.charCodeAt(j * 40 + i) - 0x30;
+          }
         }
       }
     }

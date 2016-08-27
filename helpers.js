@@ -72,7 +72,7 @@ var reset_current_level = () => {
     pick_cube_animation_frame: 0
   }
 
-  // Solidity of the tiles (some of them vary during gameplay, sor reset it before each level and after reset)
+  // Solidity of the tiles (some of them vary during gameplay, so we reset it before each level and after reset)
   solid = [
     0, 
     0, 
