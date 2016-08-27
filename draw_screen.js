@@ -97,6 +97,16 @@ var draw_screen = onload = onhashchange = () => {
     }
     
     // Tiles on grid
+    if(level_data.hash){
+      level_data.tiles = [];
+      for(var j = 0; j < 20; j++){
+        level_data.tiles[j] = [];
+        for(var i = 0; i < 40; i++){
+          level_data.tiles[j][i] = level_data.hash.charCodeAt(j * 40 + i) - 0x30;
+        }
+      }
+    }
+  
     for(j = 0; j < level_data.tiles.length; j++){
       for(i = 0; i < level_data.tiles[j].length; i++){
         drawn_tile = level_data.tiles[j][i];
@@ -177,7 +187,7 @@ var draw_screen = onload = onhashchange = () => {
     // Balances
     for(i in level_data.balances){
       
-      if(level_data.balances[i][3]){
+      if(level_data.balances[i][1]){
         // Draw balance 1
         draw_tile(15, level_data.balances[i][0] - 1, level_data.balances[i][1]);
         draw_tile(15, level_data.balances[i][0], level_data.balances[i][1]);
@@ -186,7 +196,9 @@ var draw_screen = onload = onhashchange = () => {
         level_data.tiles[level_data.balances[i][1]][level_data.balances[i][0] - 1] = 15;
         level_data.tiles[level_data.balances[i][1]][level_data.balances[i][0]] = 15;
         level_data.tiles[level_data.balances[i][1]][level_data.balances[i][0] + 1] = 15;
-        
+      }
+      
+      if(level_data.balances[i][3]){
         // Draw balance 2
         draw_tile(15, level_data.balances[i][2] - 1, level_data.balances[i][3]);
         draw_tile(15, level_data.balances[i][2], level_data.balances[i][3]);

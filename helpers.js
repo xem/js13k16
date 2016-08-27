@@ -53,7 +53,7 @@ var reset_current_level = () => {
 
   // Current mario
   current_mario = {
-    x: 0,
+    x: 640,
     y: 0,
     vx: 0,
     vy: 0,

@@ -378,7 +378,7 @@ onmousemove = (e) => {
     
     // Consider mousedown + mousemove like clicks (unless we're placing a pipe or a balance)
     if(mousedown && current_editor_tile != 14 && current_editor_tile != 15){
-      tmp(e);
+      handle_clicks(e);
     }
     
     // Save mouse tile coordinates

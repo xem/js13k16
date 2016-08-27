@@ -49,6 +49,5 @@ onkeyup = (e) => {
     if(e.keyCode == 32){
       current_mario.space ^= 1;
     }
-    
   }
 }

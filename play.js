@@ -236,11 +236,8 @@ var play = () => {
     else {
       if(level_data.cubes[current_mario.cube_held]){
         
-        // Drop ahead of mario (todo)
-        //level_data.cubes[current_mario.cube_held].x = current_mario.x + (current_mario.direction == 1 ? 1 : -1) * 16;
-        //if(is_solid(tile_at( ~~((level_data.cubes[current_mario.cube_held].x + 32) / 32), level_data.cubes[current_mario.cube_held].y))){
-        //  level_data.cubes[current_mario.cube_held].x = current_mario.x;
-        //}        
+        // Drop ahead of mario? (todo)
+        
         level_data.cubes[current_mario.cube_held].mario = null;
         current_mario.cube_held = null;
         current_mario.weight = 1;
@@ -249,7 +246,7 @@ var play = () => {
     
     // Hold cube
     if(current_mario.cube_held !== null){
-      level_data.cubes[current_mario.cube_held].x = current_mario.x + (current_mario.direction * -1) * 0;
+      level_data.cubes[current_mario.cube_held].x = current_mario.x;
       
       // Animate cube grab (make it last 5 frames)
       if(current_mario.pick_cube_animation_frame){
@@ -378,7 +375,6 @@ var play = () => {
               current_mario.portal_shoot_vx = -current_mario.portal_shoot_vx;
             }
           }
-          
           
           // Place portal if tile is #4 (white wall) and no blue portal is here yet
           if(
@@ -509,7 +505,6 @@ var play = () => {
   if(orange_portal.side == 3){
     c.fillRect(orange_portal.tile_x * 32 - 4, orange_portal.tile_y * 32 + 40, 8, 32);
   }
-  
   
   // Mechanisms
   // ==========
