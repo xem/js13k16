@@ -455,7 +455,6 @@ var gravity_and_collisions = function(obj, obj_width, type){
       blue_portal.side == 0
     ){
       obj.x = ~~((obj.x + obj_width / 2) / 32) * 32;
-      //l(obj.x);
       obj.vx = 0;
       obj.in_portal = true;
       
@@ -466,7 +465,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
           obj.x += 16; 
         }
         obj.y = orange_portal.tile_y * 32;
-        obj.teleport_idle = 5;
+        obj.teleport_idle = 2;
         
         // bottom => top
         if(orange_portal.side == 0){
@@ -500,7 +499,6 @@ var gravity_and_collisions = function(obj, obj_width, type){
       orange_portal.side == 0
     ){
       obj.x = ~~((obj.x + obj_width / 2) / 32) * 32;
-      //l(obj.x);
       obj.vx = 0;
       obj.in_portal = true;
       
@@ -510,7 +508,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
         if(blue_portal.side == 1){
           obj.x += 16; 
         }obj.y = blue_portal.tile_y * 32;
-        obj.teleport_idle = 5;
+        obj.teleport_idle = 2;
         
         // bottom => top
         if(blue_portal.side == 0){

@@ -79,6 +79,10 @@ a.onclick = a.oncontextmenu = (e) => {
     // Send portals (only if we're not in a portal already)
     if(!current_mario.in_portal){
       
+      // Cancel current shoots
+      current_mario.shoot_blue = 0;
+      current_mario.shoot_orange = 0;
+      
       // Left click: current mario sends a blue portal
       if(e.which == 1){
         current_mario.shoot_blue = 1;

@@ -82,7 +82,7 @@ var reset_current_level = () => {
     1, 
     0, // 6: coin
     0, // 7: spike
-    1, 
+    1, // 8: ice
     1, 
     0,
     0, // 11: yellow toggle

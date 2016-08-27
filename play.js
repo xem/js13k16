@@ -194,8 +194,13 @@ var play = () => {
         current_mario.pick_cube_animation_frame--;
       }
       
-      // Place cube over Mario
-      level_data.cubes[current_mario.cube_held].y = current_mario.y - 32 + current_mario.pick_cube_animation_frame * 4;
+      // Place cube over Mario (unless he's passing through a portal)
+      if(current_mario.in_portal){ 
+        level_data.cubes[current_mario.cube_held].y = current_mario.y - 4 + current_mario.pick_cube_animation_frame * 4;
+      }
+      else{
+        level_data.cubes[current_mario.cube_held].y = current_mario.y - 32 + current_mario.pick_cube_animation_frame * 4;
+      }
     }
     
     // If no cube is held, cancel space key
@@ -243,11 +248,23 @@ var play = () => {
             temp_side = 2;
           }
 
-          // Place portal if tile is #4 and no orange portal is here yet
+          // Reflect ray if tile is #8 (ice)
+          if(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y) == 8){
+            current_mario.shoot_blue = 1;
+            if(temp_side == 0 || temp_side == 2){
+              current_mario.portal_shoot_vy = -current_mario.portal_shoot_vy;
+            }
+            else //if(temp_side == 1 || temp_side == 3)
+            {
+              current_mario.portal_shoot_vx = -current_mario.portal_shoot_vx;
+            }
+          }
+          
+          // Place portal if tile is #4 (white wall) and no orange portal is here yet
           if(
             tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y) == 4
             &&
-            (~~(current_mario.portal_shoot_x / 32) != orange_portal.tile_x || ~~(current_mario.portal_shoot_y / 32) != orange_portal.tile_y || orange_portal != temp_side)
+            (~~(current_mario.portal_shoot_x / 32) != orange_portal.tile_x || ~~(current_mario.portal_shoot_y / 32) != orange_portal.tile_y || orange_portal.side != temp_side)
           ){
             blue_portal.tile_x = ~~(current_mario.portal_shoot_x / 32);
             blue_portal.tile_y = ~~(current_mario.portal_shoot_y / 32);
@@ -285,11 +302,24 @@ var play = () => {
             temp_side = 2;
           }
 
-          // Place portal if tile is #4 and no orange portal is here yet
+          // Reflect ray if tile is #8 (ice)
+          if(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y) == 8){
+            current_mario.shoot_orange = 1;
+            if(temp_side == 0 || temp_side == 2){
+              current_mario.portal_shoot_vy = -current_mario.portal_shoot_vy;
+            }
+            else //if(temp_side == 1 || temp_side == 3)
+            {
+              current_mario.portal_shoot_vx = -current_mario.portal_shoot_vx;
+            }
+          }
+          
+          
+          // Place portal if tile is #4 (white wall) and no blue portal is here yet
           if(
             tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y) == 4
             &&
-            (~~(current_mario.portal_shoot_x / 32) != orange_portal.tile_x || ~~(current_mario.portal_shoot_y / 32) != orange_portal.tile_y || orange_portal != temp_side)
+            (~~(current_mario.portal_shoot_x / 32) != blue_portal.tile_x || ~~(current_mario.portal_shoot_y / 32) != blue_portal.tile_y || blue_portal.side != temp_side)
           ){
             orange_portal.tile_x = ~~(current_mario.portal_shoot_x / 32);
             orange_portal.tile_y = ~~(current_mario.portal_shoot_y / 32);
