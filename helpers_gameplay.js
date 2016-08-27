@@ -641,7 +641,6 @@ var gravity_and_collisions = function(obj, obj_width, type){
       blue_portal.side == 2
     ){
       obj.x = ~~((obj.x + obj_width / 2) / 32) * 32;
-      //l(obj.x);
       obj.vx = 0;
       obj.in_portal = true;
       

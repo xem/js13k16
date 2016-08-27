@@ -11,27 +11,27 @@ var play = () => {
   
   // First levels: add text
   if(last_screen == 1){
+    c.font = "bold 30px arial";
+    c.fillStyle = "black";
+    c.textAlign = "center";
+    
     if(level == 1){
-      c.font = "bold 30px arial";
-      c.fillStyle = "black";
-      c.textAlign = "center";
       c.fillText("Move with arrow keys or WASD or ZQSD.", 640, 80);
       c.fillText("Pick and drop cubes with [space]. Restart with R.", 640, 120);
       c.fillText("Collect all coins and reach the flag.", 640, 160);
     }
+    
     if(level == 2){
-      c.font = "bold 30px arial";
-      c.fillStyle = "black";
-      c.textAlign = "center";
       c.fillText("Let's add some mechanisms...", 640, 80);
     }
     
     if(level == 3){
-      c.font = "bold 30px arial";
-      c.fillStyle = "black";
-      c.textAlign = "center";
       c.fillText("And now, you're thinking with portals!", 640, 80);
       c.fillText("Use mouse to aim and [left click] / [right click] to shoot.", 640, 120);
+    }
+    
+    if(level == 4){
+      c.fillText("Don't forget the momentum!", 640, 120);
     }
   }
   
@@ -105,7 +105,7 @@ var play = () => {
       )
     ){
       current_mario.keyright[frame] = true;
-      current_mario.vx = walk_speed;
+      current_mario.vx = Math.max(current_mario.vx, walk_speed);
       current_mario.direction = 1;
       
       // Walk animation
@@ -129,7 +129,7 @@ var play = () => {
       )
     ){
       current_mario.keyleft[frame] = true;
-      current_mario.vx = -walk_speed;
+      current_mario.vx = Math.min(current_mario.vx, -walk_speed);
       current_mario.direction = 0;
       
       // Walk animation
@@ -249,7 +249,7 @@ var play = () => {
     
     // Hold cube
     if(current_mario.cube_held !== null){
-      level_data.cubes[current_mario.cube_held].x = current_mario.x + (current_mario.direction * -1) * 8;
+      level_data.cubes[current_mario.cube_held].x = current_mario.x + (current_mario.direction * -1) * 0;
       
       // Animate cube grab (make it last 5 frames)
       if(current_mario.pick_cube_animation_frame){

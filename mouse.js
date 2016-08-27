@@ -1,6 +1,11 @@
 // Handle clicks on the canvas on each screen
 a.onclick = a.oncontextmenu = (e) => {
+  handle_clicks(e);
+  return false;
+}
 
+var handle_clicks = (e) => {
+  
   // Offsets
   x = e.pageX - a.getBoundingClientRect().left - document.documentElement.scrollLeft - document.body.scrollLeft;
   y = e.pageY - a.getBoundingClientRect().top - document.documentElement.scrollTop - document.body.scrollTop;
@@ -347,8 +352,6 @@ a.onclick = a.oncontextmenu = (e) => {
     }
     c.closePath();
   }
-  
-  return false;
 }
 
 // On mouse down, set a mousedown flag and a rightclick flag (if right click is down)
@@ -375,7 +378,7 @@ onmousemove = (e) => {
     
     // Consider mousedown + mousemove like clicks (unless we're placing a pipe or a balance)
     if(mousedown && current_editor_tile != 14 && current_editor_tile != 15){
-      onclick(e);
+      tmp(e);
     }
     
     // Save mouse tile coordinates
