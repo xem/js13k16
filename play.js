@@ -30,8 +30,8 @@ var play = () => {
       c.font = "bold 30px arial";
       c.fillStyle = "black";
       c.textAlign = "center";
-      //c.fillText("And now, you're thinking with portals!", 640, 80);
-      //c.fillText("Use mouse to aim and [left click] / [right click] to shoot.", 640, 120);
+      c.fillText("And now, you're thinking with portals!", 640, 80);
+      c.fillText("Use mouse to aim and [left click] / [right click] to shoot.", 640, 120);
     }
   }
   
@@ -67,21 +67,43 @@ var play = () => {
     
     // Idle
     current_mario.state = 0;
+    current_mario.on_pipe = false;
     
-    // Cancel vx (unless a teleportation occurred or mario not grounded)
+    // Cancel vx (unless a teleportation occurred or mario not grounded or mario is on ice)
     if(
       (
-        !current_mario.teleport_idle
-        &&
-        current_mario.vx < 10
+        (
+          !current_mario.teleport_idle
+          &&
+          current_mario.vx < 10
+        )
+        ||
+        (
+          current_mario.grounded
+        )
       )
-      || current_mario.grounded
+      &&
+      tile_at(current_mario.x, current_mario.y + 33) != 8
+      &&
+      tile_at(current_mario.x + mario_width, current_mario.y + 33) != 8
     ){
       current_mario.vx = 0;
     }
     
-    // Go right
-    if(current_mario.right && !current_mario.teleport_idle){
+    // Go right (unless if being teleported, or slipping left on ice)
+    if(
+      current_mario.right
+      &&
+      !current_mario.teleport_idle
+      &&
+      !(
+        tile_at(current_mario.x, current_mario.y + 33) == 8
+        &&
+        tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
+        &&
+        current_mario.vx < 0
+      )
+    ){
       current_mario.keyright[frame] = true;
       current_mario.vx = walk_speed;
       current_mario.direction = 1;
@@ -92,8 +114,20 @@ var play = () => {
       }
     }
     
-    // Go left
-    if(current_mario.left && !current_mario.teleport_idle){
+    // Go left (unless if being teleported, or slipping right on ice)
+    if(
+      current_mario.left
+      &&
+      !current_mario.teleport_idle
+      &&
+      !(
+        tile_at(current_mario.x, current_mario.y + 33) == 8
+        &&
+        tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
+        &&
+        current_mario.vx > 0
+      )
+    ){
       current_mario.keyleft[frame] = true;
       current_mario.vx = -walk_speed;
       current_mario.direction = 0;
@@ -104,8 +138,24 @@ var play = () => {
       } 
     }
     
-    // Jump (if not in a portal)
-    if(!current_mario.in_portal && current_mario.up && current_mario.grounded && current_mario.can_jump){
+    // Jump (if not in a portal and not slipping on ice)
+    if(
+      !current_mario.in_portal
+      &&
+      current_mario.up
+      &&
+      current_mario.grounded
+      &&
+      current_mario.can_jump
+      &&
+      !(
+        tile_at(current_mario.x, current_mario.y + 33) == 8
+        &&
+        tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
+        &&
+        current_mario.vx != 0
+      )
+    ){
       current_mario.keyup[frame] = true;
       current_mario.vy -= jump_speed;
       current_mario.grounded = false;
@@ -118,9 +168,7 @@ var play = () => {
     }
     
     // Apply gravity and collsions
-    //console.log(current_mario.x, current_mario.y);
     gravity_and_collisions(current_mario, mario_width, 0);
-    //console.log(current_mario.x, current_mario.y);
     
     // Collect coins (tile 6 => tile 0)
     if(tile_at(current_mario.x + mario_width / 2, current_mario.y + 16) == 6){
@@ -138,13 +186,27 @@ var play = () => {
       tile_at(current_mario.x + mario_width - 3, current_mario.y + 5) == 7
     ){
       current_mario.state = 3;
-      current_mario.vy = -1.5 * jump_speed;
+      current_mario.vy = -1 * jump_speed;
     }
     
     // Die (fall)
     if(current_mario.y > 648){
       current_mario.state = 3;
       current_mario.vy = -1.5 * jump_speed;
+    }
+    
+    // Die (crush between a pipe or a balance, and a solid tile)
+    if(
+      current_mario.on_moving_object
+      &&
+      (
+        is_solid(tile_at(current_mario.x, current_mario.y + 1))
+        ||
+        is_solid(tile_at(current_mario.x + mario_width, current_mario.y + 1))
+      )
+    ){
+      current_mario.state = 3;
+      current_mario.vy = -1 * jump_speed;
     }
     
     // Pick cube
@@ -194,9 +256,12 @@ var play = () => {
         current_mario.pick_cube_animation_frame--;
       }
       
-      // Place cube over Mario (unless he's passing through a portal)
+      // Place cube over Mario (unless he's passing through a portal or there's a solid tile above, in this case hold it very low)
       if(current_mario.in_portal){ 
-        level_data.cubes[current_mario.cube_held].y = current_mario.y - 4 + current_mario.pick_cube_animation_frame * 4;
+        level_data.cubes[current_mario.cube_held].y = current_mario.y;
+      }
+      else if(is_solid(tile_at(current_mario.x, current_mario.y - 28)) || is_solid(tile_at(current_mario.x + mario_width, current_mario.y - 28))){
+        level_data.cubes[current_mario.cube_held].y = ~~((current_mario.y + 4) / 32) * 32;
       }
       else{
         level_data.cubes[current_mario.cube_held].y = current_mario.y - 32 + current_mario.pick_cube_animation_frame * 4;
@@ -366,6 +431,24 @@ var play = () => {
   
   for(i in level_data.cubes){
     
+    // If cube is not in a #4 solid tile, assume it's not in a portal
+    if(
+      tile_at(level_data.cubes[i].x + 1, level_data.cubes[i].y + 1) != 4
+      &&
+      tile_at(level_data.cubes[i].x + 32 - 1, level_data.cubes[i].y + 1) != 4
+      &&
+      tile_at(level_data.cubes[i].x + 1, level_data.cubes[i].y + 31) != 4
+      &&
+      tile_at(level_data.cubes[i].x + + 32 - 1, level_data.cubes[i].y + 31) != 4
+    ){
+      level_data.cubes[i].in_portal = false;
+    }
+    
+    // Decrement teleportation idle delay
+    if(level_data.cubes[i].teleport_idle){
+      level_data.cubes[i].teleport_idle--;
+    }  
+    
     // Apply gravity and collsions if the cube is not held
     if(level_data.cubes[i].mario === null){
       level_data.cubes[i].vx = 0;
@@ -373,11 +456,14 @@ var play = () => {
     }
   }
   
+  // Draw
+  // ====
+
   // Draw cubes
   for(i in level_data.cubes){
     c.drawImage(tileset, 12 * 16, 0, 16, 16, level_data.cubes[i].x, 40 + level_data.cubes[i].y, 32, 32);
   }
-  
+    
   // Draw Mario (facing right)
   if(current_mario.direction == 1){
     c.drawImage(tileset, [26, [27,28,29][~~(frame / 2) % 3], 30, 31][current_mario.state] * 16, 0, 16, 16, current_mario.x - 4, 40 + current_mario.y, 32, 32);
@@ -424,6 +510,10 @@ var play = () => {
     c.fillRect(orange_portal.tile_x * 32 - 4, orange_portal.tile_y * 32 + 40, 8, 32);
   }
   
+  
+  // Mechanisms
+  // ==========
+  
   // Apply yellow toggle (invert plain and transparent tiles if yellow toggle has changed during this frame)
   if(yellow_toggle != yellow_toggle_last_frame){
     for(j = 0; j < 20; j++){
@@ -444,14 +534,30 @@ var play = () => {
   // Balances
   for(i in level_data.balances){
     
-    // More weight on side 1
-    if(balances_state[i].weight1 > balances_state[i].weight2){
+    // More weight on side 1 and no solid tile under platform 1 and no solid tile over platform 2
+    if(
+      balances_state[i].weight1 > balances_state[i].weight2
+      && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 + 20))
+      && !is_solid(tile_at(level_data.balances[i][0] * 32, balances_state[i].y1 + 20))
+      && !is_solid(tile_at(level_data.balances[i][0] * 32 + 32, balances_state[i].y1 + 20))
+      && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 - 4))
+      && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 - 4))
+      && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 - 4))
+    ){
       balances_state[i].y1 += 4;
       balances_state[i].y2 -= 4;
     }
     
-    // More weight on side 2
-    else if(balances_state[i].weight2 > balances_state[i].weight1){
+    // More weight on side 2 and no solid tile under platform 2 and no solid tile over platform 1
+    else if(
+      balances_state[i].weight2 > balances_state[i].weight1
+      && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 + 20))
+      && !is_solid(tile_at(level_data.balances[i][2] * 32, balances_state[i].y2 + 20))
+      && !is_solid(tile_at(level_data.balances[i][2] * 32 + 32, balances_state[i].y2 + 20))
+      && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 - 4))
+      && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 - 4))
+      && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 - 4))
+    ){
       balances_state[i].y1 -= 4;
       balances_state[i].y2 += 4;
     }

@@ -320,7 +320,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
       obj.in_portal = true;
       
       // Teleport
-      if(tile_at(obj.x - obj_width / 2, obj.y + 16) == 4){
+      if(tile_at(obj.x - obj_width / 2 + 32, obj.y + 16) == 4){
         obj.x = orange_portal.tile_x * 32;
         if(orange_portal.side == 1){
           obj.x += 16; 
@@ -328,26 +328,26 @@ var gravity_and_collisions = function(obj, obj_width, type){
         obj.y = orange_portal.tile_y * 32;
         obj.teleport_idle = 5;
         
-        // right => top
+        // left => top
         if(orange_portal.side == 0){
           obj.vy = obj.vx;
           obj.vx = 0;
         }
         
-        // right => bottom
+        // left => right
+        if(orange_portal.side == 1){
+          obj.vx = -obj.vx;
+        }
+        
+        // left => bottom
         if(orange_portal.side == 2){
           obj.vy = -obj.vx;
           obj.vx = 0;
         }
-        
-        // right => left
-        if(orange_portal.side == 3){
-          obj.vx = obj.vx;
-        }
       }
     }
     
-    // Enter a orange portal on the right (tile 4 + portal on position 1 = left + blue portal exists)
+    // Enter a orange portal on the left (tile 4 + portal on position 1 = left + blue portal exists)
     else if(
       tile_at(obj.x + obj.vx, obj.y + 16) == 4
       &&
@@ -364,7 +364,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
       obj.in_portal = true;
       
       // Teleport
-      if(tile_at(obj.x - obj_width / 2, obj.y + 16) == 4){
+      if(tile_at(obj.x - obj_width / 2 + 32, obj.y + 16) == 4){
         obj.x = blue_portal.tile_x * 32;
         if(blue_portal.side == 1){
           obj.x += 16; 
@@ -372,21 +372,21 @@ var gravity_and_collisions = function(obj, obj_width, type){
         obj.y = blue_portal.tile_y * 32;
         obj.teleport_idle = 5;
         
-        // right => top
+        // left => top
         if(blue_portal.side == 0){
-          obj.vy = -obj.vx;
-          obj.vx = 0;
-        }
-        
-        // right => bottom
-        if(blue_portal.side == 2){
           obj.vy = obj.vx;
           obj.vx = 0;
         }
         
-        // right => left
-        if(blue_portal.side == 3){
+        // left => right
+        if(blue_portal.side == 1){
           obj.vx = -obj.vx;
+        }
+        
+        // left => bottom
+        if(blue_portal.side == 2){
+          obj.vy = -obj.vx;
+          obj.vx = 0;
         }
       }
     }
@@ -544,9 +544,13 @@ var gravity_and_collisions = function(obj, obj_width, type){
       obj.grounded = true;
     }
     
-    // Stop falling if a cube is under object
+    // Stop falling if a cube is under object (only if the cube and the object are not in a portal)
     for(i in level_data.cubes){
       if(
+        !level_data.cubes[i].in_portal
+        &&
+        !obj.in_portal
+        &&
         obj.x + obj_width > level_data.cubes[i].x
         &&
         obj.x < level_data.cubes[i].x + 32
@@ -578,6 +582,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
         obj.y = pipes_state[j].y - 32;
         obj.vy = 0;
         obj.grounded = true;
+        obj.on_moving_object = true;
       }
     }
     
@@ -595,6 +600,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
         obj.y = balances_state[j].y1 - 32;
         obj.vy = 0;
         obj.grounded = true;
+        obj.on_moving_object = true;
         balances_state[j].weight1 += obj.weight;
       }
     }
@@ -613,6 +619,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
         obj.y = balances_state[j].y2 - 32;
         obj.vy = 0;
         obj.grounded = true;
+        obj.on_moving_object = true;
         balances_state[j].weight2 += obj.weight;
       }
     }
