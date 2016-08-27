@@ -5,11 +5,7 @@ a.onclick = a.oncontextmenu = (e) => {
 }
 
 var handle_clicks = (e) => {
-  
-  // Offsets
-  x = e.pageX - a.getBoundingClientRect().left - document.documentElement.scrollLeft - document.body.scrollLeft;
-  y = e.pageY - a.getBoundingClientRect().top - document.documentElement.scrollTop - document.body.scrollTop;
-
+    
   // Main menu
   // =========
   
@@ -123,19 +119,20 @@ var handle_clicks = (e) => {
   // ===============
   if(screen == 3){
   
+    // Build a hash with all the tiles #0 - #15 and #20 - #22 (i.e. all except pipes and pipe switches)
+    level_data.hash = "";
+    for(j = 0; j < 20; j++){
+      for(i = 0; i < 40; i++){
+        tile = level_data.tiles[j][i] || 0;
+        tile = (tile < 16 || tile > 21) ? tile : 0;
+        level_data.hash += String.fromCharCode(tile + 0x30);
+      }
+    }
+
     // Test
     c.beginPath();
     c.rect(750, 4, 100, 32);
     if(c.isPointInPath(x, y)){
-      
-      level_data.hash = "";
-      for(j = 0; j < 20; j++){
-        for(i = 0; i < 40; i++){
-          tile = level_data.tiles[j][i] || 0;
-          tile = (tile < 16 || tile > 21) ? tile : 0;
-          level_data.hash += String.fromCharCode(tile + 0x30);
-        }
-      }
       last_screen = 3;
       screen = 2;
       draw_screen();
@@ -146,26 +143,13 @@ var handle_clicks = (e) => {
     c.beginPath();
     c.rect(875, 4, 100, 32);
     if(c.isPointInPath(x, y)){
-      
-      level_data.hash = "";
-      for(j = 0; j < 20; j++){
-        for(i = 0; i < 40; i++){
-          tile = level_data.tiles[j][i] || 0;
-          tile = (tile < 16 || tile > 21) ? tile : 0;
-          level_data.hash += String.fromCharCode(tile + 0x30);
-        }
-      }
-      
       location.hash = "";
-        
       if(level_data.tested == false){
         alert("You need to test and win your level first.");
-        
         // TMP
         prompt("Here's your level URL:", encodeURI(location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances})));
         prompt("Here's your level URL:", location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances}));
       }
-      
       else {
         prompt("Here's your level URL:", encodeURI(location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances})));
         prompt("Here's your level URL:", location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances}));
@@ -196,6 +180,8 @@ var handle_clicks = (e) => {
       c.beginPath();
       c.rect(8.5 + i * 35, 3.5, 32, 32);
       if(c.isPointInPath(x, y) && pipe_click == 0 && balance_click == 0){
+        
+        // Chosen tile
         current_editor_tile = i;
         
         // Pipe: init a pipe object
@@ -208,28 +194,23 @@ var handle_clicks = (e) => {
           level_data.balances[current_balance] = [];
         }
         
+        // Redraw entire screen (to show the active tile of the tileset)
         draw_screen();
       }
       c.closePath();
     }
     
-    // Grid (place a tile)
+    // Click on the grid (to place a tile)
     c.beginPath();
     c.rect(8.5, 40.5, 1264, 592);
     if(c.isPointInPath(x, y)){
       
-      // Mark the level as untested
+      // Mark the level as untested because it has changed
       level_data.tested = false;
       
-      // Compute click coordinates
-      tile_x = Math.floor(x / 32);
-      tile_y = Math.floor((y - 40) / 32);
+      // Save and draw placed tile.
       
-      // Draw tiles
-      
-      // Special cases:
-      
-      // Right click
+      // Right click: erase (place sky / tile #0 instead of current tile)
       if(rightclick == true){
         
         // If the tile is writable
@@ -238,9 +219,11 @@ var handle_clicks = (e) => {
         }
       }
       
+      // Left click
       else{
-        l(1);
-        // Tile #1: only one time machine, below line 1
+        
+        // Special cases
+        // Tile #1: allow only one time machine, below line 1
         if(current_editor_tile == 1){
           
           // If the two tiles are writable
@@ -340,14 +323,13 @@ var handle_clicks = (e) => {
           }
         }
         
-        // Normal case:
-        
-        // Save current tile
+        // Normal case: save current tile
         else if(is_writable(tile_x, tile_y)){
           level_data.tiles[tile_y][tile_x] = current_editor_tile;
         }      
       }
       
+      // Map has been updated, redraw everything
       draw_screen(1);
     }
     c.closePath();
@@ -355,7 +337,7 @@ var handle_clicks = (e) => {
 }
 
 // On mouse down, set a mousedown flag and a rightclick flag (if right click is down)
-onmousedown = (e) => {
+a.onmousedown = (e) => {
   mousedown = true;
   if(e.which == 3){
     rightclick = true;
@@ -366,12 +348,18 @@ onmousedown = (e) => {
 }
 
 // On mouse up, reset the mousedown flag
-onmouseup = () => {
+a.onmouseup = () => {
   mousedown = false;
 }
 
 // On mouse move:
-onmousemove = (e) => {
+a.onmousemove = (e) => {
+  
+  // Compute mouse coords in px and in tiles
+  x = e.pageX - a.getBoundingClientRect().left - document.documentElement.scrollLeft - document.body.scrollLeft;
+  y = e.pageY - a.getBoundingClientRect().top - document.documentElement.scrollTop - document.body.scrollTop;
+  tile_x = Math.floor(x / 32);
+  tile_y = Math.floor((y - 40) / 32);
   
   // Level editor only
   if(screen == 3){
@@ -381,11 +369,7 @@ onmousemove = (e) => {
       handle_clicks(e);
     }
     
-    // Save mouse tile coordinates
-    x = e.pageX - a.getBoundingClientRect().left - document.documentElement.scrollLeft - document.body.scrollLeft;
-    y = e.pageY - a.getBoundingClientRect().top - document.documentElement.scrollTop - document.body.scrollTop;
-    tile_x = Math.floor(x / 32);
-    tile_y = Math.floor((y - 40) / 32);
+    // Jut mousemove: show the block to be placed.
     draw_screen(1);
   }
 }

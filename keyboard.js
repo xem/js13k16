@@ -4,17 +4,17 @@ onkeydown = onkeypress = (e) => {
     
     // Top
     if(e.keyCode == 38 || e.keyCode == 90 ||e.keyCode == 87){
-      current_mario.up = true;
+      current_mario.keyup = true;
     }
     
     // Right
     if(e.keyCode == 39 || e.keyCode == 68){
-      current_mario.right = true;
+      current_mario.keyright = true;
     }
     
     // Left
     if(e.keyCode == 37 || e.keyCode == 65 ||e.keyCode == 81){
-      current_mario.left = true;
+      current_mario.keyleft = true;
     }
   }
 }
@@ -26,18 +26,17 @@ onkeyup = (e) => {
     
     // Top
     if(e.keyCode == 38 || e.keyCode == 90 || e.keyCode == 87){
-      current_mario.up = false;
-      current_mario.can_jump = true;
+      current_mario.keyup = false;
     }
     
     // Right
     if(e.keyCode == 39 || e.keyCode == 68){
-      current_mario.right = false;
+      current_mario.keyright = false;
     }
     
     // Left
     if(e.keyCode == 37 || e.keyCode == 65 || e.keyCode == 81){
-      current_mario.left = false;
+      current_mario.keyleft = false;
     }
     
     // R (reset)
@@ -47,7 +46,8 @@ onkeyup = (e) => {
     
     // Space (press to toggle)
     if(e.keyCode == 32){
-      current_mario.space ^= 1;
+      current_mario.space[frame] = true;
+      current_mario.pickdrop ^= 1;
     }
   }
 }

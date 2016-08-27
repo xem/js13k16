@@ -35,6 +35,17 @@ var play = () => {
     }
   }
   
+  // Save keys being pressed (for latest hero only)
+  if(current_mario.keyleft){
+    current_mario.left[frame] = true;
+  }
+  if(current_mario.keyright){
+    current_mario.right[frame] = true;
+  }
+  if(current_mario.keyup){
+    current_mario.up[frame] = true;
+  }
+  
   // Pixelize graphics
   c.mozImageSmoothingEnabled = false;
   c.imageSmoothingEnabled = false;
@@ -92,7 +103,7 @@ var play = () => {
     
     // Go right (unless if being teleported, or slipping left on ice)
     if(
-      current_mario.right
+      current_mario.right[frame]
       &&
       !current_mario.teleport_idle
       &&
@@ -104,7 +115,6 @@ var play = () => {
         current_mario.vx < 0
       )
     ){
-      current_mario.keyright[frame] = true;
       current_mario.vx = Math.max(current_mario.vx, walk_speed);
       current_mario.direction = 1;
       
@@ -115,8 +125,9 @@ var play = () => {
     }
     
     // Go left (unless if being teleported, or slipping right on ice)
+    
     if(
-      current_mario.left
+      current_mario.left[frame]
       &&
       !current_mario.teleport_idle
       &&
@@ -128,7 +139,6 @@ var play = () => {
         current_mario.vx > 0
       )
     ){
-      current_mario.keyleft[frame] = true;
       current_mario.vx = Math.min(current_mario.vx, -walk_speed);
       current_mario.direction = 0;
       
@@ -142,11 +152,9 @@ var play = () => {
     if(
       !current_mario.in_portal
       &&
-      current_mario.up
+      current_mario.up[frame]
       &&
       current_mario.grounded
-      &&
-      current_mario.can_jump
       &&
       !(
         tile_at(current_mario.x, current_mario.y + 33) == 8
@@ -156,10 +164,8 @@ var play = () => {
         current_mario.vx != 0
       )
     ){
-      current_mario.keyup[frame] = true;
       current_mario.vy -= jump_speed;
       current_mario.grounded = false;
-      current_mario.can_jump = false;
     }
     
     // Jump sprite
@@ -210,8 +216,7 @@ var play = () => {
     }
     
     // Pick cube
-    if(current_mario.space){
-      current_mario.keyspace[frame] = true;
+    if(current_mario.pickdrop){
       if(current_mario.cube_held === null){
         for(i in level_data.cubes){
           if(
@@ -267,7 +272,7 @@ var play = () => {
     
     // If no cube is held, cancel space key
     else {
-      current_mario.space = 0;
+      current_mario.pickdrop = 0;
     }
     
     // Win (all coins gathered and touch flag)

@@ -17,6 +17,9 @@ var draw_screen = onload = onhashchange = (no_reset) => {
   // =========
 
   if(screen == 0){
+    
+    // Cursor
+    a.style.cursor = "";
  
     // Show title
     c.drawImage(tileset, 512, 0, 70, 16, 120, 150, 280, 64);
@@ -38,6 +41,9 @@ var draw_screen = onload = onhashchange = (no_reset) => {
   // ====================
   
   if(screen == 1){
+    
+    // Cursor
+    a.style.cursor = "";
     
     c.beginPath();
     c.fillStyle = "#000";
@@ -65,6 +71,9 @@ var draw_screen = onload = onhashchange = (no_reset) => {
   
   if(screen == 2){
     
+    // Cursor
+    a.style.cursor = "crosshair";
+    
     if(loop){
       clearInterval(loop);
     }
@@ -76,6 +85,9 @@ var draw_screen = onload = onhashchange = (no_reset) => {
   // ============
   
   if(screen == 3){
+    
+    // Cursor
+    a.style.cursor = "";
     
     c.strokeStyle = "#777";
     c.lineWidth = 1;
@@ -190,8 +202,8 @@ var draw_screen = onload = onhashchange = (no_reset) => {
     // Balances
     for(i in level_data.balances){
       
+      // Draw balance 1
       if(level_data.balances[i][1]){
-        // Draw balance 1
         draw_tile(15, level_data.balances[i][0] - 1, level_data.balances[i][1]);
         draw_tile(15, level_data.balances[i][0], level_data.balances[i][1]);
         draw_tile(15, level_data.balances[i][0] + 1, level_data.balances[i][1]);
@@ -201,8 +213,8 @@ var draw_screen = onload = onhashchange = (no_reset) => {
         level_data.tiles[level_data.balances[i][1]][level_data.balances[i][0] + 1] = 15;
       }
       
+      // Draw balance 2
       if(level_data.balances[i][3]){
-        // Draw balance 2
         draw_tile(15, level_data.balances[i][2] - 1, level_data.balances[i][3]);
         draw_tile(15, level_data.balances[i][2], level_data.balances[i][3]);
         draw_tile(15, level_data.balances[i][2] + 1, level_data.balances[i][3]);
@@ -215,7 +227,6 @@ var draw_screen = onload = onhashchange = (no_reset) => {
     
     
     // Show the tile being placed:
-    
     if(tile_y >= 0 && !rightclick){
       
       // Special cases:
