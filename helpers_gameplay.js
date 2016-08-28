@@ -804,8 +804,6 @@ var play_hero = (current_mario) => {
       &&
       !current_mario.teleport_idle
       &&
-      !current_mario.in_portal
-      &&
       !(
         (
           tile_at(current_mario.x, current_mario.y + 33) == 8
@@ -813,7 +811,7 @@ var play_hero = (current_mario) => {
           tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
         )
         &&
-        current_mario.vx < 0
+        current_mario.vx != 0
       )
     ){
       current_mario.vx = Math.max(current_mario.vx, walk_speed);
@@ -831,8 +829,6 @@ var play_hero = (current_mario) => {
       &&
       !current_mario.teleport_idle
       &&
-      !current_mario.in_portal
-      &&
       !(
         (
           tile_at(current_mario.x, current_mario.y + 33) == 8
@@ -840,7 +836,7 @@ var play_hero = (current_mario) => {
           tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
         )
         &&
-        current_mario.vx > 0
+        current_mario.vx != 0
       )
     ){
       current_mario.vx = Math.min(current_mario.vx, -walk_speed);
@@ -861,9 +857,11 @@ var play_hero = (current_mario) => {
       current_mario.grounded
       &&
       !(
-        tile_at(current_mario.x, current_mario.y + 33) == 8
-        &&
-        tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
+        (
+          tile_at(current_mario.x, current_mario.y + 33) == 8
+          ||
+          tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
+        )
         &&
         current_mario.vx != 0
       )

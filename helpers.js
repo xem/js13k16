@@ -40,19 +40,10 @@ var is_writable = (tile_x, tile_y) => {
   return !level_data.tiles[tile_y][tile_x] || level_data.tiles[tile_y][tile_x] < 14 || level_data.tiles[tile_y][tile_x] > 24
 }
 
-// Reset all the settings of the current level (before playing / testing)
-var reset_current_level = () => {
-  
-  // Reset win condition
-  win = false;
-  coins_left = 0;
-  win_frame = 0;
+// Reset a hero (after starting a level / reversing time)
+var reset_hero = () => {
 
-  // Current frame
-  frame = 0;
-
-  // Current mario
-  current_mario = {
+  return {
     x: 640,
     y: 0,
     vx: 0,
@@ -76,6 +67,21 @@ var reset_current_level = () => {
     position_on_cube: null,
     pick_cube_animation_frame: 0
   }
+}
+
+// Reset all the settings of the current level (before playing / testing)
+var reset_current_level = () => {
+  
+  // Reset win condition
+  win = false;
+  coins_left = 0;
+  win_frame = 0;
+
+  // Current frame
+  frame = 0;
+
+  // Reset "present" hero
+  current_mario = reset_hero();
 
   // Solidity of the tiles (some of them vary during gameplay, so we reset it before each level and after reset)
   solid = [
