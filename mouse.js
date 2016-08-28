@@ -1,9 +1,50 @@
+// OK
+
 // Handle clicks on the canvas on each screen
 a.onclick = a.oncontextmenu = (e) => {
   handle_clicks(e);
   return false;
 }
 
+// On mouse down, set a mousedown flag and a rightclick flag (if right click is down)
+a.onmousedown = (e) => {
+  mousedown = true;
+  if(e.which == 3){
+    rightclick = true;
+  }
+  else{
+    rightclick = false;
+  }
+}
+
+// On mouse up, reset the mousedown flag
+a.onmouseup = () => {
+  mousedown = false;
+}
+
+// On mouse move:
+a.onmousemove = (e) => {
+  
+  // Compute mouse coords in px and in tiles
+  x = e.pageX - a.getBoundingClientRect().left - document.documentElement.scrollLeft - document.body.scrollLeft;
+  y = e.pageY - a.getBoundingClientRect().top - document.documentElement.scrollTop - document.body.scrollTop;
+  tile_x = Math.floor(x / 32);
+  tile_y = Math.floor((y - 40) / 32);
+  
+  // Level editor only
+  if(screen == 3){
+    
+    // Consider mousedown + mousemove like clicks (unless we're placing a pipe or a balance)
+    if(mousedown && current_editor_tile != 14 && current_editor_tile != 15){
+      handle_clicks(e);
+    }
+    
+    // In every case: redraw the screen to show the tiles freshly placed and the tile being placed.
+    draw_screen(1);
+  }
+}
+
+// Handle clicks
 var handle_clicks = (e) => {
     
   // Main menu
@@ -315,43 +356,5 @@ var handle_clicks = (e) => {
       draw_screen(1);
     }
     c.closePath();
-  }
-}
-
-// On mouse down, set a mousedown flag and a rightclick flag (if right click is down)
-a.onmousedown = (e) => {
-  mousedown = true;
-  if(e.which == 3){
-    rightclick = true;
-  }
-  else{
-    rightclick = false;
-  }
-}
-
-// On mouse up, reset the mousedown flag
-a.onmouseup = () => {
-  mousedown = false;
-}
-
-// On mouse move:
-a.onmousemove = (e) => {
-  
-  // Compute mouse coords in px and in tiles
-  x = e.pageX - a.getBoundingClientRect().left - document.documentElement.scrollLeft - document.body.scrollLeft;
-  y = e.pageY - a.getBoundingClientRect().top - document.documentElement.scrollTop - document.body.scrollTop;
-  tile_x = Math.floor(x / 32);
-  tile_y = Math.floor((y - 40) / 32);
-  
-  // Level editor only
-  if(screen == 3){
-    
-    // Consider mousedown + mousemove like clicks (unless we're placing a pipe or a balance)
-    if(mousedown && current_editor_tile != 14 && current_editor_tile != 15){
-      handle_clicks(e);
-    }
-    
-    // Jut mousemove: show the block to be placed.
-    draw_screen(1);
   }
 }

@@ -1,16 +1,18 @@
-// Collection of helper functions often called
+// OK
+
+// Collection of helper functions often called (except by the game loop)
 
 // Draw a 32x32 tile aligned on the grid
 var draw_tile = (id, tile_x, tile_y) => {
   c.drawImage(tileset, id * 16, 0, 16, 16, tile_x * 32, 40 + tile_y * 32, 32, 32);
 }
 
-// Draw a 32x32 sprite anywhere (don't forget to add 40 to y to draw in the scened)
+// Draw a 32x32 sprite anywhere (don't forget to add 40 to y to draw in the scene)
 var draw_sprite = (id, x, y) => {
   c.drawImage(tileset, id * 16, 0, 16, 16, x, y, 32, 32);
 }
 
-// Which tile is at these coordinates (in px)? (0 by default)
+// Which tile is at these coordinates (in px)? (returns 0 by default)
 var tile_at = (x, y) => {
   if(!level_data.tiles[~~(y / 32)]){
     return 0;
@@ -19,7 +21,7 @@ var tile_at = (x, y) => {
   return level_data.tiles[~~(y / 32)][~~(x / 32)] || 0;
 }
 
-// Set a tile at these coordinates (in px)
+// Set a tile in the current level at these coordinates (in px)
 var set_tile = (x, y, value) => {
   if(!level_data.tiles[~~(y / 32)]){
     return;
@@ -27,7 +29,7 @@ var set_tile = (x, y, value) => {
   level_data.tiles[~~(y / 32)][~~(x / 32)] = value;
 }
 
-// Is a tile id currently solid? (and do spikes count or not?)
+// Is a tile id currently solid? (optionally, consider spikes non-solid, because cubes can be placed on them)
 var is_solid = (id, spikes) => {
   return (spikes && id == 7) || solid[id] || 0;
 }
@@ -133,7 +135,6 @@ var reset_current_level = () => {
   
   // Heros (playing simultaneously after time travels)
   heros = [];
-
 }
 
 

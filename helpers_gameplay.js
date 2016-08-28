@@ -1,9 +1,11 @@
-// Functions used by the game loop (play())
+// Functions used by the game loop (play)
 
-// First frame inits
+// OK
+
+// First frame inits (also happen after time travels)
 var first_frame = function(){
   
-  // Build map
+  // Build map from hash
   level_data.tiles = [];
   for(var j = 0; j < 20; j++){
     level_data.tiles[j] = [];
@@ -29,39 +31,35 @@ var first_frame = function(){
   }
 }
 
-// Move and draw pipes
+// OK
+
+// Move and draw pipes (at each frame)
 var move_draw_pipes = function(){
+  
+  // For each pipe
   for(var i in level_data.pipes){
     
     // Go to position 2 when switch is pressed
     if(pipes_state[i].pressed){
-      
-      // Go up
-      if(pipes_state[i].y > level_data.pipes[i][2] * 32){
-        pipes_state[i].y = Math.max(pipes_state[i].y - 4, level_data.pipes[i][2] * 32);
-      }
-      
-      // Go down
-      if(pipes_state[i].y < level_data.pipes[i][2] * 32){
-        pipes_state[i].y = Math.min(pipes_state[i].y + 4, level_data.pipes[i][2] * 32);
-      }
+      target = level_data.pipes[i][2] * 32;
     }
     
     // Go to position 1 when switch is not pressed
     else {
+      target = level_data.pipes[i][1] * 32;
+    }
       
-      // Go up
-      if(pipes_state[i].y > level_data.pipes[i][1] * 32){
-        pipes_state[i].y = Math.max(pipes_state[i].y - 4, level_data.pipes[i][1] * 32);
-      }
-      
-      // Go down
-      if(pipes_state[i].y < level_data.pipes[i][1] * 32){
-        pipes_state[i].y = Math.min(pipes_state[i].y + 4, level_data.pipes[i][1] * 32);
-      }
+    // Go up
+    if(pipes_state[i].y > target){
+      pipes_state[i].y = Math.max(pipes_state[i].y - 4, target);
+    }
+    
+    // Go down
+    else if(pipes_state[i].y < target){
+      pipes_state[i].y = Math.min(pipes_state[i].y + 4, target);
     }
 
-    // Draw pipe body    
+    // Draw pipe body (tiles #18 / #19)
     end_pipe = false;
     for(var k = ~~(pipes_state[i].y / 32) + 1; k < 21; k++){
       if(k < 20 && !is_solid(tile_at(level_data.pipes[i][0],k)) && !is_solid(tile_at(level_data.pipes[i][0] + 1, k)) && !end_pipe){
@@ -75,7 +73,7 @@ var move_draw_pipes = function(){
       }
     }
     
-    // Draw pipe top
+    // Draw pipe top (tiles #16 / #17)
     draw_sprite(16, level_data.pipes[i][0] * 32, pipes_state[i].y + 40);
     draw_sprite(17, level_data.pipes[i][0] * 32 + 32, pipes_state[i].y + 40);
     
@@ -92,7 +90,9 @@ var move_draw_pipes = function(){
   }
 }
 
-// Parse and draw map
+// OK
+
+// Parse and draw map (at each frame, but if we're on frame 0, also set start coordinates, initialize cubes and build flag pole)
 var parse_draw_map = function(){
   for(j = 0; j < 20; j++){
     for(i = 0; i < 40; i++){
@@ -136,6 +136,9 @@ var parse_draw_map = function(){
   }
 }
 
+// OK
+
+// Reset green buttons, yellow buttons and balances/cubes/heros weights (at each frame, before everything is re-computed)
 var reset_mechanisms = function(){
   
   // Reset yellow buttons
@@ -153,7 +156,13 @@ var reset_mechanisms = function(){
     pipes_state[i].pressed = false;
   }
   
-  // Reset weights of Mario, cubes and balances
+  // Reset weights of heros, cubes and balances
+  for(hero in heros){
+    
+    // TODO
+  
+  }
+  
   current_mario.weight = 1;
   
   for(i in level_data.cubes){
@@ -166,8 +175,7 @@ var reset_mechanisms = function(){
   }
 }
 
-// Apply gravity and collisions to a given object (type 0: mario, type 1: cube)
-// And enter in portals
+// Apply gravity and collisions to a given object (type 0: mario, type 1: cube), plus make it enter in portals
 var gravity_and_collisions = function(obj, obj_width, type){
   
   // compute object's weight
@@ -766,7 +774,6 @@ var gravity_and_collisions = function(obj, obj_width, type){
   }
 }
 
-
 // Play or replay a given hero (past or present)
 var play_hero = (current_mario) => {
   
@@ -1156,60 +1163,53 @@ var play_hero = (current_mario) => {
   }
 }
 
+// OK
+
 // Draw hero (past or present)
-var draw_hero = (current_mario) => {
-  
-  // Facing right
-  if(current_mario.direction == 1){
-    c.drawImage(tileset, [26, [27,28,29][~~(frame / 2) % 3], 30, 31][current_mario.state] * 16, 0, 16, 16, current_mario.x - 4, 40 + current_mario.y, 32, 32);
-  }
+var draw_hero = (hero) => {
+  c.save();
+  c.translate(hero.x + mario_width / 2, hero.y);
   
   // Facing left
-  else{
-    c.save();
-    c.translate(current_mario.x + mario_width + 4, current_mario.y);
+  if(hero.direction == 0){
     c.scale(-1,1);
-    c.drawImage(tileset, [26, [27,28,29][~~(frame / 2) % 3], 30, 31][current_mario.state] * 16, 0, 16, 16, 0, 40, 32, 32);
-    c.restore();
   }
+
+  c.drawImage(tileset, [26, [27,28,29][~~(frame / 2) % 3], 30, 31][hero.state] * 16, 0, 16, 16, - mario_width / 2, 40, 32, 32);
+  c.restore();
 }
+
+// OK
 
 // Draw portals (foreground)
 var draw_portals = () => {
-  draw_tile(4, blue_portal.tile_x, blue_portal.tile_y);
-  draw_tile(4, orange_portal.tile_x, orange_portal.tile_y);
-  c.fillStyle = "blue";
   
-  if(blue_portal.side == 0){
-    c.fillRect(blue_portal.tile_x * 32, blue_portal.tile_y * 32 + 40 - 8, 32, 8);
-  }
-  if(blue_portal.side == 1){
-    c.fillRect(blue_portal.tile_x * 32 + 28, blue_portal.tile_y * 32 + 40, 8, 32);
-  }
-  if(blue_portal.side == 2){
-    c.fillRect(blue_portal.tile_x * 32, blue_portal.tile_y * 32 + 40 + 28, 32, 8);
-  }
-  if(blue_portal.side == 3){
-    c.fillRect(blue_portal.tile_x * 32 - 4, blue_portal.tile_y * 32 + 40, 8, 32);
-  }
-  c.fillStyle = "orange";
-  
-  if(orange_portal.side == 0){
-    c.fillRect(orange_portal.tile_x * 32, orange_portal.tile_y * 32 + 40 - 8, 32, 8);
-  }
-  if(orange_portal.side == 1){
-    c.fillRect(orange_portal.tile_x * 32 + 28, orange_portal.tile_y * 32 + 40, 8, 32);
-  }
-  if(orange_portal.side == 2){
-    c.fillRect(orange_portal.tile_x * 32, orange_portal.tile_y * 32 + 40 + 28, 32, 8);
-  }
-  if(orange_portal.side == 3){
-    c.fillRect(orange_portal.tile_x * 32 - 4, orange_portal.tile_y * 32 + 40, 8, 32);
+  for(i in j = {"blue": blue_portal, "orange": orange_portal }){
+    
+    draw_tile(4, j[i].tile_x, j[i].tile_y);
+    
+    c.fillStyle = i;
+    
+    if(j[i].side == 0){
+      c.fillRect(j[i].tile_x * 32, j[i].tile_y * 32 + 40 - 8, 32, 8);
+    }
+    if(j[i].side == 1){
+      c.fillRect(j[i].tile_x * 32 + 28, j[i].tile_y * 32 + 40, 8, 32);
+    }
+    if(j[i].side == 2){
+      c.fillRect(j[i].tile_x * 32, j[i].tile_y * 32 + 40 + 28, 32, 8);
+    }
+    if(j[i].side == 3){
+      c.fillRect(j[i].tile_x * 32 - 4, j[i].tile_y * 32 + 40, 8, 32);
+    }
   }
 }
 
+// MEH
+
 // Update mechanisms
 var update_mechanisms = () => {
+  
   // Apply yellow toggle (invert plain and transparent tiles if yellow toggle has changed during this frame)
   if(yellow_toggle != yellow_toggle_last_frame){
     for(j = 0; j < 20; j++){
@@ -1237,8 +1237,8 @@ var update_mechanisms = () => {
       && !is_solid(tile_at(level_data.balances[i][0] * 32, balances_state[i].y1 + 20))
       && !is_solid(tile_at(level_data.balances[i][0] * 32 + 32, balances_state[i].y1 + 20))
       && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 - 4))
-      && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 - 4))
-      && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 - 4))
+      && !is_solid(tile_at(level_data.balances[i][2] * 32, balances_state[i].y2 - 4))
+      && !is_solid(tile_at(level_data.balances[i][2] * 32 + 32, balances_state[i].y2 - 4))
     ){
       balances_state[i].y1 += 4;
       balances_state[i].y2 -= 4;
@@ -1251,8 +1251,8 @@ var update_mechanisms = () => {
       && !is_solid(tile_at(level_data.balances[i][2] * 32, balances_state[i].y2 + 20))
       && !is_solid(tile_at(level_data.balances[i][2] * 32 + 32, balances_state[i].y2 + 20))
       && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 - 4))
-      && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 - 4))
-      && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 - 4))
+      && !is_solid(tile_at(level_data.balances[i][0] * 32, balances_state[i].y1 - 4))
+      && !is_solid(tile_at(level_data.balances[i][0] * 32 + 32, balances_state[i].y1 - 4))
     ){
       balances_state[i].y1 -= 4;
       balances_state[i].y2 += 4;
@@ -1270,6 +1270,8 @@ var update_mechanisms = () => {
   }
 }
 
+// OK
+
 // Win animation (write "CLEARED" for 30 frames and exit)
 var victory = () => {
   if(win){
@@ -1286,5 +1288,40 @@ var victory = () => {
     level_data.tested = true;
     a.width ^= 0;
     draw_screen();
+  }
+}
+
+// OK
+
+// Move and draw all cubes
+var move_cubes = () => {
+  for(i in level_data.cubes){
+    
+    // If cube is not in a #4 solid tile, assume it's not in a portal anymore
+    if(
+      tile_at(level_data.cubes[i].x + 1, level_data.cubes[i].y + 1) != 4
+      &&
+      tile_at(level_data.cubes[i].x + 32 - 1, level_data.cubes[i].y + 1) != 4
+      &&
+      tile_at(level_data.cubes[i].x + 1, level_data.cubes[i].y + 31) != 4
+      &&
+      tile_at(level_data.cubes[i].x + + 32 - 1, level_data.cubes[i].y + 31) != 4
+    ){
+      level_data.cubes[i].in_portal = false;
+    }
+    
+    // Decrement teleportation idle delay
+    if(level_data.cubes[i].teleport_idle){
+      level_data.cubes[i].teleport_idle--;
+    }  
+    
+    // Apply gravity and collsions if the cube is not held
+    if(level_data.cubes[i].mario === null){
+      level_data.cubes[i].vx = 0;
+      gravity_and_collisions(level_data.cubes[i], 32, 1);
+    }
+
+    // Draw cube
+    c.drawImage(tileset, 12 * 16, 0, 16, 16, level_data.cubes[i].x, 40 + level_data.cubes[i].y, 32, 32);
   }
 }

@@ -1,3 +1,4 @@
+// OK
 // Draw current screen (on load, when draw_screen is called, and when the hash changes)
 // If no_reset is set, update the level editor without loading the map from the hash
 var draw_screen = onload = onhashchange = (no_reset) => {
@@ -55,7 +56,7 @@ var draw_screen = onload = onhashchange = (no_reset) => {
         c.fillStyle = "#000";
         c.fillRect(i * 120 + 50, j * 100 + 120, 100, 80);
         c.fillStyle = "#fff";
-        c.fillText(+localStorage["scpm_level"] >= number ? number : "?", i * 120 + 100, j * 100 + 170);
+        c.fillText(+localStorage["scpm"] >= number ? number : "?", i * 120 + 100, j * 100 + 170);
       }
     }
     c.fillText("LEVELS", 640, 70);

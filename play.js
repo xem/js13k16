@@ -1,3 +1,5 @@
+// OK
+
 // Game loop
 var play = () => {
 
@@ -72,7 +74,7 @@ var play = () => {
   reset_mechanisms();
   
   // Replay previous heros inputs
-  for(h in heros){
+  for(hero in heros){
     
     // TODO
     
@@ -82,43 +84,8 @@ var play = () => {
   
   play_hero(current_mario);
   
-  // Move cubes
-  // =====
-  
-  for(i in level_data.cubes){
-    
-    // If cube is not in a #4 solid tile, assume it's not in a portal
-    if(
-      tile_at(level_data.cubes[i].x + 1, level_data.cubes[i].y + 1) != 4
-      &&
-      tile_at(level_data.cubes[i].x + 32 - 1, level_data.cubes[i].y + 1) != 4
-      &&
-      tile_at(level_data.cubes[i].x + 1, level_data.cubes[i].y + 31) != 4
-      &&
-      tile_at(level_data.cubes[i].x + + 32 - 1, level_data.cubes[i].y + 31) != 4
-    ){
-      level_data.cubes[i].in_portal = false;
-    }
-    
-    // Decrement teleportation idle delay
-    if(level_data.cubes[i].teleport_idle){
-      level_data.cubes[i].teleport_idle--;
-    }  
-    
-    // Apply gravity and collsions if the cube is not held
-    if(level_data.cubes[i].mario === null){
-      level_data.cubes[i].vx = 0;
-      gravity_and_collisions(level_data.cubes[i], 32, 1);
-    }
-  }
-  
-  // Draw
-  // ====
-
-  // Draw cubes
-  for(i in level_data.cubes){
-    c.drawImage(tileset, 12 * 16, 0, 16, 16, level_data.cubes[i].x, 40 + level_data.cubes[i].y, 32, 32);
-  }
+  // Move and draw cubes
+  move_cubes();
     
   // Draw previous heros
   for(hero in heros){
