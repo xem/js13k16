@@ -798,16 +798,20 @@ var play_hero = (current_mario) => {
       current_mario.vx = 0;
     }
     
-    // Go right (unless if being teleported, or slipping left on ice)
+    // Go right (unless if in portal, or being teleported, or slipping left on ice)
     if(
       current_mario.right[frame]
       &&
       !current_mario.teleport_idle
       &&
+      !current_mario.in_portal
+      &&
       !(
-        tile_at(current_mario.x, current_mario.y + 33) == 8
-        &&
-        tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
+        (
+          tile_at(current_mario.x, current_mario.y + 33) == 8
+          ||
+          tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
+        )
         &&
         current_mario.vx < 0
       )
@@ -821,16 +825,20 @@ var play_hero = (current_mario) => {
       }
     }
     
-    // Go left (unless if being teleported, or slipping right on ice)
+    // Go left (unless if in portal, or being teleported, or slipping right on ice)
     if(
       current_mario.left[frame]
       &&
       !current_mario.teleport_idle
       &&
+      !current_mario.in_portal
+      &&
       !(
-        tile_at(current_mario.x, current_mario.y + 33) == 8
-        &&
-        tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
+        (
+          tile_at(current_mario.x, current_mario.y + 33) == 8
+          ||
+          tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
+        )
         &&
         current_mario.vx > 0
       )
@@ -856,8 +864,8 @@ var play_hero = (current_mario) => {
         tile_at(current_mario.x, current_mario.y + 33) == 8
         &&
         tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
-        //&&
-        //current_mario.vx != 0
+        &&
+        current_mario.vx != 0
       )
     ){
       current_mario.vy -= jump_speed;
@@ -1165,5 +1173,120 @@ var draw_hero = (current_mario) => {
     c.scale(-1,1);
     c.drawImage(tileset, [26, [27,28,29][~~(frame / 2) % 3], 30, 31][current_mario.state] * 16, 0, 16, 16, 0, 40, 32, 32);
     c.restore();
+  }
+}
+
+// Draw portals (foreground)
+var draw_portals = () => {
+  draw_tile(4, blue_portal.tile_x, blue_portal.tile_y);
+  draw_tile(4, orange_portal.tile_x, orange_portal.tile_y);
+  c.fillStyle = "blue";
+  
+  if(blue_portal.side == 0){
+    c.fillRect(blue_portal.tile_x * 32, blue_portal.tile_y * 32 + 40 - 8, 32, 8);
+  }
+  if(blue_portal.side == 1){
+    c.fillRect(blue_portal.tile_x * 32 + 28, blue_portal.tile_y * 32 + 40, 8, 32);
+  }
+  if(blue_portal.side == 2){
+    c.fillRect(blue_portal.tile_x * 32, blue_portal.tile_y * 32 + 40 + 28, 32, 8);
+  }
+  if(blue_portal.side == 3){
+    c.fillRect(blue_portal.tile_x * 32 - 4, blue_portal.tile_y * 32 + 40, 8, 32);
+  }
+  c.fillStyle = "orange";
+  
+  if(orange_portal.side == 0){
+    c.fillRect(orange_portal.tile_x * 32, orange_portal.tile_y * 32 + 40 - 8, 32, 8);
+  }
+  if(orange_portal.side == 1){
+    c.fillRect(orange_portal.tile_x * 32 + 28, orange_portal.tile_y * 32 + 40, 8, 32);
+  }
+  if(orange_portal.side == 2){
+    c.fillRect(orange_portal.tile_x * 32, orange_portal.tile_y * 32 + 40 + 28, 32, 8);
+  }
+  if(orange_portal.side == 3){
+    c.fillRect(orange_portal.tile_x * 32 - 4, orange_portal.tile_y * 32 + 40, 8, 32);
+  }
+}
+
+// Update mechanisms
+var update_mechanisms = () => {
+  // Apply yellow toggle (invert plain and transparent tiles if yellow toggle has changed during this frame)
+  if(yellow_toggle != yellow_toggle_last_frame){
+    for(j = 0; j < 20; j++){
+      for(i = 0; i < 40; i++){
+        if(level_data.tiles[j][i] == 9){
+          level_data.tiles[j][i] = 10;
+        }
+        else if(level_data.tiles[j][i] == 10){
+          level_data.tiles[j][i] = 9;
+        }
+      }
+    }
+  }
+  
+  // Save yellow toggle state 
+  yellow_toggle_last_frame = yellow_toggle;
+  
+  // Balances
+  for(i in level_data.balances){
+    
+    // More weight on side 1 and no solid tile under platform 1 and no solid tile over platform 2
+    if(
+      balances_state[i].weight1 > balances_state[i].weight2
+      && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 + 20))
+      && !is_solid(tile_at(level_data.balances[i][0] * 32, balances_state[i].y1 + 20))
+      && !is_solid(tile_at(level_data.balances[i][0] * 32 + 32, balances_state[i].y1 + 20))
+      && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 - 4))
+      && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 - 4))
+      && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 - 4))
+    ){
+      balances_state[i].y1 += 4;
+      balances_state[i].y2 -= 4;
+    }
+    
+    // More weight on side 2 and no solid tile under platform 2 and no solid tile over platform 1
+    else if(
+      balances_state[i].weight2 > balances_state[i].weight1
+      && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 + 20))
+      && !is_solid(tile_at(level_data.balances[i][2] * 32, balances_state[i].y2 + 20))
+      && !is_solid(tile_at(level_data.balances[i][2] * 32 + 32, balances_state[i].y2 + 20))
+      && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 - 4))
+      && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 - 4))
+      && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 - 4))
+    ){
+      balances_state[i].y1 -= 4;
+      balances_state[i].y2 += 4;
+    }
+    
+    // Draw balance 1
+    draw_sprite(15, level_data.balances[i][0] * 32 - 32, balances_state[i].y1 + 40);
+    draw_sprite(15, level_data.balances[i][0] * 32, balances_state[i].y1 + 40);
+    draw_sprite(15, level_data.balances[i][0] * 32 + 32, balances_state[i].y1 + 40);
+    
+    // Draw balance 2
+    draw_sprite(15, level_data.balances[i][2] * 32 - 32, balances_state[i].y2 + 40);
+    draw_sprite(15, level_data.balances[i][2] * 32, balances_state[i].y2 + 40);
+    draw_sprite(15, level_data.balances[i][2] * 32 + 32, balances_state[i].y2 + 40);
+  }
+}
+
+// Win animation (write "CLEARED" for 30 frames and exit)
+var victoty = () => {
+  if(win){
+    win_frame++;
+    c.font = "bold 100px arial";
+    c.fillStyle = "#000";
+    c.textAlign = "center";
+    c.fillText("CLEARED!", 640, 350)
+  }
+  if(win_frame >= 30){
+    a.width ^= 0;
+    clearInterval(loop);
+    screen = last_screen;
+    level_data.tested = true;
+    a.width ^= 0;
+    draw_screen();
   }
 }
