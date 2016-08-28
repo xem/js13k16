@@ -19,7 +19,7 @@ var draw_screen = onload = onhashchange = (no_reset) => {
   if(screen == 0){
     
     // Cursor
-    a.style.cursor = "";
+    a.style.cursor = "pointer";
  
     // Show title
     c.drawImage(tileset, 512, 0, 70, 16, 120, 150, 280, 64);
@@ -43,7 +43,7 @@ var draw_screen = onload = onhashchange = (no_reset) => {
   if(screen == 1){
     
     // Cursor
-    a.style.cursor = "";
+    a.style.cursor = "pointer";
     
     c.beginPath();
     c.fillStyle = "#000";
@@ -87,7 +87,7 @@ var draw_screen = onload = onhashchange = (no_reset) => {
   if(screen == 3){
     
     // Cursor
-    a.style.cursor = "";
+    a.style.cursor = "pointer";
     
     c.strokeStyle = "#777";
     c.lineWidth = 1;

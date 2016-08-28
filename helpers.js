@@ -66,8 +66,9 @@ var reset_current_level = () => {
     right: [],
     keyspace: false,
     space: [],
-    mouseX: [],
-    mouseY: [],
+    leftclick: [],
+    rightclick: [],
+    angle: 0,
     direction: 1, // 0: left, 1: right
     state: 0, // 0: idle, 1: walking, 2: jumping, 3: dead
     cube_held: null,
@@ -123,6 +124,9 @@ var reset_current_level = () => {
   // Portals
   blue_portal = { tile_x: -1, tile_y: -1 };
   orange_portal = { tile_x: -2, tile_y: -2 };
+  
+  // Heros (playing simultaneously after time travels)
+  heros = [];
 
 }
 

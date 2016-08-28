@@ -70,362 +70,16 @@ var play = () => {
   // Reset all mechanisms
   reset_mechanisms();
   
-  // Move mario
-  // ==========
-  
-  // If not dead and didn't win
-  if(current_mario.state != 3 && !win){
+  // Replay previous heros inputs
+  for(h in heros){
     
-    // Idle
-    current_mario.state = 0;
-    current_mario.on_pipe = false;
+    // TODO
     
-    // Cancel vx (unless a teleportation occurred or mario not grounded or mario is on ice)
-    if(
-      (
-        (
-          !current_mario.teleport_idle
-          &&
-          current_mario.vx < 10
-        )
-        ||
-        (
-          current_mario.grounded
-        )
-      )
-      &&
-      tile_at(current_mario.x, current_mario.y + 33) != 8
-      &&
-      tile_at(current_mario.x + mario_width, current_mario.y + 33) != 8
-    ){
-      current_mario.vx = 0;
-    }
-    
-    // Go right (unless if being teleported, or slipping left on ice)
-    if(
-      current_mario.right[frame]
-      &&
-      !current_mario.teleport_idle
-      &&
-      !(
-        tile_at(current_mario.x, current_mario.y + 33) == 8
-        &&
-        tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
-        &&
-        current_mario.vx < 0
-      )
-    ){
-      current_mario.vx = Math.max(current_mario.vx, walk_speed);
-      current_mario.direction = 1;
-      
-      // Walk animation
-      if(current_mario.grounded){
-        current_mario.state = 1;
-      }
-    }
-    
-    // Go left (unless if being teleported, or slipping right on ice)
-    
-    if(
-      current_mario.left[frame]
-      &&
-      !current_mario.teleport_idle
-      &&
-      !(
-        tile_at(current_mario.x, current_mario.y + 33) == 8
-        &&
-        tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
-        &&
-        current_mario.vx > 0
-      )
-    ){
-      current_mario.vx = Math.min(current_mario.vx, -walk_speed);
-      current_mario.direction = 0;
-      
-      // Walk animation
-      if(current_mario.grounded){
-        current_mario.state = 1;
-      } 
-    }
-    
-    // Jump (if not in a portal and not slipping on ice)
-    if(
-      !current_mario.in_portal
-      &&
-      current_mario.up[frame]
-      &&
-      current_mario.grounded
-      &&
-      !(
-        tile_at(current_mario.x, current_mario.y + 33) == 8
-        &&
-        tile_at(current_mario.x + mario_width, current_mario.y + 33) == 8
-        &&
-        current_mario.vx != 0
-      )
-    ){
-      current_mario.vy -= jump_speed;
-      current_mario.grounded = false;
-    }
-    
-    // Jump sprite
-    if(current_mario.vy < 0 && !current_mario.grounded){
-      current_mario.state = 2;
-    }
-    
-    // Apply gravity and collsions
-    gravity_and_collisions(current_mario, mario_width, 0);
-    
-    // Collect coins (tile 6 => tile 0)
-    if(tile_at(current_mario.x + mario_width / 2, current_mario.y + 16) == 6){
-      set_tile(current_mario.x + mario_width / 2, current_mario.y + 16, 0);
-    }
-    
-    // Die (spike)
-    if(
-      tile_at(current_mario.x + 3, current_mario.y) == 7
-      ||
-      tile_at(current_mario.x + mario_width - 3, current_mario.y) == 7
-      ||
-      tile_at(current_mario.x + 3, current_mario.y + 5) == 7
-      ||
-      tile_at(current_mario.x + mario_width - 3, current_mario.y + 5) == 7
-    ){
-      current_mario.state = 3;
-      current_mario.vy = -1 * jump_speed;
-    }
-    
-    // Die (fall)
-    if(current_mario.y > 648){
-      current_mario.state = 3;
-      current_mario.vy = -1.5 * jump_speed;
-    }
-    
-    // Die (crush between a pipe or a balance, and a solid tile)
-    if(
-      current_mario.on_moving_object
-      &&
-      (
-        is_solid(tile_at(current_mario.x, current_mario.y + 1))
-        ||
-        is_solid(tile_at(current_mario.x + mario_width, current_mario.y + 1))
-      )
-    ){
-      current_mario.state = 3;
-      current_mario.vy = -1 * jump_speed;
-    }
-    
-    // Pick cube
-    if(current_mario.pickdrop){
-      if(current_mario.cube_held === null){
-        for(i in level_data.cubes){
-          if(
-            current_mario.x + mario_width >= level_data.cubes[i].x
-            &&
-            current_mario.x <= level_data.cubes[i].x + 31
-            &&
-            current_mario.y + 31 >= level_data.cubes[i].y
-            &&
-            current_mario.y <= level_data.cubes[i].y + 31
-          ){
-            current_mario.cube_held = i;
-            level_data.cubes[i].mario = current_mario;
-            current_mario.pick_cube_animation_frame = 5;
-            break;
-          }
-        }
-      }
-    }
-    
-    // Drop cube
-    else {
-      if(level_data.cubes[current_mario.cube_held]){
-        
-        // Drop ahead of mario? (todo)
-        
-        level_data.cubes[current_mario.cube_held].mario = null;
-        current_mario.cube_held = null;
-        current_mario.weight = 1;
-      }
-    }
-    
-    // Hold cube
-    if(current_mario.cube_held !== null){
-      level_data.cubes[current_mario.cube_held].x = current_mario.x;
-      
-      // Animate cube grab (make it last 5 frames)
-      if(current_mario.pick_cube_animation_frame){
-        current_mario.pick_cube_animation_frame--;
-      }
-      
-      // Place cube over Mario (unless he's passing through a portal or there's a solid tile above, in this case hold it very low)
-      if(current_mario.in_portal){ 
-        level_data.cubes[current_mario.cube_held].y = current_mario.y;
-      }
-      else if(is_solid(tile_at(current_mario.x, current_mario.y - 28)) || is_solid(tile_at(current_mario.x + mario_width, current_mario.y - 28))){
-        level_data.cubes[current_mario.cube_held].y = ~~((current_mario.y + 4) / 32) * 32;
-      }
-      else{
-        level_data.cubes[current_mario.cube_held].y = current_mario.y - 32 + current_mario.pick_cube_animation_frame * 4;
-      }
-    }
-    
-    // If no cube is held, cancel space key
-    else {
-      current_mario.pickdrop = 0;
-    }
-    
-    // Win (all coins gathered and touch flag)
-    if(tile_at(current_mario.x + mario_width / 2, current_mario.y + 16) == 2 || tile_at(current_mario.x + mario_width / 2, current_mario.y + 16) == 24){
-      coins_left = 0;
-      for(j = 0; j < 20; j++){
-        for(i = 0; i < 40; i++){
-          if(level_data.tiles[j][i] == 6){
-           coins_left++;
-          }
-        }
-      }
-      if(coins_left == 0){
-        win = true;
-        current_mario.state = 0;
-      }
-    }
-    
-    // Shoot blue portal
-    if(current_mario.shoot_blue){
-      for(i = 0; i < 40; i++){
-        current_mario.shoot_blue += .001;
-        current_mario.portal_shoot_x += current_mario.shoot_blue * current_mario.portal_shoot_vx;
-        current_mario.portal_shoot_y += current_mario.shoot_blue * current_mario.portal_shoot_vy;
-        if(is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y))){
-          current_mario.shoot_blue = 0;
-          
-          // Define on which side the portal goes (0: top, 1: right, 2: bottom, 3: left)
-          // Avoid opening a portal between two solid tiles, and on sides not reachable given the current angle
-          if(current_mario.portal_shoot_x % 32 < 4 && !is_solid(tile_at(current_mario.portal_shoot_x - 32, current_mario.portal_shoot_y)) && current_mario.portal_shoot_vx > 0){
-            temp_side = 3;
-          }
-          if(current_mario.portal_shoot_x % 32 > 28 && !is_solid(tile_at(current_mario.portal_shoot_x + 32, current_mario.portal_shoot_y)) && current_mario.portal_shoot_vx < 0){
-            temp_side = 1;
-          }
-          if(current_mario.portal_shoot_y % 32 < 4 && !is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y - 32)) && current_mario.portal_shoot_vy > 0){
-            temp_side = 0;
-          }
-          if(current_mario.portal_shoot_y % 32 > 28 && !is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y + 32)) && current_mario.portal_shoot_vy < 0){
-            temp_side = 2;
-          }
-
-          // Reflect ray if tile is #8 (ice)
-          if(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y) == 8){
-            current_mario.shoot_blue = 1;
-            if(temp_side == 0 || temp_side == 2){
-              current_mario.portal_shoot_vy = -current_mario.portal_shoot_vy;
-            }
-            else //if(temp_side == 1 || temp_side == 3)
-            {
-              current_mario.portal_shoot_vx = -current_mario.portal_shoot_vx;
-            }
-          }
-          
-          // Place portal if tile is #4 (white wall) and no orange portal is here yet
-          if(
-            tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y) == 4
-            &&
-            (~~(current_mario.portal_shoot_x / 32) != orange_portal.tile_x || ~~(current_mario.portal_shoot_y / 32) != orange_portal.tile_y || orange_portal.side != temp_side)
-          ){
-            blue_portal.tile_x = ~~(current_mario.portal_shoot_x / 32);
-            blue_portal.tile_y = ~~(current_mario.portal_shoot_y / 32);
-            blue_portal.side = temp_side;
-          }
-        }
-        else{
-          c.fillStyle = "blue";
-          c.fillRect(current_mario.portal_shoot_x, current_mario.portal_shoot_y + 40, 6, 6);        
-        }
-      }
-    }
-    
-    // Shoot orange portal
-    if(current_mario.shoot_orange){
-      for(i = 0; i < 40; i++){
-        current_mario.shoot_orange += .001;
-        current_mario.portal_shoot_x += current_mario.shoot_orange * current_mario.portal_shoot_vx;
-        current_mario.portal_shoot_y += current_mario.shoot_orange * current_mario.portal_shoot_vy;
-        if(is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y))){
-          current_mario.shoot_orange = 0;
-          
-          // Define on which side the portal goes (0: top, 1: right, 2: bottom, 3: left)
-          // Avoid opening a portal between two solid tiles, and on sides not reachable given the current angle
-          if(current_mario.portal_shoot_x % 32 < 4 && !is_solid(tile_at(current_mario.portal_shoot_x - 32, current_mario.portal_shoot_y)) && current_mario.portal_shoot_vx > 0){
-            temp_side = 3;
-          }
-          if(current_mario.portal_shoot_x % 32 > 28 && !is_solid(tile_at(current_mario.portal_shoot_x + 32, current_mario.portal_shoot_y)) && current_mario.portal_shoot_vx < 0){
-            temp_side = 1;
-          }
-          if(current_mario.portal_shoot_y % 32 < 4 && !is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y - 32)) && current_mario.portal_shoot_vy > 0){
-            temp_side = 0;
-          }
-          if(current_mario.portal_shoot_y % 32 > 28 && !is_solid(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y + 32)) && current_mario.portal_shoot_vy < 0){
-            temp_side = 2;
-          }
-
-          // Reflect ray if tile is #8 (ice)
-          if(tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y) == 8){
-            current_mario.shoot_orange = 1;
-            if(temp_side == 0 || temp_side == 2){
-              current_mario.portal_shoot_vy = -current_mario.portal_shoot_vy;
-            }
-            else //if(temp_side == 1 || temp_side == 3)
-            {
-              current_mario.portal_shoot_vx = -current_mario.portal_shoot_vx;
-            }
-          }
-          
-          // Place portal if tile is #4 (white wall) and no blue portal is here yet
-          if(
-            tile_at(current_mario.portal_shoot_x, current_mario.portal_shoot_y) == 4
-            &&
-            (~~(current_mario.portal_shoot_x / 32) != blue_portal.tile_x || ~~(current_mario.portal_shoot_y / 32) != blue_portal.tile_y || blue_portal.side != temp_side)
-          ){
-            orange_portal.tile_x = ~~(current_mario.portal_shoot_x / 32);
-            orange_portal.tile_y = ~~(current_mario.portal_shoot_y / 32);
-            orange_portal.side = temp_side;
-          }
-        }
-        else{
-          c.fillStyle = "orange";
-          c.fillRect(current_mario.portal_shoot_x, current_mario.portal_shoot_y + 40, 6, 6);        
-        }
-      }
-    }
-    
-    // If hero is not in a #4 solid tile, assume he's not in a portal
-    if(
-      tile_at(current_mario.x + 1, current_mario.y + 1) != 4
-      &&
-      tile_at(current_mario.x + mario_width - 1, current_mario.y + 1) != 4
-      &&
-      tile_at(current_mario.x + 1, current_mario.y + 31) != 4
-      &&
-      tile_at(current_mario.x + + mario_width - 1, current_mario.y + 31) != 4
-    ){
-      current_mario.in_portal = false;
-    }
-    
-    // Decrement teleportation idle delay
-    if(current_mario.teleport_idle){
-      current_mario.teleport_idle--;
-    }
   }
   
-  // Death animation
-  if(current_mario.state == 3){
-    current_mario.vy += gravity;
-    if(current_mario.vy > max_fall_speed){
-      current_mario.vy = max_fall_speed;
-    }
-    current_mario.y += current_mario.vy;
-  }
+  // Play current hero
+  
+  play_hero(current_mario);
   
   // Move cubes
   // =====
@@ -465,21 +119,17 @@ var play = () => {
     c.drawImage(tileset, 12 * 16, 0, 16, 16, level_data.cubes[i].x, 40 + level_data.cubes[i].y, 32, 32);
   }
     
-  // Draw Mario (facing right)
-  if(current_mario.direction == 1){
-    c.drawImage(tileset, [26, [27,28,29][~~(frame / 2) % 3], 30, 31][current_mario.state] * 16, 0, 16, 16, current_mario.x - 4, 40 + current_mario.y, 32, 32);
+  // Draw previous heros
+  for(hero in heros){
+    
+    // TODO
+    
   }
   
-  // Draw Mario (facing left)
-  else{
-    c.save();
-    c.translate(current_mario.x + mario_width + 4, current_mario.y);
-    c.scale(-1,1);
-    c.drawImage(tileset, [26, [27,28,29][~~(frame / 2) % 3], 30, 31][current_mario.state] * 16, 0, 16, 16, 0, 40, 32, 32);
-    c.restore();
-  }
+  // Draw current hero
+  draw_hero(current_mario);
   
-  // Draw portal tiles and portals in front of hero
+  // Draw portal tiles and portals in foreground
   draw_tile(4, blue_portal.tile_x, blue_portal.tile_y);
   draw_tile(4, orange_portal.tile_x, orange_portal.tile_y);
   c.fillStyle = "blue";
@@ -577,7 +227,7 @@ var play = () => {
   frame++;
   
   //document.title = frame + " " + current_mario.weight + " " + balances_state[0].weight1 + " " + balances_state[0].weight2 + " " + level_data.cubes[1].weight;
-  document.title = current_mario.x + " " + current_mario.y;
+  //document.title = current_mario.x + " " + current_mario.y;
   
   // Win animation
   if(win){
