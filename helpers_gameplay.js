@@ -1273,7 +1273,7 @@ var update_mechanisms = () => {
 }
 
 // Win animation (write "CLEARED" for 30 frames and exit)
-var victoty = () => {
+var victory = () => {
   if(win){
     win_frame++;
     c.font = "bold 100px arial";
