@@ -67,7 +67,8 @@ var reset_hero = () => {
     cube_held: null,
     cube_below: null,
     position_on_cube: null,
-    pick_cube_animation_frame: 0
+    pick_cube_animation_frame: 0,
+    can_jump: true
   }
 }
 

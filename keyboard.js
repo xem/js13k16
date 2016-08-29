@@ -1,12 +1,16 @@
 // OK
 
 // Keyboard input (during gameplay)
-onkeydown = onkeypress = (e) => {
+onkeydown = (e) => {
   if(screen == 2){
     
     // Top
-    if(e.keyCode == 38 || e.keyCode == 90 ||e.keyCode == 87){
-      current_mario.keyup = true;
+    if(e.keyCode == 38 || e.keyCode == 90 || e.keyCode == 87){
+      l(current_mario.can_jump);
+      if(current_mario.can_jump){
+        current_mario.keyup = true;
+        current_mario.can_jump = false;
+      }
     }
     
     // Right
@@ -29,6 +33,7 @@ onkeyup = (e) => {
     // Top
     if(e.keyCode == 38 || e.keyCode == 90 || e.keyCode == 87){
       current_mario.keyup = false;
+      current_mario.can_jump = true;
     }
     
     // Right
