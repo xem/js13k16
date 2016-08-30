@@ -353,7 +353,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
   // Apply horizontal speed
   obj.x += obj.vx;
   
-  // Apply gravity and compute vertical speed (but don't update position yet)
+  // Apply gravity if object is not in a portal, and compute vertical speed
   if(!obj.in_portal){
     obj.grounded = false;
     obj.vy += gravity;
@@ -361,17 +361,72 @@ var gravity_and_collisions = function(obj, obj_width, type){
       obj.vy = max_fall_speed;
     }
   }
-  
+    
   // If object's bottom (lower quarter) is on a solid tile (ex: toggled block), fall under it
-  if(!obj.in_portal && is_solid(tile_at(obj.x + obj_width / 2, obj.y + 24))){
+  else if(!obj.in_portal && is_solid(tile_at(obj.x + obj_width / 2, obj.y + 24))){
     obj.y = ~~(obj.y / 32) * 32 + 32;
   }
   
   // Go down
   if(obj.vy > 0){
     
-    // Stop falling if a solid tile is under object (or a spike, if the object is a cube)
+    obj.portal_target = null;
+    
+    // Enter a portal on the bottom (tile 4 + portal on position 0 (top) + other portal exists)
     if(
+      tile_at(obj.x + obj_width / 2, obj.y + 32 + obj.vy) == 4
+      &&
+      orange_portal.tile_x >= 0
+      &&
+      blue_portal.tile_x == ~~((obj.x + obj_width / 2) / 32)
+      &&
+      blue_portal.tile_y == ~~((obj.y + 32 + obj.vy) / 32)
+      &&
+      blue_portal.side == 0
+    ){
+      obj.portal_target = orange_portal;
+    }
+    
+    if(
+      tile_at(obj.x + obj.vx / 2, obj.y + 32 + obj.vy) == 4
+      &&
+      blue_portal.tile_x >= 0
+      &&
+      orange_portal.tile_x == ~~((obj.x + obj_width / 2) / 32)
+      &&
+      orange_portal.tile_y == ~~((obj.y + 32 + obj.vy) / 32)
+      &&
+      orange_portal.side == 0
+    ){
+      obj.portal_target = blue_portal;
+    }
+      
+    // If the object is entering a portal
+    if(obj.portal_target){
+      
+      // Adjust position and speed
+      obj.x = ~~((obj.x + obj_width / 2) / 32) * 32 + (32 - obj_width) / 2;
+      obj.vx = 0;
+      obj.in_portal = true;
+      
+      // Teleport and maintain the speed for a few frames if the object's left side entered the portal's tile
+      if(
+        // Low speed
+        (obj.vy < 10 && tile_at(obj.x + obj_width / 2, obj.y + 32 + obj.vy - 16) == 4)
+        ||
+        
+        // High speed
+        (obj.vy > 10 && tile_at(obj.x + obj_width / 2, obj.y + 32 + obj.vy) == 4)
+      ){
+        obj.teleport = true;
+        obj.momentum = Math.max(obj.vy, 6);
+        obj.vy = 0;
+        obj.teleport_idle = 8;
+      }
+    }
+  
+    // Stop falling if a solid tile is under object (or a spike, if the object is a cube)
+    else if(
       is_solid(tile_at(obj.x, obj.y + 32 + obj.vy))
       ||
       is_solid(tile_at(obj.x + obj_width, obj.y + 32 + obj.vy))
@@ -467,7 +522,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
   }
   
   // Go up (only for Mario)
-  if(type == 0 && obj.vy < 0){
+  if(obj.vy < 0){
     
     // Stop going up if there's a solid tile on top (only for Mario)
     if(
@@ -476,7 +531,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
       is_solid(tile_at(obj.x + obj_width, obj.y + obj.vy))
     ){
       
-      // Break bricks (tile #5)
+      // Break bricks (tile #5 => tile #0)
       if(tile_at(obj.x, obj.y + obj.vy) == 5){
         set_tile(obj.x, obj.y + obj.vy, 0);
       }
@@ -496,6 +551,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
   // Teleport
   if(obj.teleport){
     obj.teleport = false;
+    obj.grounded = false;
     
     obj.x = obj.portal_target.tile_x * 32 + (32 - obj_width) / 2;
     obj.y = obj.portal_target.tile_y * 32;
@@ -516,6 +572,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
     if(obj.portal_target.side == 2){
       obj.vy = obj.momentum;
       obj.vx = 0;
+      obj.y += 8;
     }
     
     // left
@@ -565,11 +622,21 @@ var play_hero = (current_mario) => {
     // If we're not in the few frames that follow a portal teleportation
     if(!current_mario.teleport_idle){
 
-      // Cancel vx (if hero not on ice)
+      // Cancel vx (if hero not on ice and not in the air or in the air but without horizontal momentum)
       if(
-        tile_at(current_mario.x, current_mario.y + 33) != 8
-        &&
-        tile_at(current_mario.x + mario_width, current_mario.y + 33) != 8
+        (
+          current_mario.grounded
+          &&
+          tile_at(current_mario.x, current_mario.y + 33) != 8
+          &&
+          tile_at(current_mario.x + mario_width, current_mario.y + 33) != 8
+        )
+        ||
+        (
+          !current_mario.grounded
+          &&
+          Math.abs(current_mario.vx) < 10
+        )
       ){
         current_mario.vx = 0;
       }
@@ -718,23 +785,32 @@ var play_hero = (current_mario) => {
     else {
       if(current_cube = level_data.cubes[current_mario.cube_held]){
         
-        // Drop ahead of hero if he's grounded
+        // Drop ahead of hero if he's grounded and not on a cube
         if(current_mario.grounded){
         
           // Left
-            if(current_mario.direction == 0){
+          if(current_mario.direction == 0){
             current_cube.x = current_mario.x - 20;
           }
           
           // Right
-          if(current_mario.direction == 1){
+          else if(current_mario.direction == 1){
             current_cube.x = current_mario.x + 20;
           }
         }
         
         // Drop in-place if not grounded
         else{
-          current_cube.x = current_mario.x;
+          
+          // Left
+          if(current_mario.direction == 0){
+            current_cube.x = current_mario.x - 6;
+          }
+          
+          // Right
+          else if(current_mario.direction == 1){
+            current_cube.x = current_mario.x;
+          }
         }
         
         // Avoid collisions
