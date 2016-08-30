@@ -6,7 +6,6 @@ onkeydown = (e) => {
     
     // Top
     if(e.keyCode == 38 || e.keyCode == 90 || e.keyCode == 87){
-      l(current_mario.can_jump);
       if(current_mario.can_jump){
         current_mario.keyup = true;
         current_mario.can_jump = false;

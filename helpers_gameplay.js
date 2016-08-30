@@ -231,7 +231,6 @@ var gravity_and_collisions = function(obj, obj_width, type){
         obj.momentum = Math.max(obj.vx, walk_speed);
         obj.vx = 0;
         obj.teleport_idle = 8;
-        //l("teleport. momentum = " + obj.momentum + " target = " + (obj.portal_target == orange_portal ? "orange" : "blue"));
       }
     }
     
@@ -497,7 +496,6 @@ var gravity_and_collisions = function(obj, obj_width, type){
   // Teleport
   if(obj.teleport){
     obj.teleport = false;
-    //l("momentum = " + obj.momentum);
     
     obj.x = obj.portal_target.tile_x * 32 + (32 - obj_width) / 2;
     obj.y = obj.portal_target.tile_y * 32;
@@ -525,8 +523,6 @@ var gravity_and_collisions = function(obj, obj_width, type){
       obj.vx = -obj.momentum;
       obj.vy = 0;
     }
-    
-    l(obj.vx);
   }
   
   // Press yellow switch (at the bottom left or right)
@@ -705,9 +701,9 @@ var play_hero = (current_mario) => {
             &&
             current_mario.x <= level_data.cubes[i].x + 31
             &&
-            current_mario.y + 31 >= level_data.cubes[i].y
+            current_mario.y + 31 + 4 >= level_data.cubes[i].y
             &&
-            current_mario.y <= level_data.cubes[i].y + 31
+            current_mario.y - 2 <= level_data.cubes[i].y + 31
           ){
             current_mario.cube_held = i;
             level_data.cubes[i].mario = current_mario;
@@ -720,11 +716,43 @@ var play_hero = (current_mario) => {
     
     // Drop cube
     else {
-      if(level_data.cubes[current_mario.cube_held]){
+      if(current_cube = level_data.cubes[current_mario.cube_held]){
         
-        // Drop ahead of mario? (todo)
+        // Drop ahead of hero if he's grounded
+        if(current_mario.grounded){
         
-        level_data.cubes[current_mario.cube_held].mario = null;
+          // Left
+            if(current_mario.direction == 0){
+            current_cube.x = current_mario.x - 20;
+          }
+          
+          // Right
+          if(current_mario.direction == 1){
+            current_cube.x = current_mario.x + 20;
+          }
+        }
+        
+        // Drop in-place if not grounded
+        else{
+          current_cube.x = current_mario.x;
+        }
+        
+        // Avoid collisions
+        if(is_solid(tile_at(current_cube.x, current_cube.y))){
+          current_cube.x = ~~((current_cube.x) / 32) * 32 + 32;
+        }
+        else if(is_solid(tile_at(current_cube.x, current_cube.y + 31))){
+          current_cube.x = ~~((current_cube.x) / 32) * 32 + 32;
+        }
+        else if(is_solid(tile_at(current_cube.x + 32, current_cube.y))){
+          current_cube.x = ~~((current_cube.x) / 32) * 32 - 1;
+        }
+        else if(is_solid(tile_at(current_cube.x + 32, current_cube.y + 31))){
+          current_cube.x = ~~((current_cube.x) / 32) * 32 - 1;
+        }
+          
+        current_cube.mario = null;
+        level_data.cubes[current_mario.cube_held] = current_cube;
         current_mario.cube_held = null;
         current_mario.weight = 1;
       }
@@ -732,14 +760,21 @@ var play_hero = (current_mario) => {
     
     // Hold cube
     if(current_mario.cube_held !== null){
-      level_data.cubes[current_mario.cube_held].x = current_mario.x;
+      
+      // Left
+      if(current_mario.direction == 0){
+        level_data.cubes[current_mario.cube_held].x = current_mario.x - 6;
+      }
+      if(current_mario.direction == 1){
+        level_data.cubes[current_mario.cube_held].x = current_mario.x;
+      }
       
       // Animate cube grab (make it last 5 frames)
       if(current_mario.pick_cube_animation_frame){
         current_mario.pick_cube_animation_frame--;
       }
       
-      // Place cube over Mario (unless he's passing through a portal or there's a solid tile above, in this case hold it very low)
+      // Place cube over Mario (unless he's passing through a portal or there's a solid tile above, in this case hold it lower)
       if(current_mario.in_portal){ 
         level_data.cubes[current_mario.cube_held].y = current_mario.y;
       }

@@ -98,7 +98,7 @@ var handle_clicks = (e) => {
     for(i = 0; i < 10; i++){
       for(j = 0; j < 3; j++){
         number = j * 10 + i + 1;
-        if(+localStorage["scpm_level"] >= number){
+        if(+localStorage["scpm"] >= number){
           c.beginPath();
           c.rect(i * 120 + 50, j * 100 + 120, 100, 80);
           if(c.isPointInPath(x, y)){
