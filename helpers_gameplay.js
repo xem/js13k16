@@ -425,7 +425,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
     else if(
       is_solid(tile_at(obj.x, obj.y + 32 + obj.vy))
       ||
-      is_solid(tile_at(obj.x + obj_width, obj.y + 32 + obj.vy))
+      is_solid(tile_at(obj.x + obj_width - 1, obj.y + 32 + obj.vy))
       ||
       (type == 1 && tile_at(obj.x, obj.y + 32 + obj.vy) == 7)
       ||
@@ -616,7 +616,10 @@ var gravity_and_collisions = function(obj, obj_width, type){
     if(obj.portal_target.side == 2){
       obj.vy = obj.momentum;
       obj.vx = 0;
+      
+      //  Ensure the hero falls off the portal and is controllable soon
       obj.y += 8;
+      obj.teleport_idle = 2;
     }
     
     // left
@@ -766,8 +769,17 @@ var play_hero = (current_hero) => {
     gravity_and_collisions(current_hero, hero_width, 0);
     
     // Collect coins (tile 6 => tile 0)
-    if(tile_at(current_hero.x + hero_width / 2, current_hero.y + 16) == 6){
-      set_tile(current_hero.x + hero_width / 2, current_hero.y + 16, 0);
+    if(tile_at(current_hero.x + hero_width / 2 - 8, current_hero.y + 16 - 8) == 6 ){
+      set_tile(current_hero.x + hero_width / 2 - 8, current_hero.y + 16 - 8, 0);
+    }
+    if(tile_at(current_hero.x + hero_width / 2 + 8, current_hero.y + 16 - 8) == 6){
+      set_tile(current_hero.x + hero_width / 2 + 8, current_hero.y + 16 - 8, 0);
+    }
+    if(tile_at(current_hero.x + hero_width / 2 - 8, current_hero.y + 16 + 8) == 6){
+      set_tile(current_hero.x + hero_width / 2 - 8, current_hero.y + 16 + 8, 0);
+    }
+    if(tile_at(current_hero.x + hero_width / 2 + 8, current_hero.y + 16 + 8) == 6){
+      set_tile(current_hero.x + hero_width / 2 + 8, current_hero.y + 16 + 8, 0);
     }
     
     // Die (spike)
@@ -827,56 +839,54 @@ var play_hero = (current_hero) => {
     }
     
     // Drop cube
-    else {
-      if(current_cube = level_data.cubes[current_hero.cube_held]){
+    else if(current_cube = level_data.cubes[current_hero.cube_held]){
         
-        // Drop ahead of hero if he's grounded and not on a cube
-        if(current_hero.grounded){
-        
-          // Left
-          if(current_hero.direction == 0){
-            current_cube.x = current_hero.x - 20;
-          }
-          
-          // Right
-          else if(current_hero.direction == 1){
-            current_cube.x = current_hero.x + 20;
-          }
+      // Drop ahead of hero if he's grounded and not on a cube
+      if(current_hero.grounded){
+      
+        // Left
+        if(current_hero.direction == 0){
+          current_cube.x = current_hero.x - 20;
         }
         
-        // Drop in-place if not grounded
-        else{
-          
-          // Left
-          if(current_hero.direction == 0){
-            current_cube.x = current_hero.x - 6;
-          }
-          
-          // Right
-          else if(current_hero.direction == 1){
-            current_cube.x = current_hero.x;
-          }
+        // Right
+        else if(current_hero.direction == 1){
+          current_cube.x = current_hero.x + 20;
         }
-        
-        // Avoid collisions
-        if(is_solid(tile_at(current_cube.x, current_cube.y))){
-          current_cube.x = ~~((current_cube.x) / 32) * 32 + 32;
-        }
-        else if(is_solid(tile_at(current_cube.x, current_cube.y + 31))){
-          current_cube.x = ~~((current_cube.x) / 32) * 32 + 32;
-        }
-        else if(is_solid(tile_at(current_cube.x + 32, current_cube.y))){
-          current_cube.x = ~~((current_cube.x) / 32) * 32 - 1;
-        }
-        else if(is_solid(tile_at(current_cube.x + 32, current_cube.y + 31))){
-          current_cube.x = ~~((current_cube.x) / 32) * 32 - 1;
-        }
-          
-        current_cube.hero = null;
-        level_data.cubes[current_hero.cube_held] = current_cube;
-        current_hero.cube_held = null;
-        current_hero.weight = 1;
       }
+      
+      // Drop in-place if not grounded
+      else{
+        
+        // Left
+        if(current_hero.direction == 0){
+          current_cube.x = current_hero.x - 6;
+        }
+        
+        // Right
+        else if(current_hero.direction == 1){
+          current_cube.x = current_hero.x;
+        }
+      }
+      
+      // Avoid collisions
+      if(is_solid(tile_at(current_cube.x, current_cube.y))){
+        current_cube.x = ~~((current_cube.x) / 32) * 32 + 32;
+      }
+      else if(is_solid(tile_at(current_cube.x, current_cube.y + 31))){
+        current_cube.x = ~~((current_cube.x) / 32) * 32 + 32;
+      }
+      else if(is_solid(tile_at(current_cube.x + 32, current_cube.y))){
+        current_cube.x = ~~((current_cube.x) / 32) * 32 - 1;
+      }
+      else if(is_solid(tile_at(current_cube.x + 32, current_cube.y + 31))){
+        current_cube.x = ~~((current_cube.x) / 32) * 32 - 1;
+      }
+        
+      current_cube.hero = null;
+      level_data.cubes[current_hero.cube_held] = current_cube;
+      current_hero.cube_held = null;
+      current_hero.weight = 1;
     }
     
     // Hold cube
@@ -887,7 +897,7 @@ var play_hero = (current_hero) => {
         level_data.cubes[current_hero.cube_held].x = current_hero.x - 6;
       }
       if(current_hero.direction == 1){
-        level_data.cubes[current_hero.cube_held].x = current_hero.x;
+        level_data.cubes[current_hero.cube_held].x = current_hero.x - 4;
       }
       
       // Animate cube grab (make it last 5 frames)
@@ -928,7 +938,7 @@ var play_hero = (current_hero) => {
       }
     }
     
-    // Send portals (only if he's not currently in a portal)
+    // Send portals (only if hero's not currently in a portal)
     if(!current_hero.in_portal && (current_hero.leftclick[frame] || current_hero.rightclick[frame])){
         
       // Cancel current shoots
@@ -953,111 +963,73 @@ var play_hero = (current_hero) => {
       current_hero.portal_shoot_vy = Math.cos(current_hero.angle);
     }
     
-    // Blue portal (beam / open portal)
-    if(current_hero.shoot_blue){
-      
-      for(i = 0; i < 40; i++){
-        current_hero.shoot_blue += .001;
-        current_hero.portal_shoot_x += current_hero.shoot_blue * current_hero.portal_shoot_vx;
-        current_hero.portal_shoot_y += current_hero.shoot_blue * current_hero.portal_shoot_vy;
-        if(is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y))){
-          current_hero.shoot_blue = 0;
-          
-          // Define on which side the portal goes (0: top, 1: right, 2: bottom, 3: left)
-          // Avoid opening a portal between two solid tiles, and on sides not reachable given the current angle
-          if(current_hero.portal_shoot_x % 32 < 4 && !is_solid(tile_at(current_hero.portal_shoot_x - 32, current_hero.portal_shoot_y)) && current_hero.portal_shoot_vx > 0){
-            temp_side = 3;
-          }
-          if(current_hero.portal_shoot_x % 32 > 28 && !is_solid(tile_at(current_hero.portal_shoot_x + 32, current_hero.portal_shoot_y)) && current_hero.portal_shoot_vx < 0){
-            temp_side = 1;
-          }
-          if(current_hero.portal_shoot_y % 32 < 4 && !is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y - 32)) && current_hero.portal_shoot_vy > 0){
-            temp_side = 0;
-          }
-          if(current_hero.portal_shoot_y % 32 > 28 && !is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y + 32)) && current_hero.portal_shoot_vy < 0){
-            temp_side = 2;
-          }
-
-          // Reflect ray if tile is #8 (ice)
-          if(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y) == 8){
-            current_hero.shoot_blue = 1;
-            if(temp_side == 0 || temp_side == 2){
-              current_hero.portal_shoot_vy = -current_hero.portal_shoot_vy;
-            }
-            else //if(temp_side == 1 || temp_side == 3)
-            {
-              current_hero.portal_shoot_vx = -current_hero.portal_shoot_vx;
-            }
-          }
-          
-          // Place portal if tile is #4 (white wall) and no orange portal is here yet
-          if(
-            tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y) == 4
-            &&
-            (~~(current_hero.portal_shoot_x / 32) != orange_portal.tile_x || ~~(current_hero.portal_shoot_y / 32) != orange_portal.tile_y || orange_portal.side != temp_side)
-          ){
-            blue_portal.tile_x = ~~(current_hero.portal_shoot_x / 32);
-            blue_portal.tile_y = ~~(current_hero.portal_shoot_y / 32);
-            blue_portal.side = temp_side;
-          }
-        }
-        else{
-          c.fillStyle = "blue";
-          c.fillRect(current_hero.portal_shoot_x, current_hero.portal_shoot_y + 40, 6, 6);        
-        }
-      }
-    }
+    // Portal beam (reflect on ice / open portal on white wall)
+    for(current_portal in portals = [["shoot_blue", blue_portal, "blue"], ["shoot_orange", orange_portal, "orange"]]){
     
-    // Orange portal (beam / open portal)
-    if(current_hero.shoot_orange){
-      for(i = 0; i < 40; i++){
-        current_hero.shoot_orange += .001;
-        current_hero.portal_shoot_x += current_hero.shoot_orange * current_hero.portal_shoot_vx;
-        current_hero.portal_shoot_y += current_hero.shoot_orange * current_hero.portal_shoot_vy;
-        if(is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y))){
-          current_hero.shoot_orange = 0;
-          
-          // Define on which side the portal goes (0: top, 1: right, 2: bottom, 3: left)
-          // Avoid opening a portal between two solid tiles, and on sides not reachable given the current angle
-          if(current_hero.portal_shoot_x % 32 < 4 && !is_solid(tile_at(current_hero.portal_shoot_x - 32, current_hero.portal_shoot_y)) && current_hero.portal_shoot_vx > 0){
-            temp_side = 3;
-          }
-          if(current_hero.portal_shoot_x % 32 > 28 && !is_solid(tile_at(current_hero.portal_shoot_x + 32, current_hero.portal_shoot_y)) && current_hero.portal_shoot_vx < 0){
-            temp_side = 1;
-          }
-          if(current_hero.portal_shoot_y % 32 < 4 && !is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y - 32)) && current_hero.portal_shoot_vy > 0){
-            temp_side = 0;
-          }
-          if(current_hero.portal_shoot_y % 32 > 28 && !is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y + 32)) && current_hero.portal_shoot_vy < 0){
-            temp_side = 2;
-          }
+      if(current_hero[portals[current_portal][0]]){
+      
+        for(i = 0; i < 40; i++){
+          current_hero[portals[current_portal][0]] += .001;
+          current_hero.portal_shoot_x += current_hero[portals[current_portal][0]] * current_hero.portal_shoot_vx;
+          current_hero.portal_shoot_y += current_hero[portals[current_portal][0]] * current_hero.portal_shoot_vy;
+          if(is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y))){
+            current_hero[portals[current_portal][0]] = 0;
+            
+            // Define on which side the portal goes (0: top, 1: right, 2: bottom, 3: left)
+            // Avoid opening a portal between two solid tiles, and on sides not reachable given the current angle
+            if(current_hero.portal_shoot_x % 32 < 4 && !is_solid(tile_at(current_hero.portal_shoot_x - 32, current_hero.portal_shoot_y)) && current_hero.portal_shoot_vx > 0){
+              temp_side = 3;
+              l(3);
+            }
+            if(current_hero.portal_shoot_x % 32 > 28 && !is_solid(tile_at(current_hero.portal_shoot_x + 32, current_hero.portal_shoot_y)) && current_hero.portal_shoot_vx < 0){
+              temp_side = 1;
+              l(1);
+            }
+            if(current_hero.portal_shoot_y % 32 < 4 && !is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y - 32)) && current_hero.portal_shoot_vy > 0){
+              temp_side = 0;
+            }
+            if(current_hero.portal_shoot_y % 32 > 28 && !is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y + 32)) && current_hero.portal_shoot_vy < 0){
+              temp_side = 2;
+            }
 
-          // Reflect ray if tile is #8 (ice)
-          if(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y) == 8){
-            current_hero.shoot_orange = 1;
-            if(temp_side == 0 || temp_side == 2){
-              current_hero.portal_shoot_vy = -current_hero.portal_shoot_vy;
+            // Reflect ray if tile is #8 (ice)
+            if(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y) == 8){
+              current_hero[portals[current_portal][0]] = 1;
+              if(temp_side == 0){
+                current_hero.portal_shoot_vy = -current_hero.portal_shoot_vy;
+                current_hero.portal_shoot_y = ~~(current_hero.portal_shoot_y / 32) * 32 - 1;
+              }
+              else if(temp_side == 2){
+                current_hero.portal_shoot_vy = -current_hero.portal_shoot_vy;
+                current_hero.portal_shoot_y = ~~(current_hero.portal_shoot_y / 32) * 32 + 32 + 1;
+              }
+              else if(temp_side == 1){
+                current_hero.portal_shoot_vx = -current_hero.portal_shoot_vx;
+                current_hero.portal_shoot_x = ~~(current_hero.portal_shoot_x / 32) * 32 + 32 + 1;
+              }
+              else //if(temp_side == 3)
+              {
+                current_hero.portal_shoot_vx = -current_hero.portal_shoot_vx;
+                current_hero.portal_shoot_x = ~~(current_hero.portal_shoot_x / 32) * 32 - 1;
+              }
             }
-            else //if(temp_side == 1 || temp_side == 3)
-            {
-              current_hero.portal_shoot_vx = -current_hero.portal_shoot_vx;
+            
+            // Place portal if tile is #4 (white wall) and no orange portal is here yet
+            if(
+              tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y) == 4
+              &&
+              (~~(current_hero.portal_shoot_x / 32) != orange_portal.tile_x || ~~(current_hero.portal_shoot_y / 32) != orange_portal.tile_y || orange_portal.side != temp_side)
+            ){
+              portals[current_portal][1].tile_x = ~~(current_hero.portal_shoot_x / 32);
+              portals[current_portal][1].tile_y = ~~(current_hero.portal_shoot_y / 32);
+              portals[current_portal][1].side = temp_side;
             }
+            break;
           }
-          
-          // Place portal if tile is #4 (white wall) and no blue portal is here yet
-          if(
-            tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y) == 4
-            &&
-            (~~(current_hero.portal_shoot_x / 32) != blue_portal.tile_x || ~~(current_hero.portal_shoot_y / 32) != blue_portal.tile_y || blue_portal.side != temp_side)
-          ){
-            orange_portal.tile_x = ~~(current_hero.portal_shoot_x / 32);
-            orange_portal.tile_y = ~~(current_hero.portal_shoot_y / 32);
-            orange_portal.side = temp_side;
+          else{
+            c.fillStyle = portals[current_portal][2];
+            c.fillRect(current_hero.portal_shoot_x, current_hero.portal_shoot_y + 40, 6, 6);        
           }
-        }
-        else{
-          c.fillStyle = "orange";
-          c.fillRect(current_hero.portal_shoot_x, current_hero.portal_shoot_y + 40, 6, 6);        
         }
       }
     }
@@ -1095,7 +1067,7 @@ var play_hero = (current_hero) => {
 // Draw hero (past or present)
 var draw_hero = (hero) => {
   c.save();
-  c.translate(hero.x + hero_width / 2, hero.y);
+  c.translate(hero.x + hero_width / 2 - 2, hero.y);
   
   // Facing left
   if(hero.direction == 0){

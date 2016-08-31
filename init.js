@@ -50,7 +50,7 @@ var level_data = {};
 var pipe_click, current_pipe, balance_click, current_balance, current_editor_tile, mouse_tile_x, mouse_tile_y, pipe_high, pipe_low, end_pipe, end_pole, number, drawn_tile;
 
 // Other globals (gameplay)
-var win, win_frame, coins_left, loop, frame, current_hero, solid, yellow_toggle, yellow_toggle_last_frame, pipes_state, balances_state, yellow_toggle_delay, yellow_toggle_on, blue_portal, orange_portal, temp_side, heros, hero, target, current_cube;
+var win, win_frame, coins_left, loop, frame, current_hero, solid, yellow_toggle, yellow_toggle_last_frame, pipes_state, balances_state, yellow_toggle_delay, yellow_toggle_on, blue_portal, orange_portal, temp_side, heros, hero, target, current_cube, portals, current_portal;
 
 // Built-in levels:
 var levels = [
@@ -141,10 +141,10 @@ var levels = [
 0400000000000000000000000000000000000080\
 0400000000000000000000000000000000000080\
 0400000000000000000000000000000000000080\
-0400000000000000000000000000000000000080\
-0400000000000060000000000000000060000080\
-040000F000000000000000000000000000200080\
-040000G000000000000000000000000000000080\
+0400000000000006000000000000000006000080\
+0400000000000006000000000000000006000080\
+040000F000000006000000000000000006200080\
+040000G000000006000000000000000000000080\
 0400088800000000000000000000000008880080\
 0400000000000000000000000000000000000080\
 0444444444444444000000000888888888888880\
