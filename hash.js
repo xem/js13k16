@@ -1,4 +1,3 @@
-// OK
 
 // If a hash is set, play the level directly
 onhashchange = function(){

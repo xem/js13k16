@@ -1,4 +1,3 @@
-// OK
 
 // Game loop
 var play = () => {
@@ -39,14 +38,14 @@ var play = () => {
   }
   
   // Save keys being pressed (for latest hero only)
-  if(current_mario.keyleft){
-    current_mario.left[frame] = true;
+  if(current_hero.keyleft){
+    current_hero.left[frame] = true;
   }
-  if(current_mario.keyright){
-    current_mario.right[frame] = true;
+  if(current_hero.keyright){
+    current_hero.right[frame] = true;
   }
-  if(current_mario.keyup){
-    current_mario.up[frame] = true;
+  if(current_hero.keyup){
+    current_hero.up[frame] = true;
   }
   
   // Pixelize graphics
@@ -82,7 +81,7 @@ var play = () => {
   
   // Play current hero
   
-  play_hero(current_mario);
+  play_hero(current_hero);
   
   // Move and draw cubes
   move_cubes();
@@ -95,7 +94,7 @@ var play = () => {
   }
   
   // Draw current hero
-  draw_hero(current_mario);
+  draw_hero(current_hero);
   
   // Draw tiles that have portals, and portals in foreground
   draw_portals();
@@ -109,8 +108,8 @@ var play = () => {
   // Next frame
   frame++;
   
-  //document.title = frame + " " + current_mario.weight + " " + balances_state[0].weight1 + " " + balances_state[0].weight2 + " " + level_data.cubes[1].weight;
-  //document.title = current_mario.x + " " + current_mario.y;
+  //document.title = frame + " " + current_hero.weight + " " + balances_state[0].weight1 + " " + balances_state[0].weight2 + " " + level_data.cubes[1].weight;
+  //document.title = current_hero.x + " " + current_hero.y;
   
   // Victoty animation (if we won)
   victory();

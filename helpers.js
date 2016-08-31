@@ -84,7 +84,7 @@ var reset_current_level = () => {
   frame = 0;
 
   // Reset "present" hero
-  current_mario = reset_hero();
+  current_hero = reset_hero();
 
   // Solidity of the tiles (some of them vary during gameplay, so we reset it before each level and after reset)
   solid = [

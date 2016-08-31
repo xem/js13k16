@@ -1,4 +1,3 @@
-// OK
 
 // Handle clicks on the canvas on each screen
 a.onclick = a.oncontextmenu = (e) => {
@@ -120,11 +119,11 @@ var handle_clicks = (e) => {
     
     // Save click coordinates
     if(e.which == 1){
-      current_mario.leftclick[frame] = [x, y];
+      current_hero.leftclick[frame] = [x, y];
     }
     
     if(e.which == 3){
-      current_mario.rightclick[frame] = [x, y];
+      current_hero.rightclick[frame] = [x, y];
     }
     
     // Quit

@@ -1,4 +1,3 @@
-// OK
 
 // Keyboard input (during gameplay)
 onkeydown = (e) => {
@@ -6,20 +5,20 @@ onkeydown = (e) => {
     
     // Top
     if(e.keyCode == 38 || e.keyCode == 90 || e.keyCode == 87){
-      if(current_mario.can_jump){
-        current_mario.keyup = true;
-        current_mario.can_jump = false;
+      if(current_hero.can_jump){
+        current_hero.keyup = true;
+        current_hero.can_jump = false;
       }
     }
     
     // Right
     if(e.keyCode == 39 || e.keyCode == 68){
-      current_mario.keyright = true;
+      current_hero.keyright = true;
     }
     
     // Left
     if(e.keyCode == 37 || e.keyCode == 65 ||e.keyCode == 81){
-      current_mario.keyleft = true;
+      current_hero.keyleft = true;
     }
   }
 }
@@ -31,18 +30,18 @@ onkeyup = (e) => {
     
     // Top
     if(e.keyCode == 38 || e.keyCode == 90 || e.keyCode == 87){
-      current_mario.keyup = false;
-      current_mario.can_jump = true;
+      current_hero.keyup = false;
+      current_hero.can_jump = true;
     }
     
     // Right
     if(e.keyCode == 39 || e.keyCode == 68){
-      current_mario.keyright = false;
+      current_hero.keyright = false;
     }
     
     // Left
     if(e.keyCode == 37 || e.keyCode == 65 || e.keyCode == 81){
-      current_mario.keyleft = false;
+      current_hero.keyleft = false;
     }
     
     // R (reset)
@@ -52,8 +51,8 @@ onkeyup = (e) => {
     
     // Space (press to toggle)
     if(e.keyCode == 32){
-      current_mario.space[frame] = true;
-      current_mario.pickdrop ^= 1;
+      current_hero.space[frame] = true;
+      current_hero.pickdrop ^= 1;
     }
   }
 }
