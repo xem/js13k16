@@ -15,26 +15,21 @@ var play = () => {
     c.font = "bold 30px arial";
     c.fillStyle = "black";
     c.textAlign = "center";
-    
-    if(level == 1){
-      c.fillText("Move with arrow keys or WASD or ZQSD.", 640, 80);
-      c.fillText("Pick and drop cubes with [space]. Restart with R.", 640, 120);
-      c.fillText("Collect all coins and reach the flag.", 640, 160);
-    }
-    
-    if(level == 2){
-      c.fillText("Let's add some mechanisms...", 640, 80);
-    }
-    
-    if(level == 3){
-      c.fillText("And now, you're thinking with portals!", 640, 80);
-      c.fillText("Use mouse to aim and [left click] / [right click] to shoot.", 640, 120);
-    }
-    
-    if(level == 4){
-      c.fillText("Don't forget the momentum!", 640, 80);
-      c.fillText("(And be careful, ice is slippy if you're not standing still)", 640, 120);
-    }
+    c.fillText(
+      [
+        "",
+        "Move with arrow keys or WASD or ZQSD. Collect all coins and reach the flag.",
+        "If you're stuck, restart with R.",
+        "Ice is slippy if you're not standing still.",
+        "Hold and drop cubes with Space.",
+        ,
+        ,
+        ,
+        "Aim with mouse, send portals with left click and right click.",
+        "Use momentum!",
+      
+      ][level] || "", 640, 80
+    );
   }
   
   // Save keys being pressed (for latest hero only)
