@@ -97,8 +97,8 @@ var reset_current_level = () => {
     0, // 6: coin
     0, // 7: spike
     1, // 8: ice
-    1, 
-    0,
+    1, // 9: solid yellow block
+    0, // 10: non-solid yellow block
     0, // 11: yellow toggle
     0, // 12: cube
     1, 

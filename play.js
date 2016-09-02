@@ -105,6 +105,7 @@ var play = () => {
   
   //document.title = frame + " " + current_hero.weight + " " + balances_state[0].weight1 + " " + balances_state[0].weight2 + " " + level_data.cubes[1].weight;
   //document.title = current_hero.x + " " + current_hero.y;
+  //document.title = level_data.cubes[0].vx + " " + level_data.cubes[0].teleport_idle;
   
   // Victoty animation (if we won)
   victory();

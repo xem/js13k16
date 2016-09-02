@@ -1,6 +1,0 @@
-todo:
-- pas de portal orange sur bleu
-- portal bas vers gauche sur la meme case = bof
-- tomber si on est sur un switch jaune au dessus de 2 blocs jaunes durs
-- cube seul avec portal envoyé en dessous disparait en allant vers un portal a gauche
-- pas de portal sous des pics

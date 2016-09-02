@@ -359,7 +359,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
   }
     
   // If object's bottom (lower quarter) is on a solid tile (ex: toggled block), fall under it
-  else if(!obj.in_portal && is_solid(tile_at(obj.x + obj_width / 2, obj.y + 24))){
+  else if(!obj.in_portal && is_solid(tile_at(obj.x + obj_width / 2, obj.y + 28))){
     obj.y = ~~(obj.y / 32) * 32 + 32;
   }
   
@@ -429,7 +429,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
       ||
       (type == 1 && tile_at(obj.x, obj.y + 32 + obj.vy) == 7)
       ||
-      (type == 1 && tile_at(obj.x + obj_width, obj.y + 32 + obj.vy) == 7)
+      (type == 1 && tile_at(obj.x + obj_width - 1, obj.y + 32 + obj.vy) == 7)
     ){
       obj.y = ~~((obj.y + obj.vy) / 32) * 32;
       obj.vy = 0;
@@ -463,7 +463,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
     // Stop falling if there's a pipe there
     for(j in level_data.pipes){
       if(
-        obj.x + obj_width >= level_data.pipes[j][0] * 32
+        obj.x + obj_width - 1 >= level_data.pipes[j][0] * 32
         &&
         obj.x < level_data.pipes[j][0] * 32 + 64
         &&
@@ -610,6 +610,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
     if(obj.portal_target.side == 1){
       obj.vx = obj.momentum;
       obj.vy = 0;
+      obj.x += 8;
     }
     
     // bottom
@@ -626,6 +627,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
     if(obj.portal_target.side == 3){
       obj.vx = -obj.momentum;
       obj.vy = 0;
+      obj.x -= 8;
     }
   }
   
@@ -641,7 +643,6 @@ var gravity_and_collisions = function(obj, obj_width, type){
   
   // Press green switch
   for(var i in level_data.pipes){
-    
     if(
       obj.x + obj_width >= level_data.pipes[i][3] * 32
       &&
@@ -653,6 +654,11 @@ var gravity_and_collisions = function(obj, obj_width, type){
     ){
       pipes_state[i].pressed = true;
     }
+  }
+  
+  // Go down if we're stuck in solid yellow blocks (tile #9){
+  if(tile_at(obj.x, obj.y + 31) == 9 || tile_at(obj.x + obj_width - 1, obj.y + 31) == 9){
+    obj.y = ~~(obj.y / 32) * 32 + 32;
   }
 }
 
@@ -968,22 +974,25 @@ var play_hero = (current_hero) => {
     
       if(current_hero[portals[current_portal][0]]){
       
+        // Make beam advance with baby steps
         for(i = 0; i < 40; i++){
           current_hero[portals[current_portal][0]] += .001;
           current_hero.portal_shoot_x += current_hero[portals[current_portal][0]] * current_hero.portal_shoot_vx;
           current_hero.portal_shoot_y += current_hero[portals[current_portal][0]] * current_hero.portal_shoot_vy;
-          if(is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y))){
+          
+          // If beam hits solid or spike (tile #7)
+          if(is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y)) || tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y) == 7){
+            
+            // Cancel any existing portal of this color
             current_hero[portals[current_portal][0]] = 0;
             
             // Define on which side the portal goes (0: top, 1: right, 2: bottom, 3: left)
             // Avoid opening a portal between two solid tiles, and on sides not reachable given the current angle
             if(current_hero.portal_shoot_x % 32 < 4 && !is_solid(tile_at(current_hero.portal_shoot_x - 32, current_hero.portal_shoot_y)) && current_hero.portal_shoot_vx > 0){
               temp_side = 3;
-              l(3);
             }
             if(current_hero.portal_shoot_x % 32 > 28 && !is_solid(tile_at(current_hero.portal_shoot_x + 32, current_hero.portal_shoot_y)) && current_hero.portal_shoot_vx < 0){
               temp_side = 1;
-              l(1);
             }
             if(current_hero.portal_shoot_y % 32 < 4 && !is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y - 32)) && current_hero.portal_shoot_vy > 0){
               temp_side = 0;
@@ -1018,7 +1027,7 @@ var play_hero = (current_hero) => {
             if(
               tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y) == 4
               &&
-              (~~(current_hero.portal_shoot_x / 32) != orange_portal.tile_x || ~~(current_hero.portal_shoot_y / 32) != orange_portal.tile_y || orange_portal.side != temp_side)
+              (~~(current_hero.portal_shoot_x / 32) != portals[1 - current_portal][1].tile_x || ~~(current_hero.portal_shoot_y / 32) != portals[1 - current_portal][1].tile_y || portals[1 - current_portal][1].side != temp_side)
             ){
               portals[current_portal][1].tile_x = ~~(current_hero.portal_shoot_x / 32);
               portals[current_portal][1].tile_y = ~~(current_hero.portal_shoot_y / 32);
@@ -1194,7 +1203,7 @@ var victory = () => {
 
 // Move and draw all cubes
 var move_cubes = () => {
-  for(i in level_data.cubes){
+  for(var i in level_data.cubes){
     
     // If cube is not in a #4 solid tile, assume it's not in a portal anymore
     if(
@@ -1204,7 +1213,7 @@ var move_cubes = () => {
       &&
       tile_at(level_data.cubes[i].x + 1, level_data.cubes[i].y + 31) != 4
       &&
-      tile_at(level_data.cubes[i].x + + 32 - 1, level_data.cubes[i].y + 31) != 4
+      tile_at(level_data.cubes[i].x + 32 - 1, level_data.cubes[i].y + 31) != 4
     ){
       level_data.cubes[i].in_portal = false;
     }
@@ -1216,7 +1225,9 @@ var move_cubes = () => {
     
     // Apply gravity and collsions if the cube is not held
     if(level_data.cubes[i].hero === null){
-      level_data.cubes[i].vx = 0;
+      if(!level_data.cubes[i].teleport_idle && !is_solid(tile_at(level_data.cubes[i].x, level_data.cubes[i].y + 31)) && !is_solid(tile_at(level_data.cubes[i].x + 31, level_data.cubes[i].y + 31))){
+        level_data.cubes[i].vx = 0;
+      }
       gravity_and_collisions(level_data.cubes[i], 32, 1);
     }
 
