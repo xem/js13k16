@@ -240,6 +240,106 @@ var handle_clicks = (e) => {
         if(is_writable(tile_x, tile_y)){
           level_data.tiles[tile_y][tile_x] = 0;
         }
+        
+        // Erase pipe if we click on tile #16 or #17 (pipe top)
+        if(pipe_click == 0){
+          if(level_data.tiles[tile_y][tile_x] == 16){
+            for(i in level_data.pipes){
+              if(level_data.pipes[i][0] == tile_x && (level_data.pipes[i][1] == tile_y || level_data.pipes[i][2] == tile_y)){
+                for(j = level_data.pipes[i][1]; j < 20; j++){
+                  if(level_data.tiles[j][tile_x] == 16 || level_data.tiles[j][tile_x] == 18){
+                    level_data.tiles[j][tile_x] = 0;
+                    level_data.tiles[j][tile_x + 1] = 0;
+                  }
+                  else{
+                    break;
+                  }
+                }
+                for(j = level_data.pipes[i][2]; j < 20; j++){
+                  if(level_data.tiles[j][tile_x] == 16 || level_data.tiles[j][tile_x] == 18){
+                    level_data.tiles[j][tile_x] = 0;
+                    level_data.tiles[j][tile_x + 1] = 0;
+                  }
+                  else{
+                    break;
+                  }
+                }
+                level_data.tiles[level_data.pipes[i][4]][level_data.pipes[i][3]] = 0;
+                delete level_data.pipes[i];
+              }
+            }
+          }
+          
+          if(level_data.tiles[tile_y][tile_x] == 17){
+            for(i in level_data.pipes){
+              if(level_data.pipes[i][0] == (tile_x - 1) && (level_data.pipes[i][1] == tile_y || level_data.pipes[i][2] == tile_y)){
+                for(j = level_data.pipes[i][1]; j < 20; j++){
+                  if(level_data.tiles[j][tile_x] == 17 || level_data.tiles[j][tile_x] == 19){
+                    level_data.tiles[j][tile_x] = 0;
+                    level_data.tiles[j][tile_x - 1] = 0;
+                  }
+                  else{
+                    break;
+                  }
+                }
+                for(j = level_data.pipes[i][2]; j < 20; j++){
+                  if(level_data.tiles[j][tile_x] == 17 || level_data.tiles[j][tile_x] == 19){
+                    level_data.tiles[j][tile_x] = 0;
+                    level_data.tiles[j][tile_x - 1] = 0;
+                  }
+                  else{
+                    break;
+                  }
+                }
+                level_data.tiles[level_data.pipes[i][4]][level_data.pipes[i][3]] = 0;
+                delete level_data.pipes[i];
+              }
+            }
+          }
+        }
+        
+        // Erase balances if we click on tile #15
+        if(balance_click == 0){
+          if(level_data.tiles[tile_y][tile_x] == 15){
+            for(i in level_data.balances){
+              if(
+                (
+                  level_data.balances[i][1] == tile_y
+                  &&
+                  (
+                    level_data.balances[i][0] == tile_x
+                    ||
+                    level_data.balances[i][0] == tile_x - 1
+                    ||
+                    level_data.balances[i][0] == tile_x + 1
+                  )
+                )
+                ||
+                (
+                  level_data.balances[i][3] == tile_y
+                  &&
+                  (
+                    level_data.balances[i][2] == tile_x
+                    ||
+                    level_data.balances[i][2] == tile_x - 1
+                    ||
+                    level_data.balances[i][2] == tile_x + 1
+                  )
+                )
+              ){
+                level_data.tiles[level_data.balances[i][1]][level_data.balances[i][0]] = 0;
+                level_data.tiles[level_data.balances[i][1]][level_data.balances[i][0] - 1] = 0;
+                level_data.tiles[level_data.balances[i][1]][level_data.balances[i][0] + 1] = 0;
+                
+                level_data.tiles[level_data.balances[i][3]][level_data.balances[i][2]] = 0;
+                level_data.tiles[level_data.balances[i][3]][level_data.balances[i][2] - 1] = 0;
+                level_data.tiles[level_data.balances[i][3]][level_data.balances[i][2] + 1] = 0;
+                
+                delete level_data.balances[i];
+              }
+            }
+          }
+        }
       }
       
       // Left click
