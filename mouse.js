@@ -29,6 +29,7 @@ a.onmousemove = (e) => {
   y = e.pageY - a.getBoundingClientRect().top - document.documentElement.scrollTop - document.body.scrollTop;
   tile_x = Math.floor(x / 32);
   tile_y = Math.floor((y - 40) / 32);
+  document.title = tile_y;
   
   // Level editor only
   if(screen == 3){
@@ -224,7 +225,7 @@ var handle_clicks = (e) => {
     
     // Click on the grid (to place a tile)
     c.beginPath();
-    c.rect(8.5, 40.5, 1264, 592);
+    c.rect(0, 40, 1280, 608);
     if(c.isPointInPath(x, y)){
       
       // Mark the level as untested because it has changed

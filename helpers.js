@@ -39,7 +39,7 @@ var is_writable = (tile_x, tile_y) => {
   if(!level_data.tiles[tile_y]){
     return 0;
   }
-  return !level_data.tiles[tile_y][tile_x] || level_data.tiles[tile_y][tile_x] < 14 || level_data.tiles[tile_y][tile_x] > 24
+  return !level_data.tiles[tile_y][tile_x] || level_data.tiles[tile_y][tile_x] < 14 || level_data.tiles[tile_y][tile_x] > 21
 }
 
 // Reset a hero (after starting a level / reversing time)
@@ -109,9 +109,9 @@ var reset_current_level = () => {
     1, 
     1, 
     1, // 20: Green switch
-    0, // 21: Green switch presed
-    0, 
-    0, 
+    0, // 21: Green switch pressed
+    0, // 22: Tardis top
+    0, // 23: Tardis bottom
     0, 
     0 // 25: yellow toggle pressed
   ];
