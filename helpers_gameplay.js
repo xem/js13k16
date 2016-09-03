@@ -60,7 +60,7 @@ var move_draw_pipes = function(){
     // Draw pipe body (tiles #18 / #19)
     end_pipe = false;
     for(var k = ~~(pipes_state[i].y / 32) + 1; k < 21; k++){
-      if(k < 20 && !is_solid(tile_at(level_data.pipes[i][0],k)) && !is_solid(tile_at(level_data.pipes[i][0] + 1, k)) && !end_pipe){
+      if(k < 20 && !is_solid(tile_at(level_data.pipes[i][0] * 32, k * 32)) && !is_solid(tile_at(level_data.pipes[i][0] + 1 * 32, k * 32)) && !end_pipe){
         draw_tile(18, level_data.pipes[i][0], k);
         draw_tile(19, level_data.pipes[i][0] + 1, k);
       }
@@ -662,182 +662,206 @@ var gravity_and_collisions = function(obj, obj_width, type){
   }
 }
 
-// Play or replay a given hero (past or present)
-var play_hero = (current_hero) => {
+// Play or replay a given hero (past: 1 / present: 0)
+var play_hero = (this_hero, past) => {
   
   // If he's not dead and didn't win yet
-  if(current_hero.state != 3 && !win){
+  if(this_hero.state != 3 && !win){
     
     // Reset to idle state, consider he's not on a moving object
-    current_hero.state = 0;
-    current_hero.on_moving_object = false;
+    this_hero.state = 0;
+    this_hero.on_moving_object = false;
     
     // If we're not in the few frames that follow a portal teleportation
-    if(!current_hero.teleport_idle){
+    if(!this_hero.teleport_idle){
 
       // Cancel vx (if hero not on ice and not in the air or in the air but without horizontal momentum)
       if(
         (
-          current_hero.grounded
+          this_hero.grounded
           &&
-          tile_at(current_hero.x, current_hero.y + 33) != 8
+          tile_at(this_hero.x, this_hero.y + 33) != 8
           &&
-          tile_at(current_hero.x + hero_width, current_hero.y + 33) != 8
+          tile_at(this_hero.x + hero_width, this_hero.y + 33) != 8
         )
         ||
         (
-          !current_hero.grounded
+          !this_hero.grounded
           &&
-          Math.abs(current_hero.vx) < 10
+          Math.abs(this_hero.vx) < 10
         )
       ){
-        current_hero.vx = 0;
+        this_hero.vx = 0;
       }
     
       // Go right (unless if in portal, or being teleported, or slipping left on ice)
       if(
-        current_hero.right[frame]
+        this_hero.right[frame]
         &&
         !(
           (
-            tile_at(current_hero.x, current_hero.y + 33) == 8
+            tile_at(this_hero.x, this_hero.y + 33) == 8
             ||
-            tile_at(current_hero.x + hero_width, current_hero.y + 33) == 8
+            tile_at(this_hero.x + hero_width, this_hero.y + 33) == 8
           )
           &&
-          current_hero.vx != 0
+          this_hero.vx != 0
         )
       ){
-        current_hero.vx = Math.max(current_hero.vx, walk_speed);
-        current_hero.direction = 1;
+        this_hero.vx = Math.max(this_hero.vx, walk_speed);
+        this_hero.direction = 1;
         
         // Walk animation
-        if(current_hero.grounded){
-          current_hero.state = 1;
+        if(this_hero.grounded){
+          this_hero.state = 1;
         }
       }
       
       // Go left (unless if in portal, or being teleported, or slipping right on ice)
       if(
-        current_hero.left[frame]
+        this_hero.left[frame]
         &&
         !(
           (
-            tile_at(current_hero.x, current_hero.y + 33) == 8
+            tile_at(this_hero.x, this_hero.y + 33) == 8
             ||
-            tile_at(current_hero.x + hero_width, current_hero.y + 33) == 8
+            tile_at(this_hero.x + hero_width, this_hero.y + 33) == 8
           )
           &&
-          current_hero.vx != 0
+          this_hero.vx != 0
         )
       ){
-        current_hero.vx = Math.min(current_hero.vx, -walk_speed);
-        current_hero.direction = 0;
+        this_hero.vx = Math.min(this_hero.vx, -walk_speed);
+        this_hero.direction = 0;
         
         // Walk animation
-        if(current_hero.grounded){
-          current_hero.state = 1;
+        if(this_hero.grounded){
+          this_hero.state = 1;
         } 
       }
     }
     
     // Jump (if not in a portal and not slipping on ice)
     if(
-      !current_hero.in_portal
+      !this_hero.in_portal
       &&
-      current_hero.up[frame]
+      this_hero.up[frame]
       &&
-      current_hero.grounded
+      this_hero.grounded
       &&
       !(
         (
-          tile_at(current_hero.x, current_hero.y + 33) == 8
+          tile_at(this_hero.x, this_hero.y + 33) == 8
           ||
-          tile_at(current_hero.x + hero_width, current_hero.y + 33) == 8
+          tile_at(this_hero.x + hero_width, this_hero.y + 33) == 8
         )
         &&
-        current_hero.vx != 0
+        this_hero.vx != 0
       )
     ){
-      current_hero.vy -= jump_speed;
-      current_hero.grounded = false;
-      current_hero.keyup = false;
-      current_hero.can_jump = false;
-      current_hero.cube_below = null;
+      this_hero.vy -= jump_speed;
+      this_hero.grounded = false;
+      this_hero.keyup = false;
+      this_hero.can_jump = false;
+      this_hero.cube_below = null;
     }
     
     // Jump sprite
-    if(current_hero.vy < 0 && !current_hero.grounded){
-      current_hero.state = 2;
+    if(this_hero.vy < 0 && !this_hero.grounded){
+      this_hero.state = 2;
     }
     
     // Apply gravity and collsions
-    gravity_and_collisions(current_hero, hero_width, 0);
+    gravity_and_collisions(this_hero, hero_width, 0);
     
     // Collect coins (tile 6 => tile 0)
-    if(tile_at(current_hero.x + hero_width / 2 - 8, current_hero.y + 16 - 8) == 6 ){
-      set_tile(current_hero.x + hero_width / 2 - 8, current_hero.y + 16 - 8, 0);
+    if(tile_at(this_hero.x + hero_width / 2 - 8, this_hero.y + 16 - 8) == 6 ){
+      set_tile(this_hero.x + hero_width / 2 - 8, this_hero.y + 16 - 8, 0);
     }
-    if(tile_at(current_hero.x + hero_width / 2 + 8, current_hero.y + 16 - 8) == 6){
-      set_tile(current_hero.x + hero_width / 2 + 8, current_hero.y + 16 - 8, 0);
+    if(tile_at(this_hero.x + hero_width / 2 + 8, this_hero.y + 16 - 8) == 6){
+      set_tile(this_hero.x + hero_width / 2 + 8, this_hero.y + 16 - 8, 0);
     }
-    if(tile_at(current_hero.x + hero_width / 2 - 8, current_hero.y + 16 + 8) == 6){
-      set_tile(current_hero.x + hero_width / 2 - 8, current_hero.y + 16 + 8, 0);
+    if(tile_at(this_hero.x + hero_width / 2 - 8, this_hero.y + 16 + 8) == 6){
+      set_tile(this_hero.x + hero_width / 2 - 8, this_hero.y + 16 + 8, 0);
     }
-    if(tile_at(current_hero.x + hero_width / 2 + 8, current_hero.y + 16 + 8) == 6){
-      set_tile(current_hero.x + hero_width / 2 + 8, current_hero.y + 16 + 8, 0);
+    if(tile_at(this_hero.x + hero_width / 2 + 8, this_hero.y + 16 + 8) == 6){
+      set_tile(this_hero.x + hero_width / 2 + 8, this_hero.y + 16 + 8, 0);
     }
+    
+    // Press Shift
+    if(this_hero.shift[frame]){
+      
+      // If in front of the time machine
+      if(
+        tile_at(this_hero.x, this_hero.y) == 23
+        ||
+        tile_at(this_hero.x + hero_width, this_hero.y) == 23
+        ||
+        tile_at(this_hero.x, this_hero.y + 31) == 23
+        ||
+        tile_at(this_hero.x + hero_width, this_hero.y + 31) == 23
+      ){
+        
+        // Present hero: add it to the array of past heros and go back to frame 0
+        if(!past){
+          heros.push(this_hero);
+          frame = 0;
+          current_hero = reset_hero();
+        }
+      } 
+    }
+    
     
     // Die (spike)
     if(
-      tile_at(current_hero.x + 3, current_hero.y) == 7
+      tile_at(this_hero.x + 3, this_hero.y) == 7
       ||
-      tile_at(current_hero.x + hero_width - 3, current_hero.y) == 7
+      tile_at(this_hero.x + hero_width - 3, this_hero.y) == 7
       ||
-      tile_at(current_hero.x + 3, current_hero.y + 5) == 7
+      tile_at(this_hero.x + 3, this_hero.y + 5) == 7
       ||
-      tile_at(current_hero.x + hero_width - 3, current_hero.y + 5) == 7
+      tile_at(this_hero.x + hero_width - 3, this_hero.y + 5) == 7
     ){
-      current_hero.state = 3;
-      current_hero.vy = -1 * jump_speed;
+      this_hero.state = 3;
+      this_hero.vy = -1 * jump_speed;
     }
     
     // Die (fall)
-    if(current_hero.y > 648){
-      current_hero.state = 3;
-      current_hero.vy = -1.5 * jump_speed;
+    if(this_hero.y > 648){
+      this_hero.state = 3;
+      this_hero.vy = -1.5 * jump_speed;
     }
     
     // Die (crush between a pipe or a balance, and a solid tile)
     if(
-      current_hero.on_moving_object
+      this_hero.on_moving_object
       &&
       (
-        is_solid(tile_at(current_hero.x, current_hero.y + 1))
+        is_solid(tile_at(this_hero.x, this_hero.y + 1))
         ||
-        is_solid(tile_at(current_hero.x + hero_width, current_hero.y + 1))
+        is_solid(tile_at(this_hero.x + hero_width, this_hero.y + 1))
       )
     ){
-      current_hero.state = 3;
-      current_hero.vy = -1 * jump_speed;
+      this_hero.state = 3;
+      this_hero.vy = -1 * jump_speed;
     }
     
     // Pick cube
-    if(current_hero.pickdrop){
-      if(current_hero.cube_held === null){
+    if(this_hero.pickdrop){
+      if(this_hero.cube_held === null){
         for(i in level_data.cubes){
           if(
-            current_hero.x + hero_width >= level_data.cubes[i].x
+            this_hero.x + hero_width >= level_data.cubes[i].x
             &&
-            current_hero.x <= level_data.cubes[i].x + 31
+            this_hero.x <= level_data.cubes[i].x + 31
             &&
-            current_hero.y + 31 + 4 >= level_data.cubes[i].y
+            this_hero.y + 31 + 4 >= level_data.cubes[i].y
             &&
-            current_hero.y <= level_data.cubes[i].y + 31
+            this_hero.y <= level_data.cubes[i].y + 31
           ){
-            current_hero.cube_held = i;
-            level_data.cubes[i].hero = current_hero;
-            current_hero.pick_cube_animation_frame = 5;
+            this_hero.cube_held = i;
+            level_data.cubes[i].hero = this_hero;
+            this_hero.pick_cube_animation_frame = 5;
             break;
           }
         }
@@ -845,19 +869,19 @@ var play_hero = (current_hero) => {
     }
     
     // Drop cube
-    else if(current_cube = level_data.cubes[current_hero.cube_held]){
+    else if(current_cube = level_data.cubes[this_hero.cube_held]){
         
       // Drop ahead of hero if he's grounded and not on a cube
-      if(current_hero.grounded){
+      if(this_hero.grounded){
       
         // Left
-        if(current_hero.direction == 0){
-          current_cube.x = current_hero.x - 20;
+        if(this_hero.direction == 0){
+          current_cube.x = this_hero.x - 20;
         }
         
         // Right
-        else if(current_hero.direction == 1){
-          current_cube.x = current_hero.x + 20;
+        else if(this_hero.direction == 1){
+          current_cube.x = this_hero.x + 20;
         }
       }
       
@@ -865,13 +889,13 @@ var play_hero = (current_hero) => {
       else{
         
         // Left
-        if(current_hero.direction == 0){
-          current_cube.x = current_hero.x - 6;
+        if(this_hero.direction == 0){
+          current_cube.x = this_hero.x - 6;
         }
         
         // Right
-        else if(current_hero.direction == 1){
-          current_cube.x = current_hero.x;
+        else if(this_hero.direction == 1){
+          current_cube.x = this_hero.x;
         }
       }
       
@@ -890,46 +914,46 @@ var play_hero = (current_hero) => {
       }
         
       current_cube.hero = null;
-      level_data.cubes[current_hero.cube_held] = current_cube;
-      current_hero.cube_held = null;
-      current_hero.weight = 1;
+      level_data.cubes[this_hero.cube_held] = current_cube;
+      this_hero.cube_held = null;
+      this_hero.weight = 1;
     }
     
     // Hold cube
-    if(current_hero.cube_held !== null){
+    if(this_hero.cube_held !== null){
       
       // Left
-      if(current_hero.direction == 0){
-        level_data.cubes[current_hero.cube_held].x = current_hero.x - 6;
+      if(this_hero.direction == 0){
+        level_data.cubes[this_hero.cube_held].x = this_hero.x - 6;
       }
-      if(current_hero.direction == 1){
-        level_data.cubes[current_hero.cube_held].x = current_hero.x - 4;
+      if(this_hero.direction == 1){
+        level_data.cubes[this_hero.cube_held].x = this_hero.x - 4;
       }
       
       // Animate cube grab (make it last 5 frames)
-      if(current_hero.pick_cube_animation_frame){
-        current_hero.pick_cube_animation_frame--;
+      if(this_hero.pick_cube_animation_frame){
+        this_hero.pick_cube_animation_frame--;
       }
       
       // Place cube over hero (unless he's passing through a portal or there's a solid tile above, in this case hold it lower)
-      if(current_hero.in_portal){ 
-        level_data.cubes[current_hero.cube_held].y = current_hero.y;
+      if(this_hero.in_portal){ 
+        level_data.cubes[this_hero.cube_held].y = this_hero.y;
       }
-      else if(is_solid(tile_at(current_hero.x, current_hero.y - 28)) || is_solid(tile_at(current_hero.x + hero_width, current_hero.y - 28))){
-        level_data.cubes[current_hero.cube_held].y = ~~((current_hero.y + 4) / 32) * 32;
+      else if(is_solid(tile_at(this_hero.x, this_hero.y - 28)) || is_solid(tile_at(this_hero.x + hero_width, this_hero.y - 28))){
+        level_data.cubes[this_hero.cube_held].y = ~~((this_hero.y + 4) / 32) * 32;
       }
       else{
-        level_data.cubes[current_hero.cube_held].y = current_hero.y - 32 + current_hero.pick_cube_animation_frame * 4;
+        level_data.cubes[this_hero.cube_held].y = this_hero.y - 32 + this_hero.pick_cube_animation_frame * 4;
       }
     }
     
     // If no cube is held, cancel space key
     else {
-      current_hero.pickdrop = 0;
+      this_hero.pickdrop = 0;
     }
     
     // Win (all coins gathered and touch flag)
-    if(tile_at(current_hero.x + hero_width / 2, current_hero.y + 16) == 2 || tile_at(current_hero.x + hero_width / 2, current_hero.y + 16) == 24){
+    if(tile_at(this_hero.x + hero_width / 2, this_hero.y + 16) == 2 || tile_at(this_hero.x + hero_width / 2, this_hero.y + 16) == 24){
       coins_left = 0;
       for(j = 0; j < 20; j++){
         for(i = 0; i < 40; i++){
@@ -940,104 +964,104 @@ var play_hero = (current_hero) => {
       }
       if(coins_left == 0){
         win = true;
-        current_hero.state = 0;
+        this_hero.state = 0;
       }
     }
     
     // Send portals (only if hero's not currently in a portal)
-    if(!current_hero.in_portal && (current_hero.leftclick[frame] || current_hero.rightclick[frame])){
+    if(!this_hero.in_portal && (this_hero.leftclick[frame] || this_hero.rightclick[frame])){
         
       // Cancel current shoots
-      current_hero.shoot_blue = 0;
-      current_hero.shoot_orange = 0;
+      this_hero.shoot_blue = 0;
+      this_hero.shoot_orange = 0;
       
       // Left click: current hero sends a blue portal
-      if(current_hero.leftclick[frame]){
-        current_hero.shoot_blue = 1;
+      if(this_hero.leftclick[frame]){
+        this_hero.shoot_blue = 1;
       }
       
       // Right click: current hero sends a orange portal
-      if(current_hero.rightclick[frame]){
-        current_hero.shoot_orange = 1;
+      if(this_hero.rightclick[frame]){
+        this_hero.shoot_orange = 1;
       }
       
       // Compute the angle made by the line "hero - click coordinates" and the horizontal axis
-      current_hero.angle = Math.atan2(x - (current_hero.x + hero_width / 2), y - (current_hero.y + 40 + 16));
-      current_hero.portal_shoot_x = current_hero.x + hero_width / 2;
-      current_hero.portal_shoot_y = current_hero.y + 16;
-      current_hero.portal_shoot_vx = Math.sin(current_hero.angle);
-      current_hero.portal_shoot_vy = Math.cos(current_hero.angle);
+      this_hero.angle = Math.atan2(x - (this_hero.x + hero_width / 2), y - (this_hero.y + 40 + 16));
+      this_hero.portal_shoot_x = this_hero.x + hero_width / 2;
+      this_hero.portal_shoot_y = this_hero.y + 16;
+      this_hero.portal_shoot_vx = Math.sin(this_hero.angle);
+      this_hero.portal_shoot_vy = Math.cos(this_hero.angle);
     }
     
     // Portal beam (reflect on ice / open portal on white wall)
     for(current_portal in portals = [["shoot_blue", blue_portal, "blue"], ["shoot_orange", orange_portal, "orange"]]){
     
-      if(current_hero[portals[current_portal][0]]){
+      if(this_hero[portals[current_portal][0]]){
       
         // Make beam advance with baby steps
         for(i = 0; i < 40; i++){
-          current_hero[portals[current_portal][0]] += .001;
-          current_hero.portal_shoot_x += current_hero[portals[current_portal][0]] * current_hero.portal_shoot_vx;
-          current_hero.portal_shoot_y += current_hero[portals[current_portal][0]] * current_hero.portal_shoot_vy;
+          this_hero[portals[current_portal][0]] += .001;
+          this_hero.portal_shoot_x += this_hero[portals[current_portal][0]] * this_hero.portal_shoot_vx;
+          this_hero.portal_shoot_y += this_hero[portals[current_portal][0]] * this_hero.portal_shoot_vy;
           
           // If beam hits solid or spike (tile #7)
-          if(is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y)) || tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y) == 7){
+          if(is_solid(tile_at(this_hero.portal_shoot_x, this_hero.portal_shoot_y)) || tile_at(this_hero.portal_shoot_x, this_hero.portal_shoot_y) == 7){
             
             // Cancel any existing portal of this color
-            current_hero[portals[current_portal][0]] = 0;
+            this_hero[portals[current_portal][0]] = 0;
             
             // Define on which side the portal goes (0: top, 1: right, 2: bottom, 3: left)
             // Avoid opening a portal between two solid tiles, and on sides not reachable given the current angle
-            if(current_hero.portal_shoot_x % 32 < 4 && !is_solid(tile_at(current_hero.portal_shoot_x - 32, current_hero.portal_shoot_y)) && current_hero.portal_shoot_vx > 0){
+            if(this_hero.portal_shoot_x % 32 < 4 && !is_solid(tile_at(this_hero.portal_shoot_x - 32, this_hero.portal_shoot_y)) && this_hero.portal_shoot_vx > 0){
               temp_side = 3;
             }
-            if(current_hero.portal_shoot_x % 32 > 28 && !is_solid(tile_at(current_hero.portal_shoot_x + 32, current_hero.portal_shoot_y)) && current_hero.portal_shoot_vx < 0){
+            if(this_hero.portal_shoot_x % 32 > 28 && !is_solid(tile_at(this_hero.portal_shoot_x + 32, this_hero.portal_shoot_y)) && this_hero.portal_shoot_vx < 0){
               temp_side = 1;
             }
-            if(current_hero.portal_shoot_y % 32 < 4 && !is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y - 32)) && current_hero.portal_shoot_vy > 0){
+            if(this_hero.portal_shoot_y % 32 < 4 && !is_solid(tile_at(this_hero.portal_shoot_x, this_hero.portal_shoot_y - 32)) && this_hero.portal_shoot_vy > 0){
               temp_side = 0;
             }
-            if(current_hero.portal_shoot_y % 32 > 28 && !is_solid(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y + 32)) && current_hero.portal_shoot_vy < 0){
+            if(this_hero.portal_shoot_y % 32 > 28 && !is_solid(tile_at(this_hero.portal_shoot_x, this_hero.portal_shoot_y + 32)) && this_hero.portal_shoot_vy < 0){
               temp_side = 2;
             }
 
             // Reflect ray if tile is #8 (ice)
-            if(tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y) == 8){
-              current_hero[portals[current_portal][0]] = 1;
+            if(tile_at(this_hero.portal_shoot_x, this_hero.portal_shoot_y) == 8){
+              this_hero[portals[current_portal][0]] = 1;
               if(temp_side == 0){
-                current_hero.portal_shoot_vy = -current_hero.portal_shoot_vy;
-                current_hero.portal_shoot_y = ~~(current_hero.portal_shoot_y / 32) * 32 - 1;
+                this_hero.portal_shoot_vy = -this_hero.portal_shoot_vy;
+                this_hero.portal_shoot_y = ~~(this_hero.portal_shoot_y / 32) * 32 - 1;
               }
               else if(temp_side == 2){
-                current_hero.portal_shoot_vy = -current_hero.portal_shoot_vy;
-                current_hero.portal_shoot_y = ~~(current_hero.portal_shoot_y / 32) * 32 + 32 + 1;
+                this_hero.portal_shoot_vy = -this_hero.portal_shoot_vy;
+                this_hero.portal_shoot_y = ~~(this_hero.portal_shoot_y / 32) * 32 + 32 + 1;
               }
               else if(temp_side == 1){
-                current_hero.portal_shoot_vx = -current_hero.portal_shoot_vx;
-                current_hero.portal_shoot_x = ~~(current_hero.portal_shoot_x / 32) * 32 + 32 + 1;
+                this_hero.portal_shoot_vx = -this_hero.portal_shoot_vx;
+                this_hero.portal_shoot_x = ~~(this_hero.portal_shoot_x / 32) * 32 + 32 + 1;
               }
               else //if(temp_side == 3)
               {
-                current_hero.portal_shoot_vx = -current_hero.portal_shoot_vx;
-                current_hero.portal_shoot_x = ~~(current_hero.portal_shoot_x / 32) * 32 - 1;
+                this_hero.portal_shoot_vx = -this_hero.portal_shoot_vx;
+                this_hero.portal_shoot_x = ~~(this_hero.portal_shoot_x / 32) * 32 - 1;
               }
             }
             
             // Place portal if tile is #4 (white wall) and no orange portal is here yet
             if(
-              tile_at(current_hero.portal_shoot_x, current_hero.portal_shoot_y) == 4
+              tile_at(this_hero.portal_shoot_x, this_hero.portal_shoot_y) == 4
               &&
-              (~~(current_hero.portal_shoot_x / 32) != portals[1 - current_portal][1].tile_x || ~~(current_hero.portal_shoot_y / 32) != portals[1 - current_portal][1].tile_y || portals[1 - current_portal][1].side != temp_side)
+              (~~(this_hero.portal_shoot_x / 32) != portals[1 - current_portal][1].tile_x || ~~(this_hero.portal_shoot_y / 32) != portals[1 - current_portal][1].tile_y || portals[1 - current_portal][1].side != temp_side)
             ){
-              portals[current_portal][1].tile_x = ~~(current_hero.portal_shoot_x / 32);
-              portals[current_portal][1].tile_y = ~~(current_hero.portal_shoot_y / 32);
+              portals[current_portal][1].tile_x = ~~(this_hero.portal_shoot_x / 32);
+              portals[current_portal][1].tile_y = ~~(this_hero.portal_shoot_y / 32);
               portals[current_portal][1].side = temp_side;
             }
             break;
           }
           else{
             c.fillStyle = portals[current_portal][2];
-            c.fillRect(current_hero.portal_shoot_x, current_hero.portal_shoot_y + 40, 6, 6);        
+            c.fillRect(this_hero.portal_shoot_x, this_hero.portal_shoot_y + 40, 6, 6);        
           }
         }
       }
@@ -1045,42 +1069,41 @@ var play_hero = (current_hero) => {
     
     // If hero is not in a #4 solid tile, assume he's not in a portal
     if(
-      tile_at(current_hero.x + 1, current_hero.y + 1) != 4
+      tile_at(this_hero.x + 1, this_hero.y + 1) != 4
       &&
-      tile_at(current_hero.x + hero_width - 1, current_hero.y + 1) != 4
+      tile_at(this_hero.x + hero_width - 1, this_hero.y + 1) != 4
       &&
-      tile_at(current_hero.x + 1, current_hero.y + 31) != 4
+      tile_at(this_hero.x + 1, this_hero.y + 31) != 4
       &&
-      tile_at(current_hero.x + + hero_width - 1, current_hero.y + 31) != 4
+      tile_at(this_hero.x + + hero_width - 1, this_hero.y + 31) != 4
     ){
-      current_hero.in_portal = false;
+      this_hero.in_portal = false;
     }
     
     // Decrement teleportation idle delay
-    if(current_hero.teleport_idle){
-      current_hero.teleport_idle--;
+    if(this_hero.teleport_idle){
+      this_hero.teleport_idle--;
     }
   }
   
   // Death animation
-  if(current_hero.state == 3){
-    current_hero.vy += gravity;
-    if(current_hero.vy > max_fall_speed){
-      current_hero.vy = max_fall_speed;
+  if(this_hero.state == 3){
+    this_hero.vy += gravity;
+    if(this_hero.vy > max_fall_speed){
+      this_hero.vy = max_fall_speed;
     }
-    current_hero.y += current_hero.vy;
+    this_hero.y += this_hero.vy;
   }
 }
 
-
-// Draw hero (past or present)
-var draw_hero = (hero) => {
+// Draw a hero (past: 1 / present: 0)
+var draw_hero = (hero, past) => {
   c.save();
   c.translate(hero.x + hero_width / 2 - 2, hero.y);
   
   // Facing left
   if(hero.direction == 0){
-    c.scale(-1,1);
+    c.scale(-1, 1);
   }
 
   c.drawImage(tileset, [26, [27,28,29][~~(frame / 2) % 3], 30, 31][hero.state] * 16, 0, 16, 16, - hero_width / 2, 40, 32, 32);

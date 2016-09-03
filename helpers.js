@@ -46,8 +46,8 @@ var is_writable = (tile_x, tile_y) => {
 var reset_hero = () => {
 
   return {
-    x: 640,
-    y: 0,
+    x: (level_data && level_data.start) ? level_data.start[0] * 32 : 640,
+    y: (level_data && level_data.start) ? level_data.start[1] * 32 : 0,
     vx: 0,
     vy: 0,
     grounded: 0,
@@ -59,6 +59,7 @@ var reset_hero = () => {
     right: [],
     keyspace: false,
     space: [],
+    shift: [],
     leftclick: [],
     rightclick: [],
     angle: 0,

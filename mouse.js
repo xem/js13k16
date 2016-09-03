@@ -29,7 +29,6 @@ a.onmousemove = (e) => {
   y = e.pageY - a.getBoundingClientRect().top - document.documentElement.scrollTop - document.body.scrollTop;
   tile_x = Math.floor(x / 32);
   tile_y = Math.floor((y - 40) / 32);
-  document.title = tile_y;
   
   // Level editor only
   if(screen == 3){

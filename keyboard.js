@@ -54,5 +54,10 @@ onkeyup = (e) => {
       current_hero.space[frame] = true;
       current_hero.pickdrop ^= 1;
     }
+    
+    // Shift 
+    if(e.keyCode == 16){
+      current_hero.shift[frame] = true;
+    }
   }
 }

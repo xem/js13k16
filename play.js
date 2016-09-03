@@ -17,7 +17,7 @@ var play = () => {
     c.textAlign = "center";
     c.fillText(
       [
-        "",
+        ,
         "Move with arrow keys or WASD or ZQSD. Collect all coins and reach the flag.",
         "If you're stuck, restart with R.",
         "Ice is slippy if you're not standing still.",
@@ -27,6 +27,8 @@ var play = () => {
         ,
         "Aim with mouse, send portals with left click and right click.",
         "Use momentum!",
+        ,
+        "Need a little help from the past? Go to the time machine and press Shift!"
       
       ][level] || "", 640, 80
     );
@@ -69,13 +71,10 @@ var play = () => {
   
   // Replay previous heros inputs
   for(hero in heros){
-    
-    // TODO
-    
+    play_hero(heros[hero], 1);
   }
   
   // Play current hero
-  
   play_hero(current_hero);
   
   // Move and draw cubes
@@ -83,9 +82,7 @@ var play = () => {
     
   // Draw previous heros
   for(hero in heros){
-    
-    // TODO
-    
+    draw_hero(heros[hero], 1);
   }
   
   // Draw current hero
@@ -103,9 +100,7 @@ var play = () => {
   // Next frame
   frame++;
   
-  //document.title = frame + " " + current_hero.weight + " " + balances_state[0].weight1 + " " + balances_state[0].weight2 + " " + level_data.cubes[1].weight;
-  //document.title = current_hero.x + " " + current_hero.y;
-  //document.title = level_data.cubes[0].vx + " " + level_data.cubes[0].teleport_idle;
+  document.title = frame;
   
   // Victoty animation (if we won)
   victory();
