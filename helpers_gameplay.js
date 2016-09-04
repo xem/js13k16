@@ -708,7 +708,12 @@ var play_hero = (this_hero, past) => {
           this_hero.vx != 0
         )
       ){
-        this_hero.vx = Math.max(this_hero.vx, walk_speed);
+        if(this_hero.direction == 1){
+          this_hero.vx = Math.max(this_hero.vx, walk_speed);
+        }
+        else {
+          this_hero.vx = 0
+        }
         this_hero.direction = 1;
         
         // Walk animation
@@ -731,7 +736,12 @@ var play_hero = (this_hero, past) => {
           this_hero.vx != 0
         )
       ){
-        this_hero.vx = Math.min(this_hero.vx, -walk_speed);
+        if(this_hero.direction == 0){
+          this_hero.vx = Math.min(this_hero.vx, -walk_speed);
+        }
+        else {
+          this_hero.vx = 0
+        }
         this_hero.direction = 0;
         
         // Walk animation
@@ -802,8 +812,9 @@ var play_hero = (this_hero, past) => {
         tile_at(this_hero.x + hero_width, this_hero.y + 31) == 23
       ){
         
-        // Present hero: add it to the array of past heros and go back to frame 0
+        // Present hero: remember the frame and add it to the array of past heros and go back to frame 0
         if(!past){
+          this_hero.last_frame = frame;
           heros.push(this_hero);
           frame = 0;
           current_hero = reset_hero();
@@ -1099,14 +1110,31 @@ var play_hero = (this_hero, past) => {
 // Draw a hero (past: 1 / present: 0)
 var draw_hero = (hero, past) => {
   c.save();
+  
+  // Go to the hero's position
   c.translate(hero.x + hero_width / 2 - 2, hero.y);
   
   // Facing left
   if(hero.direction == 0){
     c.scale(-1, 1);
   }
+    
+  // Past: alpha 0.5
+  if(past){
+    c.globalAlpha = 0.75;
+  }
+  
+  // Present and past heros exist: add arrow to present
+  else if(heros.length){
+    c.fillStyle = "#fff";
+    c.fillText("▼", 0, 10);
+  }
 
-  c.drawImage(tileset, [26, [27,28,29][~~(frame / 2) % 3], 30, 31][hero.state] * 16, 0, 16, 16, - hero_width / 2, 40, 32, 32);
+  // Draw (except if it's a past hero that has finished playing)
+  if(! (past && frame > hero.last_frame)){
+    c.drawImage(tileset, [26, [27,28,29][~~(frame / 2) % 3], 30, 31][hero.state] * 16, 0, 16, 16, - hero_width / 2, 40, 32, 32);
+  }
+  
   c.restore();
 }
 
