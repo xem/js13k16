@@ -1,5 +1,3 @@
-// OK
-
 // Collection of helper functions often called (except by the game loop)
 
 // Draw a 32x32 tile aligned on the grid
@@ -73,8 +71,8 @@ var reset_hero = () => {
   }
 }
 
-// Reset all the settings of the current level (before playing / testing)
-var reset_current_level = () => {
+// Reset all the settings of the current level (before playing : 0 / before going back in time: 1)
+var reset_current_level = (timetravel) => {
   
   // Reset win condition
   win = false;
@@ -136,7 +134,9 @@ var reset_current_level = () => {
   orange_portal = { tile_x: -2, tile_y: -2 };
   
   // Heros (playing simultaneously after time travels)
-  heros = [];
+  if(!timetravel){
+    heros = [];
+  }
 }
 
 
@@ -166,4 +166,8 @@ var reset_maker_level = () => {
   
   // Current tile in the level editor (0: sky / 1: start / etc.)
   current_editor_tile = 0;
+  
+  // Reset ability to quit
+  shared = true;
+  chose_a_tile = false;
 };

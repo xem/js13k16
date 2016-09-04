@@ -175,6 +175,7 @@ var handle_clicks = (e) => {
       else {
         prompt("Here's your level URL:", encodeURI(location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances})));
         prompt("Here's your level URL:", location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances}));
+        shared = true;
       }
     }
     c.closePath();
@@ -192,8 +193,10 @@ var handle_clicks = (e) => {
     c.beginPath();
     c.rect(1125, 4, 100, 32);
     if(c.isPointInPath(x, y)){
-      screen = 0;
-      draw_screen();
+      if(quit()){
+        screen = 0;
+        draw_screen();
+      }
     }
     c.closePath();
     
@@ -204,6 +207,7 @@ var handle_clicks = (e) => {
       if(c.isPointInPath(x, y) && pipe_click == 0 && balance_click == 0){
         
         // Chosen tile
+        chose_a_tile = true;
         current_editor_tile = i;
         
         // Pipe: init a pipe object
@@ -226,6 +230,11 @@ var handle_clicks = (e) => {
     c.beginPath();
     c.rect(0, 40, 1280, 608);
     if(c.isPointInPath(x, y)){
+      
+      // Reset shared flag
+      if(chose_a_tile){
+        shared = false;
+      }
       
       // Mark the level as untested because it has changed
       level_data.tested = false;

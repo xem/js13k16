@@ -1,9 +1,10 @@
 // Functions used by the game loop (play)
 
-
 // First frame inits (also happen after time travels)
 var first_frame = function(){
   
+  reset_current_level(1);
+    
   // Build map from hash
   level_data.tiles = [];
   for(var j = 0; j < 20; j++){
@@ -29,7 +30,6 @@ var first_frame = function(){
     balances_state[i] = {y1: level_data.balances[i][1] * 32 , y2: level_data.balances[i][3] * 32, weight1: 0, weight2: 0};
   }
 }
-
 
 // Move and draw pipes (at each frame)
 var move_draw_pipes = function(){
@@ -88,7 +88,6 @@ var move_draw_pipes = function(){
   }
 }
 
-
 // Parse and draw map (at each frame, but if we're on frame 0, also set start coordinates, initialize cubes and build flag pole)
 var parse_draw_map = function(){
   for(j = 0; j < 20; j++){
@@ -131,8 +130,22 @@ var parse_draw_map = function(){
       }
     }
   }
+  
+  // Frame 0: re-place all past heros at the start position and reset their movement properties
+  if(frame == 0){
+    
+    for(hero in heros){
+      heros[hero].x = level_data.start[0] * 32;
+      heros[hero].y = level_data.start[1] * 32;
+      heros[hero].vx = 0;
+      heros[hero].vy = 0;
+      heros[hero].keyleft = false;
+      heros[hero].keyup = false;
+      heros[hero].keyright = false;
+      heros[hero].keyspace = false;
+    }
+  }
 }
-
 
 // Reset green buttons, yellow buttons and balances/cubes/heros weights (at each frame, before everything is re-computed)
 var reset_mechanisms = function(){
@@ -801,7 +814,7 @@ var play_hero = (this_hero, past) => {
     // Press Shift
     if(this_hero.shift[frame]){
       
-      // If in front of the time machine
+      // If in front of the time machine (tile #23)
       if(
         tile_at(this_hero.x, this_hero.y) == 23
         ||
@@ -812,14 +825,14 @@ var play_hero = (this_hero, past) => {
         tile_at(this_hero.x + hero_width, this_hero.y + 31) == 23
       ){
         
-        // Present hero: remember the frame and add it to the array of past heros and go back to frame 0
+        // Present hero: remember the frame and add it to the array of past heros and go back to the beginning of time (frame -1)
         if(!past){
           this_hero.last_frame = frame;
           heros.push(this_hero);
-          frame = 0;
+          frame = -1;
           current_hero = reset_hero();
         }
-      } 
+      }
     }
     
     
@@ -989,19 +1002,26 @@ var play_hero = (this_hero, past) => {
       // Left click: current hero sends a blue portal
       if(this_hero.leftclick[frame]){
         this_hero.shoot_blue = 1;
+        
+        // Compute the angle made by the line "hero - click coordinates" and the horizontal axis
+        this_hero.angle = Math.atan2(this_hero.leftclick[frame][0] - (this_hero.x + hero_width / 2), this_hero.leftclick[frame][1] - (this_hero.y + 40 + 16));
       }
       
       // Right click: current hero sends a orange portal
       if(this_hero.rightclick[frame]){
         this_hero.shoot_orange = 1;
+        
+        // Compute the angle made by the line "hero - click coordinates" and the horizontal axis
+        this_hero.angle = Math.atan2(this_hero.rightclick[frame][0] - (this_hero.x + hero_width / 2), this_hero.rightclick[frame][1] - (this_hero.y + 40 + 16));
       }
       
-      // Compute the angle made by the line "hero - click coordinates" and the horizontal axis
-      this_hero.angle = Math.atan2(x - (this_hero.x + hero_width / 2), y - (this_hero.y + 40 + 16));
+      // Compute portal beam movement
       this_hero.portal_shoot_x = this_hero.x + hero_width / 2;
       this_hero.portal_shoot_y = this_hero.y + 16;
       this_hero.portal_shoot_vx = Math.sin(this_hero.angle);
       this_hero.portal_shoot_vy = Math.cos(this_hero.angle);
+      
+      
     }
     
     // Portal beam (reflect on ice / open portal on white wall)
@@ -1138,7 +1158,6 @@ var draw_hero = (hero, past) => {
   c.restore();
 }
 
-
 // Draw portals (foreground)
 var draw_portals = () => {
   
@@ -1166,7 +1185,6 @@ var draw_portals = () => {
     }
   }
 }
-
 
 // Update mechanisms
 var update_mechanisms = () => {
@@ -1231,7 +1249,6 @@ var update_mechanisms = () => {
   }
 }
 
-
 // Win animation (write "CLEARED" for 30 frames and exit)
 var victory = () => {
   if(win){
@@ -1250,7 +1267,6 @@ var victory = () => {
     draw_screen();
   }
 }
-
 
 // Move and draw all cubes
 var move_cubes = () => {
