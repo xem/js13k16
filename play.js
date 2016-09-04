@@ -28,7 +28,9 @@ var play = () => {
         "Aim with mouse, send portals with left click and right click.",
         "Use momentum!",
         ,
-        "Need a little help from the past? Go to the time machine and press Shift!"
+        "Need a little help from the past? Go to the time machine and press Shift!",
+        "Sometimes it's easier with multiple time travels...",
+        "If a past self dies or gets stuck, it's a paradox. *wink wink the theme*"
       
       ][level] || "", 640, 80
     );
