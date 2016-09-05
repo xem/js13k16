@@ -30,7 +30,7 @@ var play = () => {
         ,
         "Need a little help from the past? Go to the time machine and press Shift!",
         "Sometimes it's easier with multiple time travels...",
-        "If a past self dies or gets stuck, it's a paradox. *wink wink the theme*"
+        "If a past self can't reach the time machine, it's a paradox! *wink wink the theme*",
       
       ][level] || "", 640, 80
     );
@@ -104,6 +104,6 @@ var play = () => {
   
   document.title = frame;
   
-  // Victoty animation (if we won)
-  victory();
+  // Victoty animation (if we won) / Game over animation (if we lose)
+  victory_or_defeat();
 }

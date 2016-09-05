@@ -60,7 +60,7 @@ var move_draw_pipes = function(){
     // Draw pipe body (tiles #18 / #19)
     end_pipe = false;
     for(var k = ~~(pipes_state[i].y / 32) + 1; k < 21; k++){
-      if(k < 20 && !is_solid(tile_at(level_data.pipes[i][0] * 32, k * 32)) && !is_solid(tile_at(level_data.pipes[i][0] + 1 * 32, k * 32)) && !end_pipe){
+      if(k < 20 && !is_solid(tile_at(level_data.pipes[i][0] * 32, k * 32)) && !is_solid(tile_at(level_data.pipes[i][0] * 32 + 1 * 32, k * 32)) && !end_pipe){
         draw_tile(18, level_data.pipes[i][0], k);
         draw_tile(19, level_data.pipes[i][0] + 1, k);
       }
@@ -143,6 +143,8 @@ var parse_draw_map = function(){
       heros[hero].keyup = false;
       heros[hero].keyright = false;
       heros[hero].keyspace = false;
+      heros[hero].safe = false;
+      heros[hero].direction = 1;
     }
   }
 }
@@ -832,9 +834,13 @@ var play_hero = (this_hero, past) => {
           frame = -1;
           current_hero = reset_hero();
         }
+        
+        // Past hero: remember that he's safe
+        else{
+          this_hero.safe = true;
+        }
       }
     }
-    
     
     // Die (spike)
     if(
@@ -1250,15 +1256,51 @@ var update_mechanisms = () => {
 }
 
 // Win animation (write "CLEARED" for 30 frames and exit)
-var victory = () => {
+// Defeat (write "LOST" or "PARADOX" for 30 frames and exit)
+var victory_or_defeat = () => {
+  
+  c.font = "bold 100px arial";
+  c.fillStyle = "#000";
+  c.textAlign = "center";
+  
+  // Win
   if(win){
     win_frame++;
-    c.font = "bold 100px arial";
-    c.fillStyle = "#000";
-    c.textAlign = "center";
-    c.fillText("CLEARED!", 640, 350)
+    c.fillText("CLEARED!", 640, 350);
   }
-  if(win_frame >= 30){
+  
+  // Current hero dies
+  if(current_hero.state == 3){
+    lose_frame++;
+    c.fillText("LOST!", 640, 350);
+  }
+  
+  for(hero in heros){
+
+    // Past hero dies or gets stuck (not at the time machine at the end of his frame record)
+    if(heros[hero].state == 3 || (heros[hero].last_frame < frame && !heros[hero].safe)){
+      paradox_frame++;
+      c.fillText("PARADOX!", 640, 350);
+    }
+  }
+  
+  if(lose_frame >= 30){
+    a.width ^= 0;
+    clearInterval(loop);
+    screen = last_screen;
+    level_data.tested = true;
+    a.width ^= 0;
+    draw_screen();
+  }
+  
+  // Paradox (glitch)
+  if(paradox_frame){
+    for(m = ~~(paradox_frame / 5); m--;){
+      c.drawImage(a, i = Math.random() * 1280, j = Math.random() * 648, k = Math.random() * 1280, l = Math.random() * 648, i + Math.random() * 100 - 50, j + Math.random() * 100 - 50, k, l);
+    }
+  }
+  
+  if(win_frame >= 30 || lose_frame >= 30 || paradox_frame >= 80){
     a.width ^= 0;
     clearInterval(loop);
     screen = last_screen;

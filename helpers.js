@@ -78,6 +78,8 @@ var reset_current_level = (timetravel) => {
   win = false;
   coins_left = 0;
   win_frame = 0;
+  lose_frame = 0;
+  paradox_frame = 0;
 
   // Current frame
   frame = 0;
