@@ -1,4 +1,3 @@
-
 // Keyboard input (during gameplay)
 onkeydown = (e) => {
   if(screen == 2){

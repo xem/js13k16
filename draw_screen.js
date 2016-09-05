@@ -1,4 +1,3 @@
-// OK
 // Draw current screen (on load, when draw_screen is called, and when the hash changes)
 // If no_reset is set, update the level editor without loading the map from the hash
 var draw_screen = onload = onhashchange = (no_reset) => {

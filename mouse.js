@@ -1,4 +1,3 @@
-
 // Handle clicks on the canvas on each screen
 a.onclick = a.oncontextmenu = (e) => {
   handle_clicks(e);
