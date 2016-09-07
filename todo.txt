@@ -1,1 +1,2 @@
 - si un cube presse un bouton jaune et tombe car ya un bloc jaune dessous, si mario est sur un bloc jaune, faut qu'il tombe.
+- un mec du passé arrive pas a porter un cube. wut

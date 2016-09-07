@@ -862,14 +862,28 @@ var play_hero = (this_hero, past) => {
       this_hero.vy = -1.5 * jump_speed;
     }
     
-    // Die (crush between a pipe or a balance, and a solid tile)
+    // Die (crush between a pipe or a balance and a solid tile, unless there's a portal bottom on the tile above the hero)
     if(
       this_hero.on_moving_object
       &&
       (
-        is_solid(tile_at(this_hero.x, this_hero.y + 1))
-        ||
-        is_solid(tile_at(this_hero.x + hero_width, this_hero.y + 1))
+        (
+          is_solid(tile_at(this_hero.x, this_hero.y + 1))
+          ||
+          is_solid(tile_at(this_hero.x + hero_width, this_hero.y + 1))
+        )
+        
+        /*&&
+        
+        !(
+          (~~(this_hero.x / 32) == blue_portal.tile_x && ~~(this_hero.y / 32) == blue_portal.tile_y && blue_portal.side == 2)
+          ||
+          (~~(this_hero.x + hero_width / 32) == blue_portal.tile_x && ~~(this_hero.y / 32) == blue_portal.tile_y && blue_portal.side == 2)
+          ||
+          (~~(this_hero.x / 32) == orange_portal.tile_x && ~~(this_hero.y / 32) == orange_portal.tile_y && orange_portal.side == 2)
+          ||
+          (~~(this_hero.x + hero_width / 32) == orange_portal.tile_x && ~~(this_hero.y / 32) == orange_portal.tile_y && orange_portal.side == 2)
+        )*/
       )
     ){
       this_hero.state = 3;

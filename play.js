@@ -32,6 +32,8 @@ var play = () => {
         ,
         "Sometimes it's easier with multiple time travels...", // 13
         "If a past self dies or can't reach the time machine, it's a paradox! *wink wink theme*", // 14
+        ,
+        "You have to share 3 things with your past selves: cubes, portals and patience..." // 16
       
       ][level] || "", 640, 80
     );
