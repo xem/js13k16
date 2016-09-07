@@ -21,7 +21,7 @@ var play = () => {
         "Move with arrow keys or WASD or ZQSD. Collect all coins and reach the flag.",
         "If you're stuck, restart with R.",
         "Ice is slippy if you're not standing still.",
-        "Hold and drop cubes with Space.",
+        "Press space to hold and drop cubes. Jump and press space to throw them.",
         ,
         ,
         ,
@@ -102,7 +102,7 @@ var play = () => {
   // Next frame
   frame++;
   
-  document.title = frame;
+  //document.title = frame;
   
   // Victoty animation (if we won) / Game over animation (if we lose)
   victory_or_defeat();

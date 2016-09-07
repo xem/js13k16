@@ -900,34 +900,24 @@ var play_hero = (this_hero, past) => {
     
     // Drop cube
     else if(current_cube = level_data.cubes[this_hero.cube_held]){
-        
-      // Drop ahead of hero if he's grounded and not on a cube
-      if(this_hero.grounded){
       
-        // Left
-        if(this_hero.direction == 0){
-          current_cube.x = this_hero.x - 20;
-        }
-        
-        // Right
-        else if(this_hero.direction == 1){
-          current_cube.x = this_hero.x + 20;
-        }
-      }
+      current_cube.x = this_hero.x;
       
-      // Drop in-place if not grounded
-      else{
+       
+      // Throw it if hero is not grounded
+      if(!this_hero.grounded){
         
         // Left
         if(this_hero.direction == 0){
-          current_cube.x = this_hero.x - 6;
+          current_cube.vx = -14;
         }
         
         // Right
-        else if(this_hero.direction == 1){
-          current_cube.x = this_hero.x;
+        else{
+          current_cube.vx = 14;
         }
       }
+      //document.title = this_hero.grounded + " " + current_cube.vx;
       
       // Avoid collisions
       if(is_solid(tile_at(current_cube.x, current_cube.y))){
@@ -1335,7 +1325,15 @@ var move_cubes = () => {
     // Apply gravity and collsions if the cube is not held
     if(level_data.cubes[i].hero === null){
       if(!level_data.cubes[i].teleport_idle && !is_solid(tile_at(level_data.cubes[i].x, level_data.cubes[i].y + 31)) && !is_solid(tile_at(level_data.cubes[i].x + 31, level_data.cubes[i].y + 31))){
-        level_data.cubes[i].vx = 0;
+        if(level_data.cubes[i].vx > 2){
+          level_data.cubes[i].vx -= 2;
+        }
+        else if(level_data.cubes[i].vx < -2){
+          level_data.cubes[i].vx += 2;
+        }
+        else{
+          level_data.cubes[i].vx = 0;
+        }
       }
       gravity_and_collisions(level_data.cubes[i], 32, 1);
     }
