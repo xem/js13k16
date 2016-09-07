@@ -681,7 +681,7 @@ var gravity_and_collisions = function(obj, obj_width, type){
 var play_hero = (this_hero, past) => {
   
   // If he's not dead and didn't win yet
-  if(this_hero.state != 3 && !win){
+  if(this_hero.state != 3 && !win && !paradox_frame){
     
     // Reset to idle state, consider he's not on a moving object
     this_hero.state = 0;

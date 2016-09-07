@@ -18,19 +18,20 @@ var play = () => {
     c.fillText(
       [
         ,
-        "Move with arrow keys or WASD or ZQSD. Collect all coins and reach the flag.",
-        "If you're stuck, restart with R.",
-        "Ice is slippy if you're not standing still.",
-        "Press space to hold and drop cubes. Jump and press space to throw them.",
+        "Move with arrow keys or WASD or ZQSD. Collect all coins and reach the flag.", // 1
+        "If you're stuck, restart with R.", // 2
+        "Ice is slippy if you're not standing still.", // 3
+        "Press space to hold and drop cubes. Jump and press space to throw them.", // 4
         ,
         ,
         ,
-        "Aim with mouse, send portals with left click and right click.",
-        "Use momentum!",
+        "Aim with mouse, send portals with left click and right click.", // 8
+        "Use momentum!", // 9
         ,
-        "Need a little help from the past? Go to the time machine and press Shift!",
-        "Sometimes it's easier with multiple time travels...",
-        "If a past self can't reach the time machine, it's a paradox! *wink wink the theme*",
+        "Need a little help from the past? Go to the time machine and press Shift!", // 11
+        ,
+        "Sometimes it's easier with multiple time travels...", // 13
+        "If a past self dies or can't reach the time machine, it's a paradox! *wink wink theme*", // 14
       
       ][level] || "", 640, 80
     );
