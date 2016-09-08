@@ -1,2 +1,6 @@
-- editor: suppression d'une machine pas gg
+- editor: suppression d'un pipe pas gg
 - nuage
+- 13 levels
+- musique
+- golf
+- zip

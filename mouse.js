@@ -243,6 +243,20 @@ var handle_clicks = (e) => {
       // Right click: erase (place sky / tile #0 instead of current tile)
       if(rightclick == true){
         
+        console.log(tile_y, tile_x, level_data.tiles[tile_y][tile_x]);
+        
+        // Erase time machine
+        // Top
+        if(level_data.tiles[tile_y][tile_x] == 22){
+          level_data.tiles[tile_y][tile_x] = 0;
+          level_data.tiles[tile_y + 1][tile_x] = 0;
+        }
+        // Bottom
+        if(level_data.tiles[tile_y][tile_x] == 23){
+          level_data.tiles[tile_y][tile_x] = 0;
+          level_data.tiles[tile_y - 1][tile_x] = 0;
+        }
+        
         // If the tile is writable
         if(is_writable(tile_x, tile_y)){
           level_data.tiles[tile_y][tile_x] = 0;
