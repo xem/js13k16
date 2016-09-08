@@ -243,8 +243,6 @@ var handle_clicks = (e) => {
       // Right click: erase (place sky / tile #0 instead of current tile)
       if(rightclick == true){
         
-        console.log(tile_y, tile_x, level_data.tiles[tile_y][tile_x]);
-        
         // Erase time machine
         // Top
         if(level_data.tiles[tile_y][tile_x] == 22){
@@ -317,7 +315,17 @@ var handle_clicks = (e) => {
               }
             }
           }
+          
+          level_data.old_pipes = level_data.pipes;
+          level_data.pipes = [];
+          for(i in level_data.old_pipes){
+            if(level_data.old_pipes[i]){
+              level_data.pipes.push(level_data.old_pipes[i]);
+            }
+          }
         }
+        
+        
         
         // Erase balances if we click on tile #15
         if(balance_click == 0){

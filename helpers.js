@@ -104,10 +104,10 @@ var reset_current_level = (timetravel) => {
     1, 
     1, 
     0, // 15: Balance
-    1, 
-    1, 
-    1, 
-    1, 
+    1, // 16: pipe top left
+    1, // 17: pipe top right
+    1, // 18: pipe body left
+    1, // 19: pipe body right
     1, // 20: Green switch
     0, // 21: Green switch pressed
     0, // 22: Tardis top

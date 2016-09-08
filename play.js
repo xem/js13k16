@@ -109,7 +109,7 @@ var play = () => {
   frame++;
   
   //document.title = frame;
-  document.title = heros[0].pickdrop;
+  //document.title = heros[0].pickdrop;
   
   // Victoty animation (if we won) / Game over animation (if we lose)
   victory_or_defeat();

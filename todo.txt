@@ -1,6 +1,7 @@
-- editor: suppression d'un pipe pas gg
 - nuage
 - 13 levels
 - musique
 - golf
 - zip
+- More levels online (twitter search)
+- title screen

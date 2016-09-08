@@ -1,0 +1,1 @@
+advzip -z -4 -i 1000 entry.zip

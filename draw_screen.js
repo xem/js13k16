@@ -185,12 +185,17 @@ var draw_screen = onload = onhashchange = (no_reset) => {
       if(level_data.pipes[i][1]){
         draw_tile(16, level_data.pipes[i][0], level_data.pipes[i][1]);
         draw_tile(17, level_data.pipes[i][0] + 1, level_data.pipes[i][1]);
+        level_data.tiles[level_data.pipes[i][1]][level_data.pipes[i][0]] = 16;
+        level_data.tiles[level_data.pipes[i][1]][level_data.pipes[i][0] + 1] = 17;
+        
       }
       
       // Pipe position 2
       if(level_data.pipes[i][2]){
         draw_tile(16, level_data.pipes[i][0], level_data.pipes[i][2]);
         draw_tile(17, level_data.pipes[i][0] + 1, level_data.pipes[i][2]);
+        level_data.tiles[level_data.pipes[i][2]][level_data.pipes[i][0]] = 16;
+        level_data.tiles[level_data.pipes[i][2]][level_data.pipes[i][0] + 1] = 17;
       }
       
       // Switch
