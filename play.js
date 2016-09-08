@@ -30,8 +30,11 @@ var play = () => {
         ,
         "Need a little help from the past? Go to the time machine and press Shift!", // 11
         ,
-        "Sometimes it's easier with multiple time travels...", // 13
-        "If a past self dies or can't reach the time machine, it's a paradox! *wink wink theme*", // 14
+        ,
+        "Sometimes it's easier with multiple time travels...", // 14
+        ,
+        ,
+        "If a past self dies or can't reach the time machine, it's a paradox! *wink wink theme*", // 16
         ,
         //"You have to share 3 things with your past selves: cubes, portals and patience..." // 16
       

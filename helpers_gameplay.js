@@ -197,6 +197,13 @@ var gravity_and_collisions = function(obj, obj_width, type){
   if(typeof obj.cube_held != "undefined" && obj.cube_held !== null){
     obj.weight = 1 + level_data.cubes[obj.cube_held].weight;
   }
+  
+  // Follow the cube below and forget it until next frame
+  if(obj.cube_below !== null && obj.cube_below != obj.cube_held){
+    obj.x = level_data.cubes[obj.cube_below].x + obj.position_on_cube;
+    obj.y = level_data.cubes[obj.cube_below].y - 32;
+    obj.cube_below = null;
+  }
 
   // Go right
   if(obj.vx > 0){
@@ -375,11 +382,6 @@ var gravity_and_collisions = function(obj, obj_width, type){
     if(obj.vy > max_fall_speed){
       obj.vy = max_fall_speed;
     }
-  }
-    
-  // If object's bottom (lower quarter) is on a solid tile (ex: toggled block), fall under it
-  else if(!obj.in_portal && is_solid(tile_at(obj.x + obj_width / 2, obj.y + 28))){
-    obj.y = ~~(obj.y / 32) * 32 + 32;
   }
   
   // Go down
@@ -674,11 +676,6 @@ var gravity_and_collisions = function(obj, obj_width, type){
       pipes_state[i].pressed = true;
     }
   }
-  
-  // Go down if we're stuck in solid yellow blocks (tile #9){
-  if(tile_at(obj.x, obj.y + 31) == 9 || tile_at(obj.x + obj_width - 1, obj.y + 31) == 9){
-    obj.y = ~~(obj.y / 32) * 32 + 32;
-  }
 }
 
 // Play or replay a given hero (past: 1 / present: 0)
@@ -866,7 +863,21 @@ var play_hero = (this_hero, past) => {
       this_hero.vy = -1.5 * jump_speed;
     }
     
-    // Die (crush between a pipe or a balance and a solid tile, unless there's a portal bottom on the tile above the hero)
+    // Die (if a solid yellow block (#9) appears on top of the hero)
+    if(
+      (tile_at(this_hero.x + 1, this_hero.y + 1) == 9)
+      ||
+      (tile_at(this_hero.x + hero_width - 1, this_hero.y + 1) == 9)
+      ||
+      (tile_at(this_hero.x + 1, this_hero.y + 31) == 9)
+      ||
+      (tile_at(this_hero.x + hero_width - 1, this_hero.y + 31) == 9)
+    ){
+      this_hero.state = 3;
+      this_hero.vy = -1.5 * jump_speed;
+    }
+    
+    // Die (crush between a pipe or a balance and a solid tile, unless there's a portal bottom on the tile above the hero <-- commented)
     if(
       this_hero.on_moving_object
       &&
@@ -925,6 +936,7 @@ var play_hero = (this_hero, past) => {
     else if(current_cube = level_data.cubes[this_hero.cube_held]){
       
       current_cube.x = this_hero.x;
+      current_cube.cube_below = null;
       
        
       // Throw it if hero is not grounded
