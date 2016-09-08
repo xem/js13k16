@@ -142,9 +142,13 @@ var parse_draw_map = function(){
       heros[hero].keyleft = false;
       heros[hero].keyup = false;
       heros[hero].keyright = false;
-      heros[hero].keyspace = false;
       heros[hero].safe = false;
       heros[hero].direction = 1;
+      heros[hero].pickdrop = 0;
+      heros[hero].cube_held = null;
+    }
+    for(i in level_data.cubes){
+      level_data.cubes[i].mario = null;
     }
   }
 }
@@ -890,6 +894,11 @@ var play_hero = (this_hero, past) => {
       this_hero.vy = -1 * jump_speed;
     }
     
+    // Pick/drop cube toggle
+    if(this_hero.space[frame]){
+      this_hero.pickdrop ^= 1;
+    }
+    
     // Pick cube
     if(this_hero.pickdrop){
       if(this_hero.cube_held === null){
@@ -1339,11 +1348,11 @@ var move_cubes = () => {
     // Apply gravity and collsions if the cube is not held
     if(level_data.cubes[i].hero === null){
       if(!level_data.cubes[i].teleport_idle && !is_solid(tile_at(level_data.cubes[i].x, level_data.cubes[i].y + 31)) && !is_solid(tile_at(level_data.cubes[i].x + 31, level_data.cubes[i].y + 31))){
-        if(level_data.cubes[i].vx > 2){
-          level_data.cubes[i].vx -= 2;
+        if(level_data.cubes[i].vx > 1){
+          level_data.cubes[i].vx -= 1;
         }
-        else if(level_data.cubes[i].vx < -2){
-          level_data.cubes[i].vx += 2;
+        else if(level_data.cubes[i].vx < -1){
+          level_data.cubes[i].vx += 1;
         }
         else{
           level_data.cubes[i].vx = 0;

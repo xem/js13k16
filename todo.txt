@@ -1,2 +1,5 @@
-- si un cube presse un bouton jaune et tombe car ya un bloc jaune dessous, si mario est sur un bloc jaune, faut qu'il tombe.
 - un mec du passé arrive pas a porter un cube. wut
+- faire un niveau ou ya pas de paradoxe si on est assez patient
+- mourir si on cube jaune réapparait à notre emplacement
+- editor: suppression d'une machine pas gg
+- position_on_cube à appliquer sur les heros / cubes quand le cube dessous  bouge ou est jeté

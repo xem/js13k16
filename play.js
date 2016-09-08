@@ -33,7 +33,7 @@ var play = () => {
         "Sometimes it's easier with multiple time travels...", // 13
         "If a past self dies or can't reach the time machine, it's a paradox! *wink wink theme*", // 14
         ,
-        "You have to share 3 things with your past selves: cubes, portals and patience..." // 16
+        //"You have to share 3 things with your past selves: cubes, portals and patience..." // 16
       
       ][level] || "", 640, 80
     );
@@ -106,6 +106,7 @@ var play = () => {
   frame++;
   
   //document.title = frame;
+  document.title = heros[0].pickdrop;
   
   // Victoty animation (if we won) / Game over animation (if we lose)
   victory_or_defeat();

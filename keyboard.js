@@ -48,10 +48,9 @@ onkeyup = (e) => {
       reset_current_level();
     }
     
-    // Space (press to toggle)
+    // Space (press to toggle between pick cube and drop cube)
     if(e.keyCode == 32){
       current_hero.space[frame] = true;
-      current_hero.pickdrop ^= 1;
     }
     
     // Shift 

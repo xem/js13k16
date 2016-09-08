@@ -55,7 +55,6 @@ var reset_hero = () => {
     up: [],
     keyright: false,
     right: [],
-    keyspace: false,
     space: [],
     shift: [],
     leftclick: [],
