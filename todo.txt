@@ -5,3 +5,5 @@
 - zip
 - More levels online (twitter search)
 - title screen
+- quand on saute sur un cube porté c'est chelou
+- suppression de balances pas gg

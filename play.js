@@ -28,15 +28,14 @@ var play = () => {
         "Aim with mouse, send portals with left click and right click.", // 8
         "Use momentum!", // 9
         ,
-        "Need a little help from the past? Go to the time machine and press Shift!", // 11
+        ,
+        "Need a little help from the past? Go to the time machine and press Shift!", // 12
         ,
         ,
-        "Sometimes it's easier with multiple time travels...", // 14
-        ,
-        ,
+        "Sometimes you need to make multiple time travels...", // 15
         "If a past self dies or can't reach the time machine, it's a paradox! *wink wink theme*", // 16
         ,
-        //"You have to share 3 things with your past selves: cubes, portals and patience..." // 16
+        "Only one pair of portals can exist at the same time" // 18
       
       ][level] || "", 640, 80
     );
