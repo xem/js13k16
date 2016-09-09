@@ -1,9 +1,9 @@
 - nuage
-- 13 levels
-- musique
+- musique & son
+- title screen
+- derniers levels
+- Share (twitter link)
+- More levels online (twitter search)
+- time trial
 - golf
 - zip
-- More levels online (twitter search)
-- title screen
-- quand on saute sur un cube porté c'est chelou
-- suppression de balances pas gg

@@ -316,16 +316,15 @@ var handle_clicks = (e) => {
             }
           }
           
-          level_data.old_pipes = level_data.pipes;
+          // Reorganize remaining pipes
+          level_data.tmp = level_data.pipes;
           level_data.pipes = [];
-          for(i in level_data.old_pipes){
-            if(level_data.old_pipes[i]){
-              level_data.pipes.push(level_data.old_pipes[i]);
+          for(i in level_data.tmp){
+            if(level_data.tmp[i]){
+              level_data.pipes.push(level_data.tmp[i]);
             }
           }
         }
-        
-        
         
         // Erase balances if we click on tile #15
         if(balance_click == 0){
@@ -366,6 +365,15 @@ var handle_clicks = (e) => {
                 
                 delete level_data.balances[i];
               }
+            }
+          }
+          
+          // Reorganize remaining balances
+          level_data.tmp = level_data.balances;
+          level_data.balances = [];
+          for(i in level_data.tmp){
+            if(level_data.tmp[i]){
+              level_data.balances.push(level_data.tmp[i]);
             }
           }
         }

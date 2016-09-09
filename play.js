@@ -35,7 +35,7 @@ var play = () => {
         "Sometimes you need to make multiple time travels...", // 15
         "If a past self dies or can't reach the time machine, it's a paradox! *wink wink theme*", // 16
         ,
-        "Only one pair of portals can exist at the same time" // 18
+        "Only two portals can exist at the same time." // 18
       
       ][level] || "", 640, 80
     );
