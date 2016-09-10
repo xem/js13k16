@@ -15,37 +15,7 @@ var play = () => {
     c.font = "bold 30px arial";
     c.fillStyle = "black";
     c.textAlign = "center";
-    c.fillText(
-      [
-        ,
-        "Move with arrow keys or WASD or ZQSD. Collect all coins and reach the flag.", // 1
-        "If you're stuck, restart with R.", // 2
-        "Ice is slippy if you're not standing still.", // 3
-        "Press space to hold and drop cubes. Jump and press space to throw them.", // 4
-        "Yellow switches are all connected.", // 5
-        "Each green switch controls one pipe.", // 6
-        ,
-        "Aim with mouse, send portals with left click and right click.", // 8
-        "Use momentum!", // 9
-        ,
-        ,
-        ,
-        "Need a little help from the past? Go to the time machine and press Shift!", // 13
-        ,
-        ,
-        "Sometimes you need to make multiple time travels...", // 16
-        "If a past self dies or can't reach the time machine, it's a paradox! *wink wink theme*", // 17
-        ,
-        "Heros and cubes have the same weight", // 19
-        "Only two portals can exist at the same time.", // 20
-        "Clouds will block all your future selves!", // 21
-        "Count in your head: 1-2-3-switch! 1-2-3-switch! I know, this one's terrible.", // 22
-        "You can grab and throw cubes even if they're not here yet...", // 23
-        "You can aim and shoot portals even if you're not here yet...", // 24
-        
-      
-      ][level] || "", 640, 80
-    );
+    c.fillText(level_data.txt || "", 640, 80);
   }
   
   // Save keys being pressed (for latest hero only)

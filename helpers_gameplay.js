@@ -157,6 +157,8 @@ var parse_draw_map = function(){
       heros[hero].direction = 1;
       heros[hero].pickdrop = 0;
       heros[hero].cube_held = null;
+      heros[hero].cube_below = null;
+      heros[hero].position_on_cube = null;
     }
     for(i in level_data.cubes){
       level_data.cubes[i].mario = null;
