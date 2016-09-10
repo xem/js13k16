@@ -180,6 +180,15 @@ function SNDwin0(i) {
 	var q = t((i*notes.length)%n,n);
 	return ((i*r)&64)?q:-q
 }
+
+
+function SNDswitch0(i) {
+	var n=7e3;
+	if (i > n) return null;
+	return ((((i^(i>>3))^(i*i*7.3)^(i<<4))&65535)/65536)*t(i,n);
+}
+
+
 /*
 function SND0(i) {
 	var n=25000;

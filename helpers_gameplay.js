@@ -1242,6 +1242,7 @@ var update_mechanisms = () => {
   
   // Apply yellow toggle (invert plain and transparent tiles if yellow toggle has changed during this frame)
   if(yellow_toggle != yellow_toggle_last_frame){
+    mkaudio(SNDswitch0).play();
     for(j = 0; j < 20; j++){
       for(i = 0; i < 40; i++){
         if(level_data.tiles[j][i] == 9){
