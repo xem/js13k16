@@ -1337,6 +1337,10 @@ var victory_or_defeat = () => {
     mkaudio(SNDdie0).play();
   }
   
+  if(paradox_frame == 1){
+    mkaudio(SNDglitch1).play();
+  }
+  
   if(lose_frame >= 30){
     a.width ^= 0;
     clearInterval(loop);
@@ -1353,7 +1357,7 @@ var victory_or_defeat = () => {
     }
   }
   
-  if(win_frame >= 30 || lose_frame >= 30 || paradox_frame >= 80){
+  if(win_frame >= 30 || lose_frame >= 30 || paradox_frame >= 60){
     a.width ^= 0;
     clearInterval(loop);
     screen = last_screen;

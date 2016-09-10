@@ -1,3 +1,4 @@
+// Sound by Anders Kaare
 function mkaudio(fn) {
 	var data = [];
 	for (var i = 0;;i++) {
@@ -134,7 +135,7 @@ function SNDglitch0(i) {
 */
 
 function SNDglitch1(i) {
-	var n=5e4;
+	var n=9e4;
 	if (i > n) return null;
 	return ((P(i+S(i*0.01)*1000,0.8)&200)?0.5:-0.5)*P(t(i,n),1);
 }
