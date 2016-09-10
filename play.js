@@ -39,7 +39,9 @@ var play = () => {
         "Heros and cubes have the same weight", // 19
         "Only two portals can exist at the same time.", // 20
         "Clouds will block all your future selves!", // 21
-        "Count in your head: 1-2-3-switch! 1-2-3-switch! I know, this one's terrible." // 22
+        "Count in your head: 1-2-3-switch! 1-2-3-switch! I know, this one's terrible.", // 22
+        "You can grab and throw cubes even if they're not here yet...", // 23
+        "You can aim and shoot portals even if you're not here yet...", // 24
         
       
       ][level] || "", 640, 80

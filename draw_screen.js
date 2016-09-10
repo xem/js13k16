@@ -59,8 +59,8 @@ var draw_screen = onload = onhashchange = (no_reset) => {
       }
     }
     c.fillText("◀", 40, 70);
-    c.fillText("LEVELS", 640, 70);
-    c.fillText("MORE LEVELS ONLINE", 640, 470);
+    c.fillText("TUTORIAL LEVELS", 640, 70);
+    c.fillText("LEVELS SHARED ON TWITTER", 640, 470);
     c.fillText("GO", 640, 570);
     c.stroke();
     c.closePath();
