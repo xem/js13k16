@@ -22,8 +22,8 @@ var play = () => {
         "If you're stuck, restart with R.", // 2
         "Ice is slippy if you're not standing still.", // 3
         "Press space to hold and drop cubes. Jump and press space to throw them.", // 4
-        ,
-        ,
+        "Yellow switches are all connected.", // 5
+        "Each green switch controls one pipe.", // 6
         ,
         "Aim with mouse, send portals with left click and right click.", // 8
         "Use momentum!", // 9
@@ -38,7 +38,9 @@ var play = () => {
         ,
         "Heros and cubes have the same weight", // 19
         "Only two portals can exist at the same time.", // 20
-        "Clouds will block all your future selves!" // 21 
+        "Clouds will block all your future selves!", // 21
+        "Count in your head: 1-2-3-switch! 1-2-3-switch! I know, this one's terrible." // 22
+        
       
       ][level] || "", 640, 80
     );
