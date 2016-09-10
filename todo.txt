@@ -1,5 +1,6 @@
 - débloquer les niveaux au fur et à mesure & localstorage
 - écran post-jeu: indique le temps passé, le record developpeur, et si on perd 5 fois, on peut give up
+- suppression de tuyau pas gg
 - musique & son
 - title screen
 - derniers levels

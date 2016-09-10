@@ -803,6 +803,7 @@ var play_hero = (this_hero, past) => {
       this_hero.keyup = false;
       this_hero.can_jump = false;
       this_hero.cube_below = null;
+      mkaudio(SNDjump2).play();
     }
     
     // Jump sprite
@@ -1319,6 +1320,7 @@ var victory_or_defeat = () => {
   // Current hero dies
   if(current_hero.state == 3){
     lose_frame++;
+    
     c.fillText("LOST!", 640, 350);
   }
   
@@ -1329,6 +1331,10 @@ var victory_or_defeat = () => {
       paradox_frame++;
       c.fillText("PARADOX!", 640, 350);
     }
+  }
+  
+  if(lose_frame == 1){
+    mkaudio(SNDdie0).play();
   }
   
   if(lose_frame >= 30){
