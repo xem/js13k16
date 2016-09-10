@@ -1371,7 +1371,13 @@ var victory_or_defeat = () => {
     }
   }
   
-  if(win_frame >= 30 || lose_frame >= 30 || paradox_frame >= 60){
+  if(win_frame >= 30){
+    level++;
+    level_data = levels[level];
+    draw_screen();
+  }
+  
+  if(lose_frame >= 30 || paradox_frame >= 60){
     a.width ^= 0;
     clearInterval(loop);
     screen = last_screen;
