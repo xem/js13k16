@@ -188,6 +188,14 @@ function SNDswitch0(i) {
 	return ((((i^(i>>3))^(i*i*7.3)^(i<<4))&65535)/65536)*t(i,n);
 }
 
+function SNDtimetravel0(i) {
+	var n=5e4;
+	var n1=1e5;
+	if (i > n) return null;
+	i=P(i,1.2-S(i/n1))*7;
+	var x=S(i/30+S(i/1500));
+	return P(x,9)*t(i,n);
+}
 
 /*
 function SND0(i) {

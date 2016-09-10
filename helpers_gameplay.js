@@ -860,6 +860,8 @@ var play_hero = (this_hero, past) => {
         else{
           this_hero.safe = true;
         }
+        
+        mkaudio(SNDtimetravel0).play();
       }
     }
     
