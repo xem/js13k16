@@ -145,7 +145,7 @@ var handle_clicks = (e) => {
     for(j = 0; j < 20; j++){
       for(i = 0; i < 40; i++){
         tile = level_data.tiles[j][i] || 0;
-        tile = (tile < 16 || tile > 21) ? tile : 0;
+        //tile = (tile < 16 || tile > 21) ? tile : 0;
         level_data.hash += String.fromCharCode(tile + 0x30);
       }
     }
@@ -167,10 +167,10 @@ var handle_clicks = (e) => {
       location.hash = "";
       if(level_data.tested == false){
         alert("You need to test and win your level first.");
-        window.open("https://www.twitter.com/intent/tweet?text=" + encodeURIComponent("I made a level for #SuperChronoPortalMaker !\nPlay the game here: " + location.origin + location.pathname + ". \nPlay my level here:" + encodeURI(location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances}) + "\nPlz RT")));
+        window.open("https://www.twitter.com/intent/tweet?text=" + encodeURIComponent("I made a level for #SuperChronoPortalMaker !\nPlay the game here: " + location.origin + location.pathname + ". \nPlay my level here:" + encodeURI(location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances})) + "\nPlz RT"));
       }
       else {
-        window.open("https://www.twitter.com/intent/tweet?text=" + encodeURIComponent("I made a level for #SuperChronoPortalMaker !\nPlay the game here: " + location.origin + location.pathname + ". \nPlay my level here:" + encodeURI(location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances}) + "\nPlz RT")));
+        window.open("https://www.twitter.com/intent/tweet?text=" + encodeURIComponent("I made a level for #SuperChronoPortalMaker !\nPlay the game here: " + location.origin + location.pathname + ". \nPlay my level here:" + encodeURI(location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances})) + "\nPlz RT"));
         shared = true;
       }
     }
