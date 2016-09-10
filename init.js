@@ -5,10 +5,10 @@
 var c = a.getContext("2d");
 
 // Init local storage to 1 if it's not already set
-localStorage["scpm"] = 30;
+localStorage["scpm"] |= 1;
 
 // Current screen (0: main menu / 1: level selection / 2: playing / 3: editor)
-var screen = 1;
+var screen = 0;
 
 // Previous screen (when we quit a level, 0: when playing a shared level / 1: when playing a built-in level / 3: whe testing a level in the level eitor)
 var last_screen = 0;

@@ -88,7 +88,7 @@ var handle_clicks = (e) => {
     c.beginPath();
     c.rect(590, 520, 100, 80);
     if(c.isPointInPath(x, y)){
-      location = "todo";
+      window.open("https://twitter.com/search?f=tweets&q=%23SuperChronoPortalMaker");
     }
     c.closePath();
     

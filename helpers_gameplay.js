@@ -1324,6 +1324,7 @@ var victory_or_defeat = () => {
   if(win){
     win_frame++;
     c.fillText("CLEARED!", 640, 350);
+    localStorage["scpm"] = Math.max(+localStorage["scpm"], level + 1);
   }
   
   // Current hero dies
