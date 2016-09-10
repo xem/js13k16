@@ -612,9 +612,11 @@ var gravity_and_collisions = function(obj, obj_width, type){
       // Break bricks (tile #5 => tile #0)
       if(tile_at(obj.x, obj.y + obj.vy) == 5){
         set_tile(obj.x, obj.y + obj.vy, 0);
+        mkaudio(SNDbrick1).play();
       }
       if(tile_at(obj.x + hero_width, obj.y + obj.vy) == 5){
         set_tile(obj.x + hero_width, obj.y + obj.vy, 0);
+        mkaudio(SNDbrick1).play();
       }
       
       obj.y = ~~((obj.y + obj.vy) / 32) * 32 + 32;
@@ -817,15 +819,19 @@ var play_hero = (this_hero, past) => {
     // Collect coins (tile 6 => tile 0)
     if(tile_at(this_hero.x + hero_width / 2 - 8, this_hero.y + 16 - 8) == 6 ){
       set_tile(this_hero.x + hero_width / 2 - 8, this_hero.y + 16 - 8, 0);
+      mkaudio(SNDcoin1).play();
     }
     if(tile_at(this_hero.x + hero_width / 2 + 8, this_hero.y + 16 - 8) == 6){
       set_tile(this_hero.x + hero_width / 2 + 8, this_hero.y + 16 - 8, 0);
+      mkaudio(SNDcoin1).play();
     }
     if(tile_at(this_hero.x + hero_width / 2 - 8, this_hero.y + 16 + 8) == 6){
       set_tile(this_hero.x + hero_width / 2 - 8, this_hero.y + 16 + 8, 0);
+      mkaudio(SNDcoin1).play();
     }
     if(tile_at(this_hero.x + hero_width / 2 + 8, this_hero.y + 16 + 8) == 6){
       set_tile(this_hero.x + hero_width / 2 + 8, this_hero.y + 16 + 8, 0);
+      mkaudio(SNDcoin1).play();
     }
     
     // Press Shift
@@ -1331,6 +1337,10 @@ var victory_or_defeat = () => {
       paradox_frame++;
       c.fillText("PARADOX!", 640, 350);
     }
+  }
+  
+  if(win_frame == 1){
+    mkaudio(SNDwin0).play();
   }
   
   if(lose_frame == 1){

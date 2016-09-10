@@ -167,13 +167,10 @@ var handle_clicks = (e) => {
       location.hash = "";
       if(level_data.tested == false){
         alert("You need to test and win your level first.");
-        // TMP
-        prompt("Here's your level URL:", encodeURI(location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances})));
-        prompt("Here's your level URL:", location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances}));
+        window.open("https://www.twitter.com/intent/tweet?text=" + encodeURIComponent("I made a level for #SuperChronoPortalMaker !\nPlay the game here: " + location.origin + location.pathname + ". \nPlay my level here:" + encodeURI(location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances}) + "\nPlz RT")));
       }
       else {
-        prompt("Here's your level URL:", encodeURI(location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances})));
-        prompt("Here's your level URL:", location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances}));
+        window.open("https://www.twitter.com/intent/tweet?text=" + encodeURIComponent("I made a level for #SuperChronoPortalMaker !\nPlay the game here: " + location.origin + location.pathname + ". \nPlay my level here:" + encodeURI(location.origin + location.pathname + "#" + JSON.stringify({hash:level_data.hash, pipes:level_data.pipes, balances: level_data.balances}) + "\nPlz RT")));
         shared = true;
       }
     }

@@ -134,6 +134,12 @@ function SNDglitch0(i) {
 }
 */
 
+function SNDbrick1(i) {
+	var n=5e3;
+	if (i > n) return null;
+	return ((P(i+S(i*0.01)*1000,0.8)&200)?0.5:-0.5)*P(t(i,n),1);
+}
+
 function SNDglitch1(i) {
 	var n=9e4;
 	if (i > n) return null;
@@ -165,7 +171,7 @@ function SNDcoin1(i) {
 
 function SNDwin0(i) {
 	var notes = [0,4,7,12,undefined,7,12];
-	var n=3.5e4;
+	var n=4e4;
 	if (i > n) return null;
 	var idx = ((notes.length*i)/n)|0;
 	var note = notes[idx];
