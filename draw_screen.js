@@ -109,6 +109,9 @@ var draw_screen = onload = onhashchange = (no_reset) => {
       draw_sprite(i, 8 + i * 35, 3);
     }
     
+    c.stroke();
+    c.closePath();
+    
     // Tiles on grid
     if(!no_reset){
       if(level_data.hash){
@@ -207,6 +210,28 @@ var draw_screen = onload = onhashchange = (no_reset) => {
     // Balances
     for(i in level_data.balances){
       
+      // Draw line and balance 2
+      if(level_data.balances[i][3]){
+        
+        // Draw line
+        c.beginPath();
+        c.strokeStyle = "#fff";
+        c.lineWidth = 2;
+        c.moveTo(level_data.balances[i][0] * 32 + 16, level_data.balances[i][1] * 32 + 40 + 8);
+        c.lineTo(level_data.balances[i][2] * 32 + 16, level_data.balances[i][3] * 32 + 40 + 8);
+        c.stroke();
+        c.closePath();
+      
+        // Balance 2
+        draw_tile(15, level_data.balances[i][2] - 1, level_data.balances[i][3]);
+        draw_tile(15, level_data.balances[i][2], level_data.balances[i][3]);
+        draw_tile(15, level_data.balances[i][2] + 1, level_data.balances[i][3]);
+        
+        level_data.tiles[level_data.balances[i][3]][level_data.balances[i][2] - 1] = 15;
+        level_data.tiles[level_data.balances[i][3]][level_data.balances[i][2]] = 15;
+        level_data.tiles[level_data.balances[i][3]][level_data.balances[i][2] + 1] = 15;
+      }
+      
       // Draw balance 1
       if(level_data.balances[i][1]){
         draw_tile(15, level_data.balances[i][0] - 1, level_data.balances[i][1]);
@@ -216,17 +241,6 @@ var draw_screen = onload = onhashchange = (no_reset) => {
         level_data.tiles[level_data.balances[i][1]][level_data.balances[i][0] - 1] = 15;
         level_data.tiles[level_data.balances[i][1]][level_data.balances[i][0]] = 15;
         level_data.tiles[level_data.balances[i][1]][level_data.balances[i][0] + 1] = 15;
-      }
-      
-      // Draw balance 2
-      if(level_data.balances[i][3]){
-        draw_tile(15, level_data.balances[i][2] - 1, level_data.balances[i][3]);
-        draw_tile(15, level_data.balances[i][2], level_data.balances[i][3]);
-        draw_tile(15, level_data.balances[i][2] + 1, level_data.balances[i][3]);
-        
-        level_data.tiles[level_data.balances[i][3]][level_data.balances[i][2] - 1] = 15;
-        level_data.tiles[level_data.balances[i][3]][level_data.balances[i][2]] = 15;
-        level_data.tiles[level_data.balances[i][3]][level_data.balances[i][2] + 1] = 15;
       }
     }
     
@@ -272,6 +286,9 @@ var draw_screen = onload = onhashchange = (no_reset) => {
     }
     
     // Grid
+    c.beginPath();
+    c.strokeStyle = "#777";
+    c.lineWidth = 1;
     for(i = 0; i < 40; i++){
       c.moveTo(i * 32, 40);
       c.lineTo(i * 32, 648);

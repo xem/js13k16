@@ -1,9 +1,10 @@
-- nuage
+- attendre que les heros passés reviennent à la machine pour gagner
 - musique & son
 - title screen
 - derniers levels
 - Share (twitter link)
 - More levels online (twitter search)
-- time trial
+- time trial?
+- responsive?
 - golf
 - zip

@@ -27,9 +27,14 @@ var set_tile = (x, y, value) => {
   level_data.tiles[~~(y / 32)][~~(x / 32)] = value;
 }
 
-// Is a tile id currently solid? (optionally, consider spikes non-solid, because cubes can be placed on them)
+// Is a tile id currently solid? 
+// Clouds are solid after a time travel
+// (optionally, consider spikes solid, because cubes can be placed on them)
 var is_solid = (id, spikes) => {
-  return (spikes && id == 7) || solid[id] || 0;
+  if(id == 13){
+    document.title = heros.length + " " + hero + " " + frame;
+  }
+  return (id == 13 && hero != 0) || (spikes && id == 7) || solid[id] || 0;
 }
 
 // Is a tile writable (in the editor, a.k.a don't already contain a pipe or a balance or a time machine)
@@ -88,12 +93,12 @@ var reset_current_level = (timetravel) => {
 
   // Solidity of the tiles (some of them vary during gameplay, so we reset it before each level and after reset)
   solid = [
-    0, 
-    0, 
-    0, 
-    1, 
-    1, 
-    1, 
+    0, // 0: sky
+    0, // 1: time machine placeholder
+    0, // 2: flag
+    1, // 3: ground
+    1, // 4: portalable wall
+    1, // 5: brick
     0, // 6: coin
     0, // 7: spike
     1, // 8: ice
@@ -101,8 +106,8 @@ var reset_current_level = (timetravel) => {
     0, // 10: non-solid yellow block
     0, // 11: yellow toggle
     0, // 12: cube
-    1, 
-    1, 
+    0, // 13: cloud
+    1, // 14: pipe placeholder
     0, // 15: Balance
     1, // 16: pipe top left
     1, // 17: pipe top right
@@ -112,8 +117,8 @@ var reset_current_level = (timetravel) => {
     0, // 21: Green switch pressed
     0, // 22: Tardis top
     0, // 23: Tardis bottom
-    0, 
-    0 // 25: yellow toggle pressed
+    0, // 24: flag pole
+    0  // 25: yellow toggle pressed
   ];
   
   // Cubes (parsed at frame 0)

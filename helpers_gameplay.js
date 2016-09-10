@@ -104,8 +104,19 @@ var parse_draw_map = function(){
         }
       }
       
-      draw_tile(drawn_tile, i, j);
-
+      // Tile #13 and not time traveled yet: transparent cloud
+      if(drawn_tile == 13 && heros.length == 0){
+        c.save();
+        c.globalAlpha = 0.5;
+        draw_tile(drawn_tile, i, j);
+        c.restore();
+      }
+      
+      // Else, any tile is opaque
+      else {
+        draw_tile(drawn_tile, i, j);
+      }
+      
       // Tile #2: flag pole (make it touch the ground)
       if(drawn_tile == 2 && frame == 0){
         end_pole = false;
@@ -1267,6 +1278,15 @@ var update_mechanisms = () => {
       balances_state[i].y1 -= 4;
       balances_state[i].y2 += 4;
     }
+    
+    // Draw line
+    c.beginPath();
+    c.strokeStyle = "#fff";
+    c.lineWidth = 2;
+    c.moveTo(level_data.balances[i][0] * 32 + 16, balances_state[i].y1 + 40 + 8);
+    c.lineTo(level_data.balances[i][2] * 32 + 16, balances_state[i].y2 + 40 + 8);
+    c.stroke();
+    c.closePath();
     
     // Draw balance 1
     draw_sprite(15, level_data.balances[i][0] * 32 - 32, balances_state[i].y1 + 40);

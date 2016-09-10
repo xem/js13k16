@@ -29,13 +29,16 @@ var play = () => {
         "Use momentum!", // 9
         ,
         ,
-        "Need a little help from the past? Go to the time machine and press Shift!", // 12
+        ,
+        "Need a little help from the past? Go to the time machine and press Shift!", // 13
         ,
         ,
-        "Sometimes you need to make multiple time travels...", // 15
-        "If a past self dies or can't reach the time machine, it's a paradox! *wink wink theme*", // 16
+        "Sometimes you need to make multiple time travels...", // 16
+        "If a past self dies or can't reach the time machine, it's a paradox! *wink wink theme*", // 17
         ,
-        "Only two portals can exist at the same time." // 18
+        "Heros and cubes have the same weight", // 19
+        "Only two portals can exist at the same time.", // 20
+        "Clouds will block all your future selves!" // 21 
       
       ][level] || "", 640, 80
     );
@@ -79,6 +82,13 @@ var play = () => {
   // Replay previous heros inputs
   for(hero in heros){
     play_hero(heros[hero], 1);
+  }
+  
+  if(heros.length){
+    hero = -1;
+  }
+  else{
+    hero = 0;
   }
   
   // Play current hero
