@@ -60,8 +60,9 @@ var win, win_frame, lose_frame, paradox_frame, coins_left, loop, frame, current_
 
 // Built-in levels:
 var levels = [
-  
-{},
+
+// 0
+,
   
 // 1
 {"hash":"0000000000000000000000000000000000000000\
@@ -937,63 +938,6 @@ var first_frame = function(){
   }
 }
 
-// Move and draw pipes (at each frame)
-var move_draw_pipes = function(){
-  
-  // For each pipe
-  for(var i in level_data.pipes){
-    
-    // Go to position 2 when switch is pressed
-    if(pipes_state[i].pressed){
-      target = level_data.pipes[i][2] * 32;
-    }
-    
-    // Go to position 1 when switch is not pressed
-    else {
-      target = level_data.pipes[i][1] * 32;
-    }
-      
-    // Go up
-    if(pipes_state[i].y > target){
-      pipes_state[i].y = Math.max(pipes_state[i].y - 4, target);
-    }
-    
-    // Go down
-    else if(pipes_state[i].y < target){
-      pipes_state[i].y = Math.min(pipes_state[i].y + 4, target);
-    }
-
-    // Draw pipe body (tiles #18 / #19)
-    end_pipe = false;
-    for(var k = ~~(pipes_state[i].y / 32) + 1; k < 21; k++){
-      if(k < 20 && !is_solid(tile_at(level_data.pipes[i][0] * 32, k * 32)) && !is_solid(tile_at(level_data.pipes[i][0] * 32 + 1 * 32, k * 32)) && !end_pipe){
-        draw_tile(18, level_data.pipes[i][0], k);
-        draw_tile(19, level_data.pipes[i][0] + 1, k);
-      }
-      else{
-        end_pipe = true;
-        pipes_state[i].y_base = k * 32;
-        break;
-      }
-    }
-    
-    // Draw pipe top (tiles #16 / #17)
-    draw_sprite(16, level_data.pipes[i][0] * 32, pipes_state[i].y + 40);
-    draw_sprite(17, level_data.pipes[i][0] * 32 + 32, pipes_state[i].y + 40);
-    
-    // Draw switch
-    if(level_data.pipes[i][4]){
-      
-      if(pipes_state[i].pressed){
-        draw_tile(21, level_data.pipes[i][3], level_data.pipes[i][4]);
-      }
-      else{
-        draw_tile(20, level_data.pipes[i][3], level_data.pipes[i][4]);
-      }
-    }
-  }
-}
-
 // Parse and draw map (at each frame, but if we're on frame 0, also set start coordinates, initialize cubes and build flag pole)
 var parse_draw_map = function(){
   for(j = 0; j < 20; j++){
@@ -1069,43 +1013,6 @@ var parse_draw_map = function(){
     for(i in level_data.cubes){
       level_data.cubes[i].hero = null;
     }
-  }
-}
-
-// Reset green buttons, yellow buttons and balances/cubes/heros weights (at each frame, before everything is re-computed)
-var reset_mechanisms = function(){
-  
-  // Reset yellow buttons
-  yellow_toggle = false;
-  for(j = 0; j < 20; j++){
-    for(i = 0; i < 40; i++){
-      if(level_data.tiles[j][i] == 25){
-        level_data.tiles[j][i] = 11;
-      }
-    }
-  }
-  
-  // Reset green buttons
-  for(i in level_data.pipes){
-    pipes_state[i].pressed = false;
-  }
-  
-  // Reset weights of heros, cubes and balances
-  for(hero in heros){
-    
-    // TODO
-  
-  }
-  
-  current_hero.weight = 1;
-  
-  for(i in level_data.cubes){
-    level_data.cubes[i].weight = 1;
-  }
-  
-  for(i in level_data.balances){
-    balances_state[i].weight1 = 0;
-    balances_state[i].weight2 = 0;
   }
 }
 
@@ -2103,258 +2010,17 @@ var draw_hero = (hero, past) => {
   c.restore();
 }
 
-// Draw portals (foreground)
-var draw_portals = () => {
-  
-  for(i in j = {"blue": blue_portal, "orange": orange_portal }){
-    
-    draw_tile(4, j[i].tile_x, j[i].tile_y);
-    
-  }
-    
-  for(i in j = {"blue": blue_portal, "orange": orange_portal }){
-
-    c.fillStyle = i;
-    
-    if(j[i].side == 0){
-      c.fillRect(j[i].tile_x * 32, j[i].tile_y * 32 + 40 - 8, 32, 8);
-    }
-    if(j[i].side == 1){
-      c.fillRect(j[i].tile_x * 32 + 28, j[i].tile_y * 32 + 40, 8, 32);
-    }
-    if(j[i].side == 2){
-      c.fillRect(j[i].tile_x * 32, j[i].tile_y * 32 + 40 + 28, 32, 8);
-    }
-    if(j[i].side == 3){
-      c.fillRect(j[i].tile_x * 32 - 4, j[i].tile_y * 32 + 40, 8, 32);
-    }
-  }
-}
-
-// Update mechanisms
-var update_mechanisms = () => {
-  
-  // Apply yellow toggle (invert plain and transparent tiles if yellow toggle has changed during this frame)
-  if(yellow_toggle != yellow_toggle_last_frame){
-    mkaudio(SNDswitch0).play();
-    for(j = 0; j < 20; j++){
-      for(i = 0; i < 40; i++){
-        if(level_data.tiles[j][i] == 9){
-          level_data.tiles[j][i] = 10;
-        }
-        else if(level_data.tiles[j][i] == 10){
-          level_data.tiles[j][i] = 9;
-        }
-      }
-    }
-  }
-  
-  // Save yellow toggle state 
-  yellow_toggle_last_frame = yellow_toggle;
-  
-  // Balances
-  for(i in level_data.balances){
-    
-    // More weight on side 1 and no solid tile under platform 1 and no solid tile over platform 2
-    if(
-      balances_state[i].weight1 > balances_state[i].weight2
-      && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 + 20))
-      && !is_solid(tile_at(level_data.balances[i][0] * 32, balances_state[i].y1 + 20))
-      && !is_solid(tile_at(level_data.balances[i][0] * 32 + 32, balances_state[i].y1 + 20))
-      && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 - 4))
-      && !is_solid(tile_at(level_data.balances[i][2] * 32, balances_state[i].y2 - 4))
-      && !is_solid(tile_at(level_data.balances[i][2] * 32 + 32, balances_state[i].y2 - 4))
-    ){
-      balances_state[i].y1 += 4;
-      balances_state[i].y2 -= 4;
-    }
-    
-    // More weight on side 2 and no solid tile under platform 2 and no solid tile over platform 1
-    else if(
-      balances_state[i].weight2 > balances_state[i].weight1
-      && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 + 20))
-      && !is_solid(tile_at(level_data.balances[i][2] * 32, balances_state[i].y2 + 20))
-      && !is_solid(tile_at(level_data.balances[i][2] * 32 + 32, balances_state[i].y2 + 20))
-      && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 - 4))
-      && !is_solid(tile_at(level_data.balances[i][0] * 32, balances_state[i].y1 - 4))
-      && !is_solid(tile_at(level_data.balances[i][0] * 32 + 32, balances_state[i].y1 - 4))
-    ){
-      balances_state[i].y1 -= 4;
-      balances_state[i].y2 += 4;
-    }
-    
-    // Draw line
-    c.beginPath();
-    c.strokeStyle = "#fff";
-    c.lineWidth = 2;
-    c.moveTo(level_data.balances[i][0] * 32 + 16, balances_state[i].y1 + 40 + 8);
-    c.lineTo(level_data.balances[i][2] * 32 + 16, balances_state[i].y2 + 40 + 8);
-    c.stroke();
-    c.closePath();
-    
-    // Draw balance 1
-    draw_sprite(15, level_data.balances[i][0] * 32 - 32, balances_state[i].y1 + 40);
-    draw_sprite(15, level_data.balances[i][0] * 32, balances_state[i].y1 + 40);
-    draw_sprite(15, level_data.balances[i][0] * 32 + 32, balances_state[i].y1 + 40);
-    
-    // Draw balance 2
-    draw_sprite(15, level_data.balances[i][2] * 32 - 32, balances_state[i].y2 + 40);
-    draw_sprite(15, level_data.balances[i][2] * 32, balances_state[i].y2 + 40);
-    draw_sprite(15, level_data.balances[i][2] * 32 + 32, balances_state[i].y2 + 40);
-  }
-}
-
-// Win animation (write "CLEARED" for 30 frames and exit)
-// Defeat (write "LOST" or "PARADOX" for 30 frames and exit)
-var victory_or_defeat = () => {
-  
-  c.font = "bold 100px arial";
-  c.fillStyle = "#000";
-  c.textAlign = "center";
-  
-  // Win
-  if(win){
-    win_frame++;
-    c.fillText("CLEARED!", 640, 300);
-    c.font = "bold 30px arial";
-    if(last_screen == 1){
-      c.fillRect(450, 350, 400, 130);
-      c.fillStyle = "#fff";
-      document.title = chrono;
-      c.fillText("Time: " + (chrono / 30).toFixed(2) + "s", 640, 400);
-      c.fillText("Dev record: " + (level_data.record / 30).toFixed(2) + "s", 640, 450);
-      if(localStorage["scpm" + level]){
-        localStorage["scpm" + level] = Math.min(+localStorage["scpm" + level], chrono);
-      }
-      else{
-        localStorage["scpm" + level] = chrono;
-      }
-    }
-  }
-  
-  // Current hero dies
-  if(current_hero.state == 3){
-    lose_frame++;
-    
-    c.fillText("LOST!", 640, 350);
-  }
-  
-  for(hero in heros){
-
-    // Past hero dies or gets stuck (not at the time machine at the end of his frame record)
-    if(heros[hero].state == 3 || (heros[hero].last_frame < frame && !heros[hero].safe && !win)){
-      paradox_frame++;
-      c.fillText("PARADOX!", 640, 350);
-    }
-  }
-  
-  if(win_frame == 1){
-    mkaudio(SNDwin0).play();
-  }
-  
-  if(lose_frame == 1){
-    mkaudio(SNDdie0).play();
-  }
-  
-  if(paradox_frame == 1){
-    mkaudio(SNDglitch1).play();
-  }
-  
-  if(lose_frame >= 30){
-    a.width ^= 0;
-    clearInterval(loop);
-    screen = last_screen;
-    level_data.tested = true;
-    a.width ^= 0;
-    draw_screen();
-  }
-  
-  // Paradox (glitch)
-  if(paradox_frame){
-    for(m = ~~(paradox_frame / 5); m--;){
-      c.drawImage(a, i = Math.random() * 1280, j = Math.random() * 648, k = Math.random() * 1280, l = Math.random() * 648, i + Math.random() * 100 - 50, j + Math.random() * 100 - 50, k, l);
-    }
-  }
-  
-  if(win_frame >= 90){
-    chrono = 0;
-    if(last_screen == 1){
-      level++;
-      localStorage["scpm"] = Math.max(+localStorage["scpm"], level);
-    }
-    a.width ^= 0;
-    clearInterval(loop);
-    screen = last_screen;
-    level_data.tested = true;
-    a.width ^= 0;
-    draw_screen();
-  }
-  
-  if(lose_frame >= 30 || paradox_frame >= 60){
-    a.width ^= 0;
-    clearInterval(loop);
-    screen = last_screen;
-    level_data.tested = false;
-    a.width ^= 0;
-    draw_screen();
-  }
-}
-
-// Move and draw all cubes
-var move_cubes = () => {
-  for(var i in level_data.cubes){
-    
-    // If cube is not in a #4 solid tile, assume it's not in a portal anymore
-    if(
-      tile_at(level_data.cubes[i].x + 1, level_data.cubes[i].y + 1) != 4
-      &&
-      tile_at(level_data.cubes[i].x + 32 - 1, level_data.cubes[i].y + 1) != 4
-      &&
-      tile_at(level_data.cubes[i].x + 1, level_data.cubes[i].y + 31) != 4
-      &&
-      tile_at(level_data.cubes[i].x + 32 - 1, level_data.cubes[i].y + 31) != 4
-    ){
-      level_data.cubes[i].in_portal = false;
-    }
-    
-    // Decrement teleportation idle delay
-    if(level_data.cubes[i].teleport_idle){
-      level_data.cubes[i].teleport_idle--;
-    }  
-    
-    // Apply gravity and collsions if the cube is not held
-    if(level_data.cubes[i].hero === null){
-      if(!level_data.cubes[i].teleport_idle && !is_solid(tile_at(level_data.cubes[i].x, level_data.cubes[i].y + 31)) && !is_solid(tile_at(level_data.cubes[i].x + 31, level_data.cubes[i].y + 31))){
-        if(level_data.cubes[i].vx > 1){
-          level_data.cubes[i].vx -= 1;
-        }
-        else if(level_data.cubes[i].vx < -1){
-          level_data.cubes[i].vx += 1;
-        }
-        else{
-          level_data.cubes[i].vx = 0;
-        }
-      }
-      gravity_and_collisions(level_data.cubes[i], 32, 1);
-    }
-
-    // Draw cube
-    c.drawImage(tileset, 12 * 16, 0, 16, 16, level_data.cubes[i].x, 40 + level_data.cubes[i].y, 32, 32);
-  }
-}
-
-
 // Input
 // =====
 
 // Handle clicks on the canvas on each screen
-a.onclick = a.oncontextmenu = (e) => {
+onclick = oncontextmenu = (e) => {
   handle_clicks(e);
   return false;
 }
 
 // On mouse down, set a mousedown flag and a rightclick flag (if right click is down)
-a.onmousedown = (e) => {
+onmousedown = (e) => {
   mousedown = true;
   if(e.which == 3){
     rightclick = true;
@@ -2365,12 +2031,12 @@ a.onmousedown = (e) => {
 }
 
 // On mouse up, reset the mousedown flag
-a.onmouseup = () => {
+onmouseup = () => {
   mousedown = false;
 }
 
 // On mouse move:
-a.onmousemove = (e) => {
+onmousemove = (e) => {
   
   // Compute mouse coords in px and in tiles
   x = e.pageX - a.getBoundingClientRect().left - document.documentElement.scrollLeft - document.body.scrollLeft;
@@ -2532,7 +2198,7 @@ var handle_clicks = (e) => {
     c.beginPath();
     c.rect(1125, 4, 100, 32);
     if(c.isPointInPath(x, y)){
-      if(quit()){
+      if(shared || (!shared && confirm("Quit? This level will be lost!"))){
         screen = 0;
         draw_screen();
       }
@@ -2905,7 +2571,6 @@ onkeyup = (e) => {
   }
 }
 
-
 // Rendering
 // =========
 
@@ -2933,26 +2598,7 @@ var draw_screen = onload = onhashchange = (no_reset) => {
     a.style.cursor = "pointer";
     
     // Background
-    level_data = {"hash":"0000==0000000000000000000000000000000000\
-000====000000000000000000000000000000000\
-0000000000000000000000000000000===000000\
-000000000000000000000000000000=====00000\
-0000000000000000000000000000000000000000\
-0000000000000000000000000000000000000000\
-0000000000000000000000000000000000000000\
-0000000000000000000000000000000000000000\
-0000000000000000000000000000000000000000\
-0000000000000000000000000000000000000000\
-0000000000000000000000000000000000000000\
-0000000000000000000000000000090000000000\
-0000000000000000000000000000000000000000\
-0000000000000000000000000000000000000000\
-0000000000090000000000000005959500000000\
-0000000000000000000000000000000000000@A0\
-0000000000000000000000000000000000000BC0\
-0J00000000000000000000000000000000000BC0\
-3333333333333333333333333333333333333333\
-0000000000000000000000000000000000000000","pipes":[[35,15,17,40,17]],"balances":[]};
+    level_data = {"hash":"0000==0000000000000000000000000000000000000====0000000000000000000000000000000000000000000000000000000000000000===000000000000000000000000000000000000=====00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000900000000000000059595000000000000000000000000000000000000000000000@A00000000000000000000000000000000000000BC00J00000000000000000000000000000000000BC033333333333333333333333333333333333333330000000000000000000000000000000000000000","pipes":[[35,15,17,40,17]],"balances":[]};
 
     heros = [,];
     first_frame();
@@ -3019,7 +2665,398 @@ var draw_screen = onload = onhashchange = (no_reset) => {
       clearInterval(loop);
     }
     reset_current_level();
-    loop = setInterval(play, 33);
+    loop = setInterval(
+    
+    // Game loop
+    // =========
+    
+    () => {
+
+      // Reset canvas
+      a.width ^= 0;
+      
+      // Draw exit button
+      c.font = "bold 30px arial";
+      c.fillStyle = "#000";
+      c.fillText("×", 1255, 25);
+      
+      // First levels: add text
+      if(last_screen == 1){
+        c.font = "bold 30px arial";
+        c.fillStyle = "black";
+        c.textAlign = "center";
+        c.fillText(level_data.txt || "", 640, 80);
+      }
+      
+      // Save keys being pressed (for latest hero only)
+      if(current_hero.keyleft){
+        current_hero.left[frame] = true;
+      }
+      if(current_hero.keyright){
+        current_hero.right[frame] = true;
+      }
+      if(current_hero.keyup){
+        current_hero.up[frame] = true;
+      }
+      
+      // Pixelize graphics
+      c.mozImageSmoothingEnabled = false;
+      c.imageSmoothingEnabled = false;
+      
+      // On first frame:
+      // ---------------
+      if(frame == 0){
+        
+        // Init states of pipes, cubes, balances...
+        first_frame();
+      }
+      
+      // Then, at each frame:
+      // --------------------
+      
+      // Move and draw pipes
+      // For each pipe
+      for(var i in level_data.pipes){
+        
+        // Go to position 2 when switch is pressed
+        if(pipes_state[i].pressed){
+          target = level_data.pipes[i][2] * 32;
+        }
+        
+        // Go to position 1 when switch is not pressed
+        else {
+          target = level_data.pipes[i][1] * 32;
+        }
+          
+        // Go up
+        if(pipes_state[i].y > target){
+          pipes_state[i].y = Math.max(pipes_state[i].y - 4, target);
+        }
+        
+        // Go down
+        else if(pipes_state[i].y < target){
+          pipes_state[i].y = Math.min(pipes_state[i].y + 4, target);
+        }
+
+        // Draw pipe body (tiles #18 / #19)
+        end_pipe = false;
+        for(var k = ~~(pipes_state[i].y / 32) + 1; k < 21; k++){
+          if(k < 20 && !is_solid(tile_at(level_data.pipes[i][0] * 32, k * 32)) && !is_solid(tile_at(level_data.pipes[i][0] * 32 + 1 * 32, k * 32)) && !end_pipe){
+            draw_tile(18, level_data.pipes[i][0], k);
+            draw_tile(19, level_data.pipes[i][0] + 1, k);
+          }
+          else{
+            end_pipe = true;
+            pipes_state[i].y_base = k * 32;
+            break;
+          }
+        }
+        
+        // Draw pipe top (tiles #16 / #17)
+        draw_sprite(16, level_data.pipes[i][0] * 32, pipes_state[i].y + 40);
+        draw_sprite(17, level_data.pipes[i][0] * 32 + 32, pipes_state[i].y + 40);
+        
+        // Draw switch
+        if(level_data.pipes[i][4]){
+          
+          if(pipes_state[i].pressed){
+            draw_tile(21, level_data.pipes[i][3], level_data.pipes[i][4]);
+          }
+          else{
+            draw_tile(20, level_data.pipes[i][3], level_data.pipes[i][4]);
+          }
+        }
+      }
+      
+      // Draw map
+      parse_draw_map();
+      
+      // Reset all mechanisms:
+      
+      // Reset yellow buttons
+      yellow_toggle = false;
+      for(j = 0; j < 20; j++){
+        for(i = 0; i < 40; i++){
+          if(level_data.tiles[j][i] == 25){
+            level_data.tiles[j][i] = 11;
+          }
+        }
+      }
+      
+      // Reset green buttons
+      for(i in level_data.pipes){
+        pipes_state[i].pressed = false;
+      }
+      
+      current_hero.weight = 1;
+      
+      for(i in level_data.cubes){
+        level_data.cubes[i].weight = 1;
+      }
+      
+      for(i in level_data.balances){
+        balances_state[i].weight1 = 0;
+        balances_state[i].weight2 = 0;
+      }
+      
+      // Replay previous heros inputs
+      for(hero in heros){
+        play_hero(heros[hero], 1);
+      }
+      
+      if(heros.length){
+        hero = -1;
+      }
+      else{
+        hero = 0;
+      }
+      
+      // Play current hero
+      play_hero(current_hero);
+      
+      // Move and draw cubes
+      for(i in level_data.cubes){
+        
+        // If cube is not in a #4 solid tile, assume it's not in a portal anymore
+        if(
+          tile_at(level_data.cubes[i].x + 1, level_data.cubes[i].y + 1) != 4
+          &&
+          tile_at(level_data.cubes[i].x + 32 - 1, level_data.cubes[i].y + 1) != 4
+          &&
+          tile_at(level_data.cubes[i].x + 1, level_data.cubes[i].y + 31) != 4
+          &&
+          tile_at(level_data.cubes[i].x + 32 - 1, level_data.cubes[i].y + 31) != 4
+        ){
+          level_data.cubes[i].in_portal = false;
+        }
+        
+        // Decrement teleportation idle delay
+        if(level_data.cubes[i].teleport_idle){
+          level_data.cubes[i].teleport_idle--;
+        }  
+        
+        // Apply gravity and collsions if the cube is not held
+        if(level_data.cubes[i].hero === null){
+          if(!level_data.cubes[i].teleport_idle && !is_solid(tile_at(level_data.cubes[i].x, level_data.cubes[i].y + 31)) && !is_solid(tile_at(level_data.cubes[i].x + 31, level_data.cubes[i].y + 31))){
+            if(level_data.cubes[i].vx > 1){
+              level_data.cubes[i].vx -= 1;
+            }
+            else if(level_data.cubes[i].vx < -1){
+              level_data.cubes[i].vx += 1;
+            }
+            else{
+              level_data.cubes[i].vx = 0;
+            }
+          }
+          gravity_and_collisions(level_data.cubes[i], 32, 1);
+        }
+
+        // Draw cube
+        c.drawImage(tileset, 12 * 16, 0, 16, 16, level_data.cubes[i].x, 40 + level_data.cubes[i].y, 32, 32);
+      }
+        
+      // Draw previous heros
+      for(hero in heros){
+        draw_hero(heros[hero], 1);
+      }
+      
+      // Draw current hero
+      draw_hero(current_hero);
+      
+      // Draw tiles that have portals, and portals in foreground
+      for(i in j = {"blue": blue_portal, "orange": orange_portal }){
+        draw_tile(4, j[i].tile_x, j[i].tile_y);
+      }
+        
+      for(i in j = {"blue": blue_portal, "orange": orange_portal }){
+
+        c.fillStyle = i;
+        
+        if(j[i].side == 0){
+          c.fillRect(j[i].tile_x * 32, j[i].tile_y * 32 + 40 - 8, 32, 8);
+        }
+        if(j[i].side == 1){
+          c.fillRect(j[i].tile_x * 32 + 28, j[i].tile_y * 32 + 40, 8, 32);
+        }
+        if(j[i].side == 2){
+          c.fillRect(j[i].tile_x * 32, j[i].tile_y * 32 + 40 + 28, 32, 8);
+        }
+        if(j[i].side == 3){
+          c.fillRect(j[i].tile_x * 32 - 4, j[i].tile_y * 32 + 40, 8, 32);
+        }
+      }
+      
+      // Update mechanisms (yellow toggles / balances):
+      // Apply yellow toggle (invert plain and transparent tiles if yellow toggle has changed during this frame)
+      if(yellow_toggle != yellow_toggle_last_frame){
+        mkaudio(SNDswitch0).play();
+        for(j = 0; j < 20; j++){
+          for(i = 0; i < 40; i++){
+            if(level_data.tiles[j][i] == 9){
+              level_data.tiles[j][i] = 10;
+            }
+            else if(level_data.tiles[j][i] == 10){
+              level_data.tiles[j][i] = 9;
+            }
+          }
+        }
+      }
+      
+      // Save yellow toggle state 
+      yellow_toggle_last_frame = yellow_toggle;
+      
+      // Balances
+      for(i in level_data.balances){
+        
+        // More weight on side 1 and no solid tile under platform 1 and no solid tile over platform 2
+        if(
+          balances_state[i].weight1 > balances_state[i].weight2
+          && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 + 20))
+          && !is_solid(tile_at(level_data.balances[i][0] * 32, balances_state[i].y1 + 20))
+          && !is_solid(tile_at(level_data.balances[i][0] * 32 + 32, balances_state[i].y1 + 20))
+          && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 - 4))
+          && !is_solid(tile_at(level_data.balances[i][2] * 32, balances_state[i].y2 - 4))
+          && !is_solid(tile_at(level_data.balances[i][2] * 32 + 32, balances_state[i].y2 - 4))
+        ){
+          balances_state[i].y1 += 4;
+          balances_state[i].y2 -= 4;
+        }
+        
+        // More weight on side 2 and no solid tile under platform 2 and no solid tile over platform 1
+        else if(
+          balances_state[i].weight2 > balances_state[i].weight1
+          && !is_solid(tile_at(level_data.balances[i][2] * 32 - 32, balances_state[i].y2 + 20))
+          && !is_solid(tile_at(level_data.balances[i][2] * 32, balances_state[i].y2 + 20))
+          && !is_solid(tile_at(level_data.balances[i][2] * 32 + 32, balances_state[i].y2 + 20))
+          && !is_solid(tile_at(level_data.balances[i][0] * 32 - 32, balances_state[i].y1 - 4))
+          && !is_solid(tile_at(level_data.balances[i][0] * 32, balances_state[i].y1 - 4))
+          && !is_solid(tile_at(level_data.balances[i][0] * 32 + 32, balances_state[i].y1 - 4))
+        ){
+          balances_state[i].y1 -= 4;
+          balances_state[i].y2 += 4;
+        }
+        
+        // Draw line
+        c.beginPath();
+        c.strokeStyle = "#fff";
+        c.lineWidth = 2;
+        c.moveTo(level_data.balances[i][0] * 32 + 16, balances_state[i].y1 + 40 + 8);
+        c.lineTo(level_data.balances[i][2] * 32 + 16, balances_state[i].y2 + 40 + 8);
+        c.stroke();
+        c.closePath();
+        
+        // Draw balance 1
+        draw_sprite(15, level_data.balances[i][0] * 32 - 32, balances_state[i].y1 + 40);
+        draw_sprite(15, level_data.balances[i][0] * 32, balances_state[i].y1 + 40);
+        draw_sprite(15, level_data.balances[i][0] * 32 + 32, balances_state[i].y1 + 40);
+        
+        // Draw balance 2
+        draw_sprite(15, level_data.balances[i][2] * 32 - 32, balances_state[i].y2 + 40);
+        draw_sprite(15, level_data.balances[i][2] * 32, balances_state[i].y2 + 40);
+        draw_sprite(15, level_data.balances[i][2] * 32 + 32, balances_state[i].y2 + 40);
+      }
+      
+      // Next frame
+      frame++;
+      
+      // Chrono
+      if(!win){
+        chrono++;
+      }
+      
+      // Victoty animation (if we won) / Game over animation (if we lose)
+      c.font = "bold 100px arial";
+      c.fillStyle = "#000";
+      c.textAlign = "center";
+      
+      // Win
+      if(win){
+        win_frame++;
+        c.fillText("CLEARED!", 640, 300);
+        c.font = "bold 30px arial";
+        if(last_screen == 1){
+          c.fillRect(450, 350, 400, 130);
+          c.fillStyle = "#fff";
+          document.title = chrono;
+          c.fillText("Time: " + (chrono / 30).toFixed(2) + "s", 640, 400);
+          c.fillText("Dev record: " + (level_data.record / 30).toFixed(2) + "s", 640, 450);
+          if(localStorage["scpm" + level]){
+            localStorage["scpm" + level] = Math.min(+localStorage["scpm" + level], chrono);
+          }
+          else{
+            localStorage["scpm" + level] = chrono;
+          }
+        }
+      }
+      
+      // Current hero dies
+      if(current_hero.state == 3){
+        lose_frame++;
+        
+        c.fillText("LOST!", 640, 350);
+      }
+      
+      for(hero in heros){
+
+        // Past hero dies or gets stuck (not at the time machine at the end of his frame record)
+        if(heros[hero].state == 3 || (heros[hero].last_frame < frame && !heros[hero].safe && !win)){
+          paradox_frame++;
+          c.fillText("PARADOX!", 640, 350);
+        }
+      }
+      
+      if(win_frame == 1){
+        mkaudio(SNDwin0).play();
+      }
+      
+      if(lose_frame == 1){
+        mkaudio(SNDdie0).play();
+      }
+      
+      if(paradox_frame == 1){
+        mkaudio(SNDglitch1).play();
+      }
+      
+      if(lose_frame >= 30){
+        a.width ^= 0;
+        clearInterval(loop);
+        screen = last_screen;
+        level_data.tested = true;
+        a.width ^= 0;
+        draw_screen();
+      }
+      
+      // Paradox (glitch)
+      if(paradox_frame){
+        for(m = ~~(paradox_frame / 5); m--;){
+          c.drawImage(a, i = Math.random() * 1280, j = Math.random() * 648, k = Math.random() * 1280, l = Math.random() * 648, i + Math.random() * 100 - 50, j + Math.random() * 100 - 50, k, l);
+        }
+      }
+      
+      if(win_frame >= 90){
+        chrono = 0;
+        if(last_screen == 1){
+          level++;
+          localStorage["scpm"] = Math.max(+localStorage["scpm"], level);
+        }
+        a.width ^= 0;
+        clearInterval(loop);
+        screen = last_screen;
+        level_data.tested = true;
+        a.width ^= 0;
+        draw_screen();
+      }
+      
+      if(lose_frame >= 30 || paradox_frame >= 60){
+        a.width ^= 0;
+        clearInterval(loop);
+        screen = last_screen;
+        level_data.tested = false;
+        a.width ^= 0;
+        draw_screen();
+      }
+    }
+    , 33);
   }
   
   // Level editor
@@ -3263,113 +3300,11 @@ var draw_screen = onload = onhashchange = (no_reset) => {
   }
 }
 
-
-// Game loop
-// =========
-
-var play = () => {
-
-  // Reset canvas
-  a.width ^= 0;
-  
-  // Draw exit button
-  c.font = "bold 30px arial";
-  c.fillStyle = "#000";
-  c.fillText("×", 1255, 25);
-  
-  // First levels: add text
-  if(last_screen == 1){
-    c.font = "bold 30px arial";
-    c.fillStyle = "black";
-    c.textAlign = "center";
-    c.fillText(level_data.txt || "", 640, 80);
-  }
-  
-  // Save keys being pressed (for latest hero only)
-  if(current_hero.keyleft){
-    current_hero.left[frame] = true;
-  }
-  if(current_hero.keyright){
-    current_hero.right[frame] = true;
-  }
-  if(current_hero.keyup){
-    current_hero.up[frame] = true;
-  }
-  
-  // Pixelize graphics
-  c.mozImageSmoothingEnabled = false;
-  c.imageSmoothingEnabled = false;
-  
-  // On first frame:
-  // ---------------
-  if(frame == 0){
-    
-    // Init states of pipes, cubes, balances...
-    first_frame();
-  }
-  
-  // Then, at each frame:
-  // --------------------
-  
-  // Move and draw pipes
-  move_draw_pipes();
-  
-  // Draw map
-  parse_draw_map();
-  
-  // Reset all mechanisms
-  reset_mechanisms();
-  
-  // Replay previous heros inputs
-  for(hero in heros){
-    play_hero(heros[hero], 1);
-  }
-  
-  if(heros.length){
-    hero = -1;
-  }
-  else{
-    hero = 0;
-  }
-  
-  // Play current hero
-  play_hero(current_hero);
-  
-  // Move and draw cubes
-  move_cubes();
-    
-  // Draw previous heros
-  for(hero in heros){
-    draw_hero(heros[hero], 1);
-  }
-  
-  // Draw current hero
-  draw_hero(current_hero);
-  
-  // Draw tiles that have portals, and portals in foreground
-  draw_portals();
-  
-  // Update mechanisms (yellow toggles / balances)
-  update_mechanisms();
-  
-  // Next frame
-  frame++;
-  
-  // Chrono
-  if(!win){
-    chrono++;
-  }
-  
-  // Victoty animation (if we won) / Game over animation (if we lose)
-  victory_or_defeat();
-}
-
-
 // Hash (shared levels)
 // ====================
 
 // If a hash is set, play the level directly
-onhashchange = function(){
+onhashchange = () => {
   if(location.hash){
     level_data = JSON.parse(decodeURIComponent(location.hash.slice(1)));
     screen = 2;
@@ -3379,27 +3314,10 @@ onhashchange = function(){
 
 onhashchange();
 
+// Sound
+// =====
 
-
-// Quit editor
-// ===========
-
-// Ask confirmation if we quit editor (or game) before sharing
-//onbeforeunload =
-quit = function(){
-  if((screen == 3 || last_screen == 3) && !shared){
-    return confirm("Quit? This level will be lost!");
-  }
-  return true;
-}
-
-
-
-
-// Sound with the great help of Anders Kaare
-// =========================================
-
-function mkaudio(fn) {
+var mkaudio = (fn) => {
 	var data = [];
 	for (var i = 0;;i++) {
 		var smp = fn(i);
@@ -3426,38 +3344,39 @@ function mkaudio(fn) {
 	return new Audio("data:audio/wav;base64,"+btoa(b));
 }
 
-P=Math.pow;S=Math.sin;
+P=Math.pow;
+S=Math.sin;
 
-function t(i,n) {
+var t = (i,n) => {
 	return (n-i)/n;
 }
 
-function SNDjump2(i) {
+var SNDjump2 = (i) => {
 	i=i*1.5;
 	var n = 2e4;
 	if (i>n) return null;
 	return ((P(i,1.075)&128)?1:-1)*P(t(i,n),2);
 }
 
-function SNDdie0(i) {
+var SNDdie0 = (i) => {
 	var n=5e4;
 	if (i > n) return null;
 	return ((P(i,0.9)&200)?1:-1)*P(t(i,n),3);
 }
 
-function SNDbrick1(i) {
+var SNDbrick1 = (i) => {
 	var n=5e3;
 	if (i > n) return null;
 	return ((P(i+S(i*0.01)*1000,0.8)&200)?0.5:-0.5)*P(t(i,n),1);
 }
 
-function SNDglitch1(i) {
+var SNDglitch1 = (i) => {
 	var n=9e4;
 	if (i > n) return null;
 	return ((P(i+S(i*0.01)*1000,0.8)&200)?0.5:-0.5)*P(t(i,n),1);
 }
 
-function SNDcoin1(i) {
+var SNDcoin1 = (i) => {
 	var n=1.6e4;
 	var c=n/7;
 	if (i > n) return null;
@@ -3465,7 +3384,7 @@ function SNDcoin1(i) {
 	return (i<c ? ((i+S(-i/900)*10)&16) : i&13) ?q:-q;
 }
 
-function SNDwin0(i) {
+var SNDwin0 = (i) => {
 	var notes = [0,4,7,12,undefined,7,12];
 	var n=4e4;
 	if (i > n) return null;
@@ -3477,14 +3396,13 @@ function SNDwin0(i) {
 	return ((i*r)&64)?q:-q
 }
 
-
-function SNDswitch0(i) {
+var SNDswitch0 = (i) => {
 	var n=7e3;
 	if (i > n) return null;
 	return ((((i^(i>>3))^(i*i*7.3)^(i<<4))&65535)/65536)*t(i,n);
 }
 
-function SNDtimetravel0(i) {
+var SNDtimetravel0 = (i) => {
 	var n=5e4;
 	var n1=1e5;
 	if (i > n) return null;
