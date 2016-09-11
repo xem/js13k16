@@ -161,7 +161,7 @@ var parse_draw_map = function(){
       heros[hero].position_on_cube = null;
     }
     for(i in level_data.cubes){
-      level_data.cubes[i].mario = null;
+      level_data.cubes[i].hero = null;
     }
   }
 }
@@ -899,7 +899,7 @@ var play_hero = (this_hero, past) => {
       this_hero.vy = -1.5 * jump_speed;
     }
     
-    // Die (crush between a pipe or a balance and a solid tile, unless there's a portal bottom on the tile above the hero <-- commented)
+    // Die (crush between a pipe or a balance and a solid tile)
     if(
       this_hero.on_moving_object
       &&
@@ -909,18 +909,6 @@ var play_hero = (this_hero, past) => {
           ||
           is_solid(tile_at(this_hero.x + hero_width, this_hero.y + 1))
         )
-        
-        /*&&
-        
-        !(
-          (~~(this_hero.x / 32) == blue_portal.tile_x && ~~(this_hero.y / 32) == blue_portal.tile_y && blue_portal.side == 2)
-          ||
-          (~~(this_hero.x + hero_width / 32) == blue_portal.tile_x && ~~(this_hero.y / 32) == blue_portal.tile_y && blue_portal.side == 2)
-          ||
-          (~~(this_hero.x / 32) == orange_portal.tile_x && ~~(this_hero.y / 32) == orange_portal.tile_y && orange_portal.side == 2)
-          ||
-          (~~(this_hero.x + hero_width / 32) == orange_portal.tile_x && ~~(this_hero.y / 32) == orange_portal.tile_y && orange_portal.side == 2)
-        )*/
       )
     ){
       this_hero.state = 3;
@@ -959,8 +947,7 @@ var play_hero = (this_hero, past) => {
       
       current_cube.x = this_hero.x;
       current_cube.cube_below = null;
-      
-       
+
       // Throw it if hero is not grounded
       if(!this_hero.grounded){
         
@@ -974,7 +961,6 @@ var play_hero = (this_hero, past) => {
           current_cube.vx = 14;
         }
       }
-      //document.title = this_hero.grounded + " " + current_cube.vx;
       
       // Avoid collisions
       if(is_solid(tile_at(current_cube.x, current_cube.y))){
@@ -1331,8 +1317,11 @@ var victory_or_defeat = () => {
       document.title = chrono;
       c.fillText("Time: " + (chrono / 30).toFixed(2) + "s", 640, 400);
       c.fillText("Dev record: " + (level_data.record / 30).toFixed(2) + "s", 640, 450);
-      if(chrono <= level_data.record){
-        localStorage["scpm" + level] = 1;
+      if(localStorage["scpm" + level]){
+        localStorage["scpm" + level] = Math.min(+localStorage["scpm" + level], chrono);
+      }
+      else{
+        localStorage["scpm" + level] = chrono;
       }
     }
   }
@@ -1347,7 +1336,7 @@ var victory_or_defeat = () => {
   for(hero in heros){
 
     // Past hero dies or gets stuck (not at the time machine at the end of his frame record)
-    if(heros[hero].state == 3 || (heros[hero].last_frame < frame && !heros[hero].safe)){
+    if(heros[hero].state == 3 || (heros[hero].last_frame < frame && !heros[hero].safe && !win)){
       paradox_frame++;
       c.fillText("PARADOX!", 640, 350);
     }

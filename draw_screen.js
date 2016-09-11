@@ -74,21 +74,28 @@ var draw_screen = onload = onhashchange = (no_reset) => {
     c.beginPath();
     c.fillStyle = "#000";
     c.fillRect(590, 520, 100, 80);
-    
+    k = 0;
     for(i = 0; i < 10; i++){
       for(j = 0; j < 3; j++){
-        number = j * 10 + i + 1;
+        l = j * 10 + i + 1;
         c.fillStyle = "#000";
         c.fillRect(i * 120 + 50, j * 100 + 120, 100, 80);
         c.fillStyle = "#fff";
-        c.fillText(+localStorage["scpm"] >= number ? number : "?", i * 120 + 100, j * 100 + 170);
-        c.fillText(localStorage["scpm" + number] ? "🏅" : "", i * 120 + 135, j * 100 + 145);
+        c.fillText(+localStorage["scpm"] >= l ? l : "?", i * 120 + 100, j * 100 + 170);
+        if(localStorage["scpm" + l] <= levels[l].record){
+          c.fillText("🏅", i * 120 + 135, j * 100 + 145);
+        }
+        k += (+localStorage["scpm" + l] || 0);
       }
     }
     c.fillText("◀", 40, 70);
     c.fillText("JS13K LEVELS", 640, 70);
     c.fillText("TWITTER LEVELS", 640, 470);
     c.fillText("GO", 640, 570);
+    c.fillStyle = "#000";
+    if(k){
+      c.fillText("Total time: " + ~~((k / 30) / 60) + ":" + ("0" + ((k / 30) % 60).toFixed(2)).slice(-5), 1100, 450);
+    }
     c.stroke();
     c.closePath();
   }

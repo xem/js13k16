@@ -1,5 +1,4 @@
-- title screen
-- time trial?
 - responsive?
+- faire tomber le cube quand un hero passé qui porte un cube fait shift (j'arrie pas)
 - golf
 - zip
