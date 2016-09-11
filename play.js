@@ -91,6 +91,11 @@ var play = () => {
   // Next frame
   frame++;
   
+  // Chrono
+  if(!win){
+    chrono++;
+  }
+  
   //document.title = frame;
   //document.title = heros[0].pickdrop;
   

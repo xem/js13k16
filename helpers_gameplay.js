@@ -1323,8 +1323,18 @@ var victory_or_defeat = () => {
   // Win
   if(win){
     win_frame++;
-    c.fillText("CLEARED!", 640, 350);
-    localStorage["scpm"] = Math.max(+localStorage["scpm"], level + 1);
+    c.fillText("CLEARED!", 640, 300);
+    c.font = "bold 30px arial";
+    if(last_screen == 1){
+      c.fillRect(450, 350, 400, 130);
+      c.fillStyle = "#fff";
+      document.title = chrono;
+      c.fillText("Time: " + (chrono / 30).toFixed(2) + "s", 640, 400);
+      c.fillText("Dev record: " + (level_data.record / 30).toFixed(2) + "s", 640, 450);
+      if(chrono <= level_data.record){
+        localStorage["scpm" + level] = 1;
+      }
+    }
   }
   
   // Current hero dies
@@ -1371,9 +1381,17 @@ var victory_or_defeat = () => {
     }
   }
   
-  if(win_frame >= 30){
-    level++;
-    level_data = levels[level];
+  if(win_frame >= 90){
+    chrono = 0;
+    if(last_screen == 1){
+      level++;
+      localStorage["scpm"] = Math.max(+localStorage["scpm"], level);
+    }
+    a.width ^= 0;
+    clearInterval(loop);
+    screen = last_screen;
+    level_data.tested = true;
+    a.width ^= 0;
     draw_screen();
   }
   
@@ -1381,7 +1399,7 @@ var victory_or_defeat = () => {
     a.width ^= 0;
     clearInterval(loop);
     screen = last_screen;
-    level_data.tested = true;
+    level_data.tested = false;
     a.width ^= 0;
     draw_screen();
   }

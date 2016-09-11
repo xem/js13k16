@@ -102,6 +102,7 @@ var handle_clicks = (e) => {
           if(c.isPointInPath(x, y)){
             last_screen = 1;
             screen = 2;
+            chrono = 0;
             level = number;
             level_data = levels[number];
             draw_screen();
@@ -145,7 +146,7 @@ var handle_clicks = (e) => {
     for(j = 0; j < 20; j++){
       for(i = 0; i < 40; i++){
         tile = level_data.tiles[j][i] || 0;
-        //tile = (tile < 16 || tile > 21) ? tile : 0;
+        tile = (tile < 16 || tile > 21) ? tile : 0;
         level_data.hash += String.fromCharCode(tile + 0x30);
       }
     }
