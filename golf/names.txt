@@ -1,3 +1,67 @@
 var names
 =========
+a = canvas
+b = tileset
+c = canvas ctx
+d = screen
+e = event / func param
+f = func param
+g = func param
+h = func param
+i,j,k,l,m = loop / tmp
+n = last_screen
+o = mousedown
+p = rightclick
+q = tile_x
+r = tile_y
+s = level
+t = level_data
+u = pipe_click
+current_pipe
+balance_click
+current_balance
+x,y = mouse coords
+current_editor_tile
+mouse_q
+mouse_r
+pipe_high
+pipe_low
+end_pipe
+end_pole
+drawn_tile
+shared
+chose_a_tile
+win
+win_frame
+lose_frame
+paradox_frame
+coins_left
 
+frame
+current_hero
+solid
+yellow_toggle
+yellow_toggle_last_frame
+pipes_state
+balances_state
+yellow_toggle_delay
+yellow_toggle_on
+blue_portal
+orange_portal
+temp_side
+heros
+hero, target
+current_cube
+portals
+current_portal
+chrono
+
+P, S, T = sound
+
+aa = keyup
+ab = keyleft
+ac = keyright
+ad = loop
+
+
+& quelques var qui font chier
