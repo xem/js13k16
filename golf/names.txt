@@ -17,51 +17,75 @@ r = tile_y
 s = level
 t = level_data
 u = pipe_click
-current_pipe
-balance_click
-current_balance
+v = current_pipe
+w = balance_click
 x,y = mouse coords
-current_editor_tile
-mouse_q
-mouse_r
-pipe_high
-pipe_low
-end_pipe
-end_pole
-drawn_tile
-shared
-chose_a_tile
-win
-win_frame
-lose_frame
-paradox_frame
-coins_left
-
-frame
-current_hero
-solid
-yellow_toggle
-yellow_toggle_last_frame
-pipes_state
-balances_state
-yellow_toggle_delay
-yellow_toggle_on
-blue_portal
-orange_portal
-temp_side
-heros
-hero, target
-current_cube
-portals
-current_portal
-chrono
-
+z = current_balance
+A = current_editor_tile
+B = pipe_high
+C = pipe_low
+D = end_pipe
+E = end_pole
+F = drawn_tile
+G = shared
+H = chose_a_tile
+I = win
+J = win_frame
+K = lose_frame
+L = paradox_frame
+M = coins_left
+N = frame
+O = current_hero
 P, S, T = sound
-
+Q = solid
+R = yellow_toggle
+U = yellow_toggle_last_frame
+V = pipes_state
+W = balances_state
+X = blue_portal
+Y = orange_portal
+Z = hero
 aa = keyup
 ab = keyleft
 ac = keyright
 ad = loop
+ae = heros
+af = target
+ag = portals
+ah = current_portal
+$ = current_cube
+_ = chrono
 
 
 & quelques var qui font chier
+
+Properties:
+
+.state = a
+.on_moving_object = b
+.teleport_idle = c
+.grounded = d
+.vx = e
+.vy = f
+.right = g
+.direction = i
+.left = j
+.in_portal = k
+.up = l
+.keyup = .aa =  m
+.can_jump = n
+.cube_below = o
+.last_N = p
+.safe = q
+.space = r
+.pickdrop = s
+.cube_held = t
+.cubes = u
+.pick_cube_animation_N = v
+.weight = w
+.tiles = x
+.leftclick = .jclick = C
+.rightclick = .gclick = z
+todo:
+.shoot_blue = A
+.shoot_orange = B
