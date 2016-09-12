@@ -1,13 +1,11 @@
 var names
 =========
+
 a = canvas
 b = tileset
 c = canvas ctx
 d = screen
-e = event / func param
-f = func param
-g = func param
-h = func param
+e,f,g,h = func param
 i,j,k,l,m = loop / tmp
 n = last_screen
 o = mousedown
@@ -56,10 +54,8 @@ ah = current_portal
 $ = current_cube
 _ = chrono
 
-
-& quelques var qui font chier
-
 Properties:
+===========
 
 .state = a
 .on_moving_object = b
@@ -84,8 +80,57 @@ Properties:
 .pick_cube_animation_N = v
 .weight = w
 .tiles = x
-.leftclick = .jclick = C
 .rightclick = .gclick = z
-todo:
 .shoot_blue = A
 .shoot_orange = B
+.leftclick = .jclick = C
+.keyleft = .ab = D
+.keyright = .ac = E
+.shift = F
+.angle = G
+.position_on_cube = H
+.pipes = I
+.balances = J
+.tested = K
+.pressed = L
+.weight1 = M
+.weight2 = N
+.y1 = O
+.y2 = P
+.start = Q
+.weight = R
+.portal_af = S
+.side = T
+.teleport = U
+.momentum = V
+.y_base = W
+.portal_shoot_x = X
+.portal_shoot_y = Y
+.portal_shoot_vx = Z
+.portal_shoot_vy = aa
+.tmp = ab
+.record = ac
+
+Functions
+=========
+
+AA = draw_tile
+AB = draw_sprite
+AC = tile_at
+AD = set_tile
+AE = is_Q
+AF = is_writable
+AG = reset_Z
+AH = reset_current_level
+AI = reset_maker_level
+AJ = first_N
+AK = parse_draw_map
+AL = gravity_and_collisions
+AM = play_Z
+AN = draw_Z
+AO = handle_clicks
+AP = draw_screen
+
+
+
+
