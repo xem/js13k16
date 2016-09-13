@@ -3410,6 +3410,14 @@ SNDcoin1 = (i) => {
 	return (i<c ? ((i+S(-i/900)*10)&16) : i&13) ?q:-q;
 }
 
+function SNDcoin1(i) {
+	var n=1.6e4;
+	var c=n/7;
+	if (i > n) return null;
+	var q=P(t(i,n),2.1);
+	return (i<c ? ((i+S(-i/900)*10)&16) : i&13) ?q:-q;
+}
+
 SNDI0 = (i) => {
 	var notes = [0,4,7,12,undefined,7,12];
 	var n=4e4;
