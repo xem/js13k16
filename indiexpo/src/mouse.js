@@ -243,10 +243,10 @@ var handle_clicks = (e) => {
         
         // Erase time machine
         // Top
-        if(level_data.tiles[tile_y][tile_x] == 22){
+        /*if(level_data.tiles[tile_y][tile_x] == 22){
           level_data.tiles[tile_y][tile_x] = 0;
           level_data.tiles[tile_y + 1][tile_x] = 0;
-        }
+        }*/
         // Bottom
         if(level_data.tiles[tile_y][tile_x] == 23){
           level_data.tiles[tile_y][tile_x] = 0;
@@ -385,7 +385,7 @@ var handle_clicks = (e) => {
         if(current_editor_tile == 1){
           
           // If the two tiles are writable
-          if(tile_y > 0 && is_writable(tile_x, tile_y) && is_writable(tile_x, tile_y - 1)){
+          if(tile_y > 0 && is_writable(tile_x, tile_y)){
             for(j in level_data.tiles){
               for(i in level_data.tiles[j]){
                 if(level_data.tiles[j][i] == 22 || level_data.tiles[j][i] == 23){
@@ -393,8 +393,8 @@ var handle_clicks = (e) => {
                 }
               }
             }
-            level_data.tiles[tile_y - 1][tile_x] = 22;
-            level_data.tiles[tile_y][tile_x] = 23;
+            //level_data.tiles[tile_y - 1][tile_x] = 22;
+            level_data.tiles[tile_y][tile_x] = 1;
           }
         }
         

@@ -48,8 +48,8 @@ var draw_screen = onload = onhashchange = (no_reset) => {
     parse_draw_map();
  
     // Show title
-    c.drawImage(tileset, 512, 0, 70, 16, 120, 150, 280, 64);
-    c.drawImage(tileset, 583, 0, 270, 16, 120, 250, 1080, 64);
+    //c.drawImage(tileset, 512, 0, 70, 16, 120, 150, 280, 64);
+    //c.drawImage(tileset, 583, 0, 270, 16, 120, 250, 1080, 64);
 
     // Draw buttons
     c.fillStyle = "#000";
@@ -286,8 +286,8 @@ var draw_screen = onload = onhashchange = (no_reset) => {
       // Tile #1: time machine
       if(current_editor_tile == 1){
         if(tile_y > 0){
-          draw_tile(22, tile_x, tile_y - 1);
-          draw_tile(23, tile_x, tile_y);
+          //draw_tile(22, tile_x, tile_y - 1);
+          draw_tile(1, tile_x, tile_y);
         }
       }
       

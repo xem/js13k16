@@ -134,7 +134,7 @@ var parse_draw_map = function(){
       }
       
       // Tile #23: time machine (save starting point coordinates, place hero there at first frame)
-      if(drawn_tile == 23 && frame == 0){
+      if(drawn_tile == 1 && frame == 0){
         level_data.start = [i, j];
         current_hero.x = level_data.start[0] * 32;
         current_hero.y = level_data.start[1] * 32;
